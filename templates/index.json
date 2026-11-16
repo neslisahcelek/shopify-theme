@@ -11,7 +11,6 @@
   "sections": {
     "slideshow": {
       "type": "slideshow",
-      "disabled": true,
       "blocks": {
         "wardrobe": {
           "type": "slide",
@@ -376,6 +375,7 @@
     },
     "hero_3d_boutique": {
       "type": "hero-3d-boutique",
+      "disabled": true,
       "settings": {
         "eyebrow": "FLAGSHIP SHOWROOM · AW26",
         "heading": "STYLE VIBEUS <em>ATELIER</em>",
