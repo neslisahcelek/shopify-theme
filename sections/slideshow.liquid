@@ -1,0 +1,235 @@
+{%- comment -%}
+  Product slideshow hero.
+  - Cut-out images (transparent PNG) float over the theme's gradient backdrop.
+  - Regular photos fill the screen with a dark overlay.
+  Layout "trio" shows every slide at once; "slider" cycles through them.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign first = section.blocks.first
+  assign photo_mode = false
+  if first.settings.cutout == false
+    if first.settings.image != blank or first.settings.image_asset != blank
+      assign photo_mode = true
+    endif
+  endif
+  assign layout = s.layout
+  assign fill = false
+  if layout == 'trio' and s.trio_style == 'fill'
+    assign fill = true
+  endif
+-%}
+<section
+  class="slideshow slideshow--{{ layout }}{% if fill %} slideshow--fill{% if s.fill_align == 'center' %} slideshow--fill-center{% endif %}{% endif %}{% if s.curtain %} slideshow--curtain{% endif %}{% if s.hide_mobile %} slideshow--hide-mobile{% endif %}{% if photo_mode %} slideshow--photo hero--image scheme-dark{% else %} slideshow--cutout{% endif %}{% if s.height == 'full' %} slideshow--full{% endif %}"
+  style="--ss-speed: {{ s.speed }}s; --overlay: {{ s.overlay | divided_by: 100.0 }}; --ss-bg: {{ s.background }}"
+  data-slideshow
+  data-autoplay="{{ s.autoplay }}"
+  data-layout="{{ layout }}"
+>
+  {%- unless photo_mode -%}
+    <div class="slideshow__backdrop" aria-hidden="true">
+      {%- if s.backdrop == 'aurora' -%}<div class="aurora"><span></span><span></span><span></span></div>{%- endif -%}
+      {%- if s.backdrop_word != blank -%}<span class="slideshow__word" data-parallax="0.15">{{ s.backdrop_word }}</span>{%- endif -%}
+    </div>
+  {%- endunless -%}
+
+  <div class="slideshow__inner page-width">
+    <div class="slideshow__content">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+      {%- if s.heading != blank -%}<h1 class="slideshow__title h-display" data-split>{{ s.heading }}</h1>{%- endif -%}
+      {%- if s.text != blank -%}<div class="slideshow__text rte" data-reveal style="--i: 2">{{ s.text }}</div>{%- endif -%}
+      {%- if s.button_label != blank -%}
+        <div class="hero__ctas" data-reveal style="--i: 3">
+          <a href="{{ s.button_link | default: routes.all_products_collection_url }}" class="btn {% if photo_mode %}btn--light{% else %}btn--primary{% endif %}" data-magnetic>
+            <span>{{ s.button_label }}</span>{% render 'icon', name: 'arrow' %}
+          </a>
+          {%- if s.button2_label != blank -%}
+            <a href="{{ s.button2_link | default: routes.collections_url }}" class="btn btn--ghost" data-magnetic>{{ s.button2_label }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      {%- if s.perks != blank -%}
+        <ul class="hero__perks" role="list" data-reveal style="--i: 4">
+          {%- assign perks = s.perks | split: '|' -%}
+          {%- for perk in perks -%}<li>{{ perk | strip }}</li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="slideshow__stage-wrap">
+    <div class="slideshow__stage" data-slides>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign link = b.link
+          if b.product != blank
+            assign link = b.product.url
+          endif
+          assign placeholder_num = forloop.index0 | modulo: 4 | plus: 1
+          assign placeholder_name = 'product-apparel-' | append: placeholder_num
+          assign img_loading = 'lazy'
+          if forloop.first
+            assign img_loading = 'eager'
+          endif
+        -%}
+        <figure
+          class="slide{% if forloop.first %} is-active{% endif %}{% if b.cutout or b.image == blank and b.image_asset == blank %} slide--cutout{% else %} slide--photo{% endif %}"
+          style="--n: {{ forloop.index0 }}"
+          data-slide
+          {{ block.shopify_attributes }}
+        >
+          {%- if link != blank -%}<a href="{{ link }}" class="slide__link" tabindex="{% if forloop.first %}0{% else %}-1{% endif %}" data-cursor="{{ 'products.card.view' | t }}">{%- endif -%}
+          <div class="slide__media"{% if b.cutout and b.image != blank %} data-lift{% endif %}>
+            {%- if b.image != blank -%}
+              {%- if b.cutout -%}
+                {%- comment -%} Pre-rendered glow layer; hover only fades it in (GPU-cheap). {%- endcomment -%}
+                {{ b.image | image_url: width: 1000 | image_tag: loading: img_loading, class: 'slide__glow', alt: '', aria-hidden: 'true' }}
+              {%- endif -%}
+              {{ b.image | image_url: width: 2000 | image_tag:
+                widths: '500, 800, 1100, 1500, 2000',
+                sizes: '(min-width: 990px) 60vw, 100vw',
+                loading: img_loading,
+                class: 'slide__img',
+                alt: b.image.alt | default: b.label | default: b.product.title | default: 'StyleVibe clothing' | escape
+              }}
+            {%- elsif b.image_asset != blank -%}
+              <img src="{{ b.image_asset | asset_url }}" class="slide__img" alt="{{ b.label | default: 'StyleVibe clothing' | escape }}" width="2400" height="1350" loading="{{ img_loading }}">
+            {%- else -%}
+              {{ placeholder_name | placeholder_svg_tag: 'slide__img placeholder' }}
+            {%- endif -%}
+          </div>
+          {%- if link != blank -%}</a>{%- endif -%}
+          {%- liquid
+            assign show_caption = false
+            if s.show_labels
+              if b.label != blank or b.product != blank
+                assign show_caption = true
+              endif
+            endif
+          -%}
+          {%- if show_caption -%}
+            <figcaption class="slide__caption">
+              {%- if b.label != blank -%}<span class="slide__label">{{ b.label }}</span>{%- endif -%}
+              {%- if b.product != blank -%}<span class="slide__price">{{ b.product.price | money }}</span>{%- endif -%}
+            </figcaption>
+          {%- endif -%}
+        </figure>
+      {%- endfor -%}
+    </div>
+    {%- if layout == 'trio' and section.blocks.size > 1 -%}
+      {%- comment -%} Yalnızca mobilde görünür: tek görsel + ok / kaydırma {%- endcomment -%}
+      <button type="button" class="ss-arrow ss-arrow--prev" data-ss-prev aria-label="Previous slide">{% render 'icon', name: 'arrow' %}</button>
+      <button type="button" class="ss-arrow ss-arrow--next" data-ss-next aria-label="Next slide">{% render 'icon', name: 'arrow' %}</button>
+      <div class="ss-mdots" aria-hidden="true">
+        {%- for block in section.blocks limit: 3 -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
+      </div>
+    {%- endif -%}
+    </div>
+  </div>
+
+  {%- if layout == 'slider' and section.blocks.size > 1 -%}
+    <div class="slideshow__dots" role="tablist" aria-label="{{ 'sections.slideshow.label' | t }}">
+      {%- for block in section.blocks -%}
+        <button type="button" class="slideshow__dot{% if forloop.first %} is-active{% endif %}" role="tab" aria-label="{{ forloop.index }} / {{ forloop.length }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" data-dot="{{ forloop.index0 }}"><i></i></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{%- if layout == 'trio' and section.blocks.size > 1 -%}
+<script>
+  (() => {
+    const wrap = document.querySelector('#shopify-section-{{ section.id }} .slideshow__stage-wrap');
+    if (!wrap) return;
+    const stage = wrap.querySelector('.slideshow__stage');
+    const slides = () => [...stage.querySelectorAll('.slide')].filter((el) => el.offsetParent !== null);
+    const dots = [...wrap.querySelectorAll('.ss-mdots i')];
+    const current = () => Math.round(stage.scrollLeft / Math.max(1, stage.clientWidth));
+    const go = (dir) => {
+      const n = slides().length;
+      const next = (current() + dir + n) % n;
+      stage.scrollTo({ left: next * stage.clientWidth, behavior: 'smooth' });
+    };
+    wrap.querySelector('[data-ss-prev]').addEventListener('click', () => go(-1));
+    wrap.querySelector('[data-ss-next]').addEventListener('click', () => go(1));
+    let raf = 0;
+    stage.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => dots.forEach((d, i) => d.classList.toggle('is-active', i === current())));
+    }, { passive: true });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Slayt gösterisi",
+  "class": "section-slideshow",
+  "settings": [
+    { "type": "paragraph", "content": "En iyi sonuç için ürün görsellerini arka planı silinmiş PNG olarak yükleyin ve \"Arka plansız\" seçeneğini açık bırakın." },
+    {
+      "type": "select", "id": "layout", "label": "Düzen", "default": "trio",
+      "options": [ { "value": "trio", "label": "Üçlü (hepsi yan yana)" }, { "value": "slider", "label": "Slayt (sırayla değişir)" } ]
+    },
+    {
+      "type": "select", "id": "trio_style", "label": "Üçlü stili", "default": "fill",
+      "options": [ { "value": "fill", "label": "Tam alan (görseller arka planı kaplar)" }, { "value": "cards", "label": "Kartlar (görseller sağda)" } ]
+    },
+    {
+      "type": "select", "id": "fill_align", "label": "Görsel hizası (tam alan)", "default": "bottom",
+      "options": [ { "value": "bottom", "label": "Alta yasla (manken fotoğrafları)" }, { "value": "center", "label": "Ortala (ürün çekimi, aksesuar)" } ]
+    },
+    { "type": "checkbox", "id": "show_labels", "label": "Görsel etiketlerini göster", "default": false },
+    { "type": "checkbox", "id": "hide_mobile", "label": "Mobilde gizle", "default": false, "info": "Telefonda sayfa doğrudan sonraki bölümle başlar." },
+    { "type": "checkbox", "id": "curtain", "label": "Perde efekti", "default": true, "info": "Sayfa kaydırılınca bu bölüm sabit kalır, alttaki içerik yukarı kayarak üstünü örter." },
+    {
+      "type": "select", "id": "height", "label": "Yükseklik", "default": "full",
+      "options": [ { "value": "full", "label": "Tam ekran" }, { "value": "auto", "label": "İçeriğe göre" } ]
+    },
+    { "type": "checkbox", "id": "autoplay", "label": "Otomatik geçiş (slayt düzeni)", "default": true },
+    { "type": "range", "id": "speed", "label": "Slayt süresi", "min": 3, "max": 12, "step": 1, "unit": "sn", "default": 6 },
+    { "type": "header", "content": "Arka plan (arka plansız görseller için)" },
+    { "type": "color", "id": "background", "label": "Zemin rengi", "default": "#ffffff" },
+    {
+      "type": "select", "id": "backdrop", "label": "Zemin efekti", "default": "none",
+      "options": [ { "value": "none", "label": "Düz renk" }, { "value": "aurora", "label": "Renk geçişli bulutlar" } ]
+    },
+    { "type": "text", "id": "backdrop_word", "label": "Arkadaki dev yazı" },
+    { "type": "header", "content": "Fotoğraf modu" },
+    { "type": "range", "id": "overlay", "label": "Karartma", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 35 },
+    { "type": "header", "content": "Metin" },
+    { "type": "text", "id": "eyebrow", "label": "Üst yazı", "default": "Yeni sezon eşofman" },
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Rahatlık <em>sokakta</em> başlar." },
+    { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Yumuşak dokulu, oversize kesim eşofman takımı. Gün boyu konfor, her açıdan stil.</p>" },
+    { "type": "text", "id": "button_label", "label": "Düğme 1", "default": "Hemen al" },
+    { "type": "url", "id": "button_link", "label": "Düğme 1 bağlantısı" },
+    { "type": "text", "id": "button2_label", "label": "Düğme 2", "default": "Tüm koleksiyon" },
+    { "type": "url", "id": "button2_link", "label": "Düğme 2 bağlantısı" },
+    { "type": "text", "id": "perks", "label": "Alt bilgi satırı", "info": "Düğmelerin altında küçük maddeler. | ile ayırın, örn. Free shipping | 30-day returns" }
+  ],
+  "blocks": [
+    {
+      "type": "slide", "name": "Görsel",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Görsel", "info": "Arka planı silinmiş PNG önerilir." },
+        { "type": "text", "id": "image_asset", "label": "Görsel (tema dosyası)", "info": "Yukarıdaki görsel boşsa tema klasöründeki bu dosya kullanılır, örn. hero-wardrobe.jpg" },
+        { "type": "checkbox", "id": "cutout", "label": "Arka plansız görsel", "default": true, "info": "Kapatırsanız görsel tam ekran fotoğraf gibi kullanılır." },
+        { "type": "text", "id": "label", "label": "Etiket", "default": "Ön" },
+        { "type": "product", "id": "product", "label": "Bağlı ürün", "info": "Seçilirse görsel ürüne gider ve fiyat görünür." },
+        { "type": "url", "id": "link", "label": "Bağlantı" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Slayt gösterisi",
+      "blocks": [
+        { "type": "slide", "settings": { "label": "Ön" } },
+        { "type": "slide", "settings": { "label": "Kombin" } },
+        { "type": "slide", "settings": { "label": "Arka" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

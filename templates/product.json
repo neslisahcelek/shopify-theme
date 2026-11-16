@@ -1,0 +1,87 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "variants": {
+          "type": "variant_picker",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity": true,
+            "show_dynamic_checkout": true
+          }
+        },
+        "perks": {
+          "type": "perks",
+          "settings": {
+            "perk_1": "Free shipping on orders over $100 / €100",
+            "perk_2": "Free 30-day returns"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "fabric": {
+          "type": "collapsible",
+          "settings": {
+            "heading": "Materials & care",
+            "content": "<p>Soft, breathable cotton. Machine wash cold, inside out, with similar colours. Do not bleach. Tumble dry low or hang to dry, and iron on low heat if needed.</p>",
+            "page": ""
+          }
+        },
+        "shipping": {
+          "type": "collapsible",
+          "settings": {
+            "heading": "Size, shipping & returns",
+            "content": "<p>Fits true to size. If you are between sizes, choose the larger one. We ship to the US and Europe, with free shipping on orders over $100 / €100 and free returns within 30 days.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "variants",
+        "buy",
+        "perks",
+        "description",
+        "fabric",
+        "shipping"
+      ],
+      "settings": {}
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "These Would Also Great !&nbsp;",
+        "limit": 6,
+        "columns": 4
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

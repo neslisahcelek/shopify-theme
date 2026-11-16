@@ -1,0 +1,25 @@
+{%- comment -%}
+  Renders a minimalist, unobtrusive luxury boutique hanger for the 3D Hanger Rack.
+  Usage: {% render 'hanger-icon', style: s.hanger_style %}
+{%- endcomment -%}
+{%- assign hanger_type = style | default: 'minimal_wire' -%}
+{%- case hanger_type -%}
+  {%- when 'hook_only' -%}
+    <div class="hanger-rack__hanger hanger-rack__hanger--hook-only" aria-hidden="true">
+      <svg class="hanger-rack__hook-svg" viewBox="0 0 180 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M83 14 C83 8, 86.5 3.5, 90 3.5 C93.8 3.5, 97 7, 97 12 C97 17.5, 90 19, 90 25.5 L90 33" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="90" cy="33" r="1.8" fill="currentColor"/>
+        <path d="M78 37 Q90 34 102 37" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+  {%- when 'hidden' -%}
+    {%- comment -%} No visible hanger rendered; garment floats naturally beneath the rail {%- endcomment -%}
+  {%- else -%}
+    <div class="hanger-rack__hanger hanger-rack__hanger--wire" aria-hidden="true">
+      <svg class="hanger-rack__hook-svg" viewBox="0 0 180 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M83 14 C83 8, 86.5 3.5, 90 3.5 C93.8 3.5, 97 7, 97 12 C97 17.5, 90 19, 90 25.5 L90 29.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="90" cy="30" r="1.6" fill="currentColor"/>
+        <path d="M90 31.5 L36 45 C32 46 31 49 34.5 50.5 L145.5 50.5 C149 49 148 46 144 45 L90 31.5 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+{%- endcase -%}

@@ -1,0 +1,73 @@
+{%- comment -%}
+  Vector garment on a wooden hanger for the closet section.
+  - type: dress | shirt | sweater | coat | tee | pants
+  - uid: unique id for the shading gradient
+  Body colour comes from the --c custom property on a parent.
+{%- endcomment -%}
+{%- liquid
+  case type
+    when 'dress'
+      assign h = 420
+      assign body = 'M74 60 L100 94 L126 60 L150 66 L172 108 L152 120 L140 104 L137 168 Q135 180 141 190 L178 398 Q100 416 22 398 L59 190 Q65 180 63 168 L60 104 L48 120 L28 108 L50 66 Z'
+    when 'shirt'
+      assign h = 330
+      assign body = 'M70 60 L100 76 L130 60 L156 68 Q170 74 174 96 L190 252 L168 256 L150 124 L150 322 L50 322 L50 124 L32 256 L10 252 L26 96 Q30 74 44 68 Z'
+    when 'sweater'
+      assign h = 300
+      assign body = 'M66 62 Q100 86 134 62 L158 70 Q172 76 176 100 L192 266 L170 270 L152 130 L154 290 L46 290 L48 130 L30 270 L8 266 L24 100 Q28 76 42 70 Z'
+    when 'coat'
+      assign h = 412
+      assign body = 'M64 60 L100 86 L136 60 L160 68 Q176 76 178 100 L192 334 L170 338 L156 132 L162 404 L38 404 L44 132 L30 338 L8 334 L22 100 Q24 76 40 68 Z'
+    when 'tee'
+      assign h = 275
+      assign body = 'M68 60 Q100 82 132 60 L170 74 L194 128 L162 142 L150 118 L152 266 L48 266 L50 118 L38 142 L6 128 L30 74 Z'
+    else
+      assign h = 400
+      assign body = 'M52 64 L148 64 L154 392 L110 392 L100 160 L90 392 L46 392 Z'
+  endcase
+-%}
+<svg class="closet__svg" viewBox="0 0 200 {{ h }}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="cg-{{ uid }}" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".22"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".22"/>
+    </linearGradient>
+  </defs>
+  {%- render 'closet-hanger', inline: true -%}
+  <path d="{{ body }}" style="fill: var(--c)"/>
+  <path d="{{ body }}" fill="url(#cg-{{ uid }})"/>
+  <g fill="none" stroke="#000" stroke-linecap="round">
+    {%- case type -%}
+      {%- when 'dress' -%}
+        <path d="M100 94 L63 172" stroke-opacity=".2" stroke-width="2"/>
+        <path d="M60 176 Q100 182 140 176" stroke-opacity=".25" stroke-width="6"/>
+        <path d="M136 180 Q146 200 142 222 M136 180 Q134 204 128 220" stroke-opacity=".22" stroke-width="4"/>
+        <path d="M100 190 Q92 300 88 408 L76 406 Q86 300 94 190 Z M128 196 Q140 300 150 404 L140 405 Q132 300 122 196 Z" fill="#000" fill-opacity=".08" stroke="none"/>
+      {%- when 'shirt' -%}
+        <path d="M70 60 L100 76 L86 96 L66 70 Z M130 60 L100 76 L114 96 L134 70 Z" fill="#fff" fill-opacity=".35" stroke-opacity=".15" stroke-width="1.5"/>
+        <path d="M100 76 V322" stroke-opacity=".15" stroke-width="2"/>
+        <path d="M112 130 h24 v26 h-24 Z" stroke-opacity=".15" stroke-width="2"/>
+        <path d="M168 256 L190 252 L192 238 L170 242 Z M32 256 L10 252 L8 238 L30 242 Z" fill="#000" fill-opacity=".12" stroke="none"/>
+        <g fill="#000" fill-opacity=".25" stroke="none"><circle cx="104" cy="120" r="2.6"/><circle cx="104" cy="160" r="2.6"/><circle cx="104" cy="200" r="2.6"/><circle cx="104" cy="240" r="2.6"/><circle cx="104" cy="280" r="2.6"/></g>
+      {%- when 'sweater' -%}
+        <path d="M66 62 Q100 86 134 62" stroke-opacity=".22" stroke-width="6"/>
+        <path d="M80 112 V268 M100 112 V268 M120 112 V268" stroke="#fff" stroke-opacity=".1" stroke-width="5"/>
+        <path d="M46 274 H154 V290 H46 Z M170 270 L192 266 L190 252 L169 256 Z M30 270 L8 266 L10 252 L31 256 Z" fill="#000" fill-opacity=".14" stroke="none"/>
+      {%- when 'coat' -%}
+        <path d="M64 60 L100 86 L86 168 L70 118 L78 104 Z M136 60 L100 86 L114 168 L130 118 L122 104 Z" fill="#000" fill-opacity=".16" stroke="none"/>
+        <path d="M100 86 L100 404" stroke-opacity=".18" stroke-width="2"/>
+        <path d="M44 222 H156" stroke-opacity=".14" stroke-width="7"/>
+        <path d="M52 284 h32 M116 284 h32" stroke-opacity=".2" stroke-width="3"/>
+        <g fill="#000" fill-opacity=".3" stroke="none"><circle cx="112" cy="196" r="4"/><circle cx="112" cy="254" r="4"/></g>
+      {%- when 'tee' -%}
+        <path d="M68 60 Q100 82 132 60" stroke-opacity=".2" stroke-width="5"/>
+        <path d="M162 142 L194 128 M38 142 L6 128" stroke-opacity=".18" stroke-width="4"/>
+        <path d="M50 256 H150" stroke-opacity=".12" stroke-width="2"/>
+      {%- else -%}
+        <path d="M52 64 H148 V80 H52 Z" fill="#000" fill-opacity=".16" stroke="none"/>
+        <path d="M72 82 L68 390 M128 82 L132 390" stroke-opacity=".1" stroke-width="2"/>
+        <path d="M62 82 Q72 108 56 120 M138 82 Q128 108 144 120" stroke-opacity=".15" stroke-width="2"/>
+    {%- endcase -%}
+  </g>
+</svg>

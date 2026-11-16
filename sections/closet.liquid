@@ -1,0 +1,326 @@
+{%- comment -%}
+  Interactive closet: garments hang on a rail inside a wooden wardrobe.
+  Hover / tap a garment and it slides forward (3D), leaving a faint silhouette
+  on the rail, and a mini product card opens beside it.
+  Each block is one garment: link a product for a real "Add to cart",
+  or use the fallback title / price for display only.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="section closet" id="Closet-{{ section.id }}">
+  <div class="page-width">
+    {%- if s.eyebrow != blank or s.heading != blank or s.text != blank -%}
+      <div class="closet__head">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+        {%- if s.heading != blank -%}<h2 class="h-section" data-split>{{ s.heading }}</h2>{%- endif -%}
+        {%- if s.text != blank -%}<div class="closet__text rte" data-reveal>{{ s.text }}</div>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="closet__stage" data-reveal>
+      <span class="closet__door closet__door--l" aria-hidden="true"></span>
+      <span class="closet__door closet__door--r" aria-hidden="true"></span>
+      <div class="closet__cabinet">
+        <div class="closet__interior">
+          {%- if s.show_shelf -%}
+            <div class="closet__shelf" aria-hidden="true">
+              <span class="closet__stack" style="--x: 9%"><i style="--f: #d8cfc2"></i><i style="--f: #2f3a4a"></i><i style="--f: #b98a5a"></i></span>
+              <span class="closet__stack" style="--x: 26%"><i style="--f: #f1ede6"></i><i style="--f: #8a8378"></i></span>
+              <span class="closet__stack" style="--x: 78%"><i style="--f: #3f7d5c"></i><i style="--f: #e6dccf"></i><i style="--f: #1e1e1e"></i><i style="--f: #c9b8a3"></i></span>
+            </div>
+          {%- endif -%}
+          <div class="closet__rail" aria-hidden="true"></div>
+
+          <ul class="closet__rack" role="list">
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign b = block.settings
+                assign product = b.product
+                assign title = b.title
+                assign price = b.price
+                if product != blank
+                  assign title = product.title
+                  assign price = product.price | money
+                endif
+                assign pop_id = 'ClosetPop-' | append: block.id
+              -%}
+              <li class="closet__item closet__item--{{ b.type }}" style="--c: {{ b.color }}; --i: {{ forloop.index0 }}" data-closet-item data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+                <div class="closet__sway">
+                  <button type="button" class="closet__hit" aria-expanded="false" aria-controls="{{ pop_id }}" aria-label="{{ title | escape }}">
+                    {%- capture garment -%}
+                      {%- if b.image != blank -%}
+                        {%- render 'closet-hanger' -%}
+                        {{ b.image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'closet__img', alt: '' }}
+                      {%- else -%}
+                        {%- render 'closet-garment', type: b.type, uid: block.id -%}
+                      {%- endif -%}
+                    {%- endcapture -%}
+                    <span class="closet__ghost" aria-hidden="true">{{ garment | replace: 'cg-', 'cgh-' }}</span>
+                    <span class="closet__garment">{{ garment }}</span>
+                  </button>
+                </div>
+
+                <div class="closet__pop" id="{{ pop_id }}" role="group" aria-label="{{ title | escape }}">
+                  {%- if b.tag != blank -%}<span class="closet__pop-tag">{{ b.tag }}</span>{%- endif -%}
+                  <p class="closet__pop-title">{{ title }}</p>
+                  {%- if price != blank -%}<p class="closet__pop-price">{{ price }}</p>{%- endif -%}
+                  {%- if product != blank -%}
+                    {%- if product.available and product.has_only_default_variant -%}
+                      <form action="{{ routes.cart_add_url }}" method="post" class="closet__pop-form" data-product-form>
+                        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn--primary closet__pop-btn">{{ 'products.product.add_to_cart' | t }}</button>
+                      </form>
+                    {%- elsif product.available -%}
+                      <a href="{{ product.url }}" class="btn btn--primary closet__pop-btn">{{ 'products.card.choose_options' | t }}</a>
+                    {%- else -%}
+                      <span class="btn closet__pop-btn closet__pop-btn--off">{{ 'products.product.sold_out' | t }}</span>
+                    {%- endif -%}
+                  {%- else -%}
+                    <a href="{{ b.link | default: routes.all_products_collection_url }}" class="btn btn--primary closet__pop-btn">{{ 'products.product.add_to_cart' | t }}</a>
+                  {%- endif -%}
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+        <div class="closet__base" aria-hidden="true"><span></span><span></span></div>
+      </div>
+      <span class="closet__floor" aria-hidden="true"></span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .closet { --walnut: #5a3a24; --oak: #b08660; --ease-closet: cubic-bezier(.22, 1, .36, 1); }
+  .closet__head { text-align: center; max-width: 760px; margin: 0 auto clamp(32px, 5vw, 64px); display: flex; flex-direction: column; align-items: center; }
+  .closet__text { margin-top: 16px; color: var(--muted); }
+
+  .closet__stage { position: relative; max-width: 1080px; margin: 0 auto; padding-inline: clamp(0px, 7%, 90px); }
+
+  /* cabinet: dark walnut frame with fine vertical grain */
+  .closet__cabinet {
+    position: relative; padding: 2.2% 2.2% 0; border-radius: 10px 10px 6px 6px;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.07) 0 1px, transparent 1px 11px),
+      repeating-linear-gradient(91deg, rgba(255,255,255,.035) 0 3px, transparent 3px 29px),
+      linear-gradient(180deg, #6a4630, var(--walnut) 60%, #4a2f1d);
+    box-shadow: 0 50px 90px -40px rgba(30, 15, 5, .55), inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  /* open doors, seen at an angle on either side */
+  .closet__door {
+    position: absolute; top: -1.5%; bottom: 0; width: clamp(0px, 7%, 90px);
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 1px, transparent 1px 9px),
+      linear-gradient(90deg, #4a2f1d, #6d4831);
+  }
+  .closet__door--l { left: 0; clip-path: polygon(0 0, 100% 4%, 100% 96%, 0 100%); }
+  .closet__door--r { right: 0; clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 96%); transform: scaleX(-1); }
+  .closet__door::after { content: ""; position: absolute; top: 46%; right: 22%; width: 6%; min-width: 3px; height: 9%; border-radius: 4px; background: linear-gradient(90deg, #d9d2c5, #8f8778); }
+
+  /* interior: lighter oak back panel, warm top light */
+  .closet__interior {
+    position: relative; container-type: inline-size; aspect-ratio: 16 / 9.6; border-radius: 4px;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255, 238, 210, .55), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(90, 50, 20, .08) 0 1px, transparent 1px 7px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 3px, transparent 3px 23px),
+      linear-gradient(180deg, #c49a70, var(--oak) 55%, #9a7250);
+    box-shadow: inset 0 3cqi 6cqi rgba(40, 20, 5, .35), inset 0 -2cqi 5cqi rgba(40, 20, 5, .3), inset 1.5cqi 0 3cqi rgba(40, 20, 5, .25), inset -1.5cqi 0 3cqi rgba(40, 20, 5, .25);
+  }
+
+  .closet__shelf { position: absolute; inset: 0 0 auto; height: 12cqi; border-bottom: 1.3cqi solid #8a6242; box-shadow: 0 1.2cqi 1.6cqi -0.6cqi rgba(30, 15, 5, .45); }
+  .closet__stack { position: absolute; left: var(--x); bottom: 0; display: flex; flex-direction: column-reverse; }
+  .closet__stack i { display: block; width: 12cqi; height: 1.9cqi; margin-top: -.2cqi; border-radius: .7cqi; background: var(--f); box-shadow: inset 0 -.35cqi 0 rgba(0,0,0,.14), 0 .2cqi .4cqi rgba(0,0,0,.15); }
+  .closet__stack i:nth-child(even) { translate: .5cqi 0; }
+
+  .closet__rail { position: absolute; top: 16cqi; left: 3cqi; right: 3cqi; height: .9cqi; border-radius: 1cqi; background: linear-gradient(180deg, #f5f5f3, #9d9a94 55%, #dcdad5); box-shadow: 0 .6cqi 1cqi rgba(0,0,0,.3); }
+
+  .closet__rack { position: absolute; top: 15.4cqi; left: 0; right: 0; z-index: 2; display: flex; justify-content: center; align-items: flex-start; margin: 0; padding: 0; list-style: none; }
+
+  .closet__item { --w: 17cqi; position: relative; z-index: 1; flex: none; width: var(--w); margin-inline: -1.5cqi; }
+  .closet__item--pants { --w: 14.5cqi; }
+  .closet__sway { perspective: 900px; transform-origin: 50% 0; animation: closet-sway 7s ease-in-out infinite; animation-delay: calc(var(--i) * -1.7s); }
+  .closet__hit { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .closet__hit:focus-visible { outline: none; }
+  .closet__hit:focus-visible .closet__garment { outline: 2px solid var(--fg); outline-offset: 4px; border-radius: 6px; }
+  .closet__svg, .closet__hanger, .closet__img { display: block; width: 100%; height: auto; }
+  .closet__img { margin-top: -5.5%; }
+
+  /* the garment that comes forward */
+  .closet__garment {
+    position: relative; display: block; transform-origin: 50% 3%;
+    transition: transform .8s var(--ease-closet), filter .6s var(--ease-closet);
+    filter: drop-shadow(0 .8cqi .7cqi rgba(40, 20, 5, .28));
+    will-change: transform;
+  }
+  /* the silhouette left on the rail */
+  .closet__ghost {
+    position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    filter: grayscale(1) brightness(.4) blur(.4px);
+    transition: opacity .6s var(--ease-closet);
+  }
+
+  .closet__item.is-active { z-index: 10; }
+  .closet__item.is-active .closet__sway { animation-play-state: paused; }
+  .closet__item.is-active .closet__garment {
+    transform: translate3d(0, 1.6cqi, 10cqi) rotateX(3deg);
+    filter: drop-shadow(0 3cqi 2.6cqi rgba(30, 15, 5, .4));
+  }
+  .closet__item.is-active .closet__ghost { opacity: .26; }
+  .closet__rack:has(.is-active) .closet__item:not(.is-active) .closet__garment { filter: brightness(.8) saturate(.8) drop-shadow(0 .8cqi .7cqi rgba(40, 20, 5, .28)); }
+
+  @media (hover: hover) {
+    .closet__item:hover { z-index: 10; }
+    .closet__item:hover .closet__sway { animation-play-state: paused; }
+    .closet__item:hover .closet__garment {
+      transform: translate3d(0, 1.6cqi, 10cqi) rotateX(3deg);
+      filter: drop-shadow(0 3cqi 2.6cqi rgba(30, 15, 5, .4));
+    }
+    .closet__item:hover .closet__ghost { opacity: .26; }
+    .closet__rack:has(.closet__item:hover) .closet__item:not(:hover) .closet__garment { filter: brightness(.8) saturate(.8) drop-shadow(0 .8cqi .7cqi rgba(40, 20, 5, .28)); }
+  }
+
+  /* mini product card */
+  .closet__pop {
+    position: absolute; top: 22%; left: calc(100% - 1cqi); z-index: 2; width: 210px; padding: 16px 18px 18px;
+    border-radius: 14px; background: #fff; color: #121212; text-align: left;
+    box-shadow: 0 24px 50px -12px rgba(20, 10, 0, .35), 0 2px 6px rgba(0,0,0,.08);
+    opacity: 0; visibility: hidden; transform: translate3d(-10px, 6px, 0) scale(.96); transform-origin: 0 30%;
+    transition: opacity .35s var(--ease-closet), transform .55s var(--ease-closet), visibility 0s linear .55s;
+  }
+  .closet__pop::before { content: ""; position: absolute; top: 0; bottom: 0; right: 100%; width: 3cqi; } /* hover bridge */
+  .closet__item[data-side="left"] .closet__pop { left: auto; right: calc(100% - 1cqi); transform: translate3d(10px, 6px, 0) scale(.96); transform-origin: 100% 30%; }
+  .closet__item[data-side="left"] .closet__pop::before { right: auto; left: 100%; }
+  .closet__item.is-active .closet__pop { opacity: 1; visibility: visible; transform: none; transition-delay: .12s, .12s, 0s; }
+  @media (hover: hover) {
+    .closet__item:hover .closet__pop { opacity: 1; visibility: visible; transform: none; transition-delay: .12s, .12s, 0s; }
+  }
+  .closet__pop-tag { display: inline-block; margin-bottom: 8px; padding: 3px 8px; border-radius: 99px; background: #f1ede6; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .closet__pop-title { margin: 0; font-family: var(--display); font-weight: 700; font-size: 16px; line-height: 1.2; letter-spacing: -0.01em; }
+  .closet__pop-price { margin: 4px 0 0; font-size: 14px; color: rgba(18,18,18,.62); }
+  .closet__pop-form { margin: 0; }
+  .closet__pop-btn { width: 100%; min-height: 42px; margin-top: 14px; padding: 0 16px; font-size: 13px; }
+  .closet__pop-btn--off { opacity: .5; pointer-events: none; }
+
+  .closet__base { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4%; padding: 1.6% 0 2.2%; }
+  .closet__base span { position: relative; height: clamp(34px, 6vw, 70px); border-radius: 3px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08); }
+  .closet__base span::after { content: ""; position: absolute; top: 50%; left: 50%; width: 22%; height: 5px; translate: -50% -50%; border-radius: 4px; background: linear-gradient(180deg, #e2dccf, #8f8778); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+  .closet__floor { display: block; height: 28px; margin: -6px auto 0; width: 80%; border-radius: 50%; background: radial-gradient(closest-side, rgba(30, 15, 5, .28), transparent); }
+
+  @keyframes closet-sway { 0%, 100% { rotate: -.7deg; } 50% { rotate: .7deg; } }
+
+  @media (max-width: 749px) {
+    .closet__interior { aspect-ratio: 1 / 1.05; }
+    .closet__rack { bottom: 0; }
+    .closet__item { --w: 19cqi; margin-inline: -2.3cqi; position: static; }
+    .closet__item--pants { --w: 17cqi; }
+    .closet__item.is-active .closet__sway { position: relative; z-index: 10; }
+    .closet__pop, .closet__item[data-side="left"] .closet__pop {
+      top: auto; bottom: 3cqi; left: 50%; right: auto; width: min(240px, 80%); z-index: 20;
+      transform: translate3d(-50%, 10px, 0) scale(.96); transform-origin: 50% 100%;
+    }
+    .closet__item.is-active .closet__pop { transform: translate3d(-50%, 0, 0); }
+    .closet__pop::before { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .closet__sway { animation: none; }
+    .closet__garment, .closet__pop, .closet__ghost { transition-duration: .01s; }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.getElementById('Closet-{{ section.id }}');
+    if (!root) return;
+    const rack = root.querySelector('.closet__rack');
+    const items = [...root.querySelectorAll('[data-closet-item]')];
+    const canHover = window.matchMedia('(hover: hover)').matches;
+
+    // open the card on whichever side has more room
+    const place = (li) => {
+      const r = li.getBoundingClientRect();
+      const s = rack.getBoundingClientRect();
+      li.dataset.side = r.left + r.width / 2 > s.left + s.width * 0.58 ? 'left' : 'right';
+    };
+    const close = (except) => items.forEach((li) => {
+      if (li === except) return;
+      li.classList.remove('is-active');
+      li.querySelector('.closet__hit').setAttribute('aria-expanded', 'false');
+    });
+    const open = (li) => {
+      close(li);
+      place(li);
+      li.classList.add('is-active');
+      li.querySelector('.closet__hit').setAttribute('aria-expanded', 'true');
+    };
+
+    items.forEach((li) => {
+      li.addEventListener('mouseenter', () => { place(li); if (canHover) close(); });
+      li.addEventListener('focusin', () => place(li));
+      li.querySelector('.closet__hit').addEventListener('click', () => {
+        li.classList.contains('is-active') ? close() : open(li);
+      });
+    });
+    document.addEventListener('click', (e) => { if (!rack.contains(e.target)) close(); });
+    root.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    document.addEventListener('shopify:block:select', (e) => {
+      const li = root.querySelector(`[data-block-id="${e.detail.blockId}"]`);
+      if (li) open(li);
+    });
+    document.addEventListener('shopify:block:deselect', () => close());
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Gardırop",
+  "tag": "section",
+  "class": "section-closet",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Üst başlık", "default": "The StyleVibe closet" },
+    { "type": "text", "id": "heading", "label": "Başlık", "default": "Pick something <em>off the rail</em>" },
+    { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Hover over a piece to take a closer look.</p>" },
+    { "type": "checkbox", "id": "show_shelf", "label": "Üst rafta katlanmış kıyafetler", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "garment",
+      "name": "Kıyafet",
+      "limit": 8,
+      "settings": [
+        { "type": "product", "id": "product", "label": "Ürün", "info": "Seçerseniz ad, fiyat ve Sepete Ekle bu üründen gelir." },
+        { "type": "select", "id": "type", "label": "Kıyafet şekli", "default": "dress", "options": [
+          { "value": "dress", "label": "Elbise" },
+          { "value": "shirt", "label": "Gömlek" },
+          { "value": "sweater", "label": "Kazak" },
+          { "value": "coat", "label": "Kaban" },
+          { "value": "tee", "label": "Tişört" },
+          { "value": "pants", "label": "Pantolon" }
+        ] },
+        { "type": "color", "id": "color", "label": "Renk", "default": "#3f7d5c" },
+        { "type": "image_picker", "id": "image", "label": "Kendi görseliniz (isteğe bağlı)", "info": "Arka planı silinmiş PNG. Çizim yerine kullanılır." },
+        { "type": "text", "id": "title", "label": "Ad (ürün seçilmediyse)", "default": "Green Wrap Dress" },
+        { "type": "text", "id": "price", "label": "Fiyat (ürün seçilmediyse)", "default": "$89.00" },
+        { "type": "url", "id": "link", "label": "Bağlantı (ürün seçilmediyse)" },
+        { "type": "text", "id": "tag", "label": "Etiket", "info": "örn. New, Bestseller" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gardırop",
+      "blocks": [
+        { "type": "garment", "settings": { "type": "coat", "color": "#b98a5a", "title": "Camel Wool Coat", "price": "$189.00" } },
+        { "type": "garment", "settings": { "type": "shirt", "color": "#dfe6ee", "title": "Oxford Shirt", "price": "$59.00" } },
+        { "type": "garment", "settings": { "type": "dress", "color": "#3f7d5c", "title": "Green Wrap Dress", "price": "$89.00", "tag": "New" } },
+        { "type": "garment", "settings": { "type": "sweater", "color": "#2f3a4a", "title": "Merino Crewneck", "price": "$79.00" } },
+        { "type": "garment", "settings": { "type": "tee", "color": "#f1ede6", "title": "Heavyweight Tee", "price": "$35.00" } },
+        { "type": "garment", "settings": { "type": "pants", "color": "#8a8378", "title": "Pleated Trousers", "price": "$95.00" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

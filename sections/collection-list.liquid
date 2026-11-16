@@ -1,0 +1,90 @@
+{%- assign s = section.settings -%}
+<section class="section collection-list collection-list--{{ s.style }}">
+  <div class="page-width">
+    {%- if s.heading != blank -%}
+      <div class="section__head">
+        {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+        <h2 class="h-section" data-split>{{ s.heading }}</h2>
+      </div>
+    {%- endif -%}
+
+    {%- if s.style == 'list' -%}
+      {%- comment -%} Big typographic list; the image follows the cursor on hover. {%- endcomment -%}
+      <ul class="collection-index" data-hover-reveal>
+        {%- for block in section.blocks -%}
+          {%- assign c = block.settings.collection -%}
+          <li class="collection-index__item" {{ block.shopify_attributes }} data-reveal style="--i: {{ forloop.index0 }}">
+            <a href="{{ c.url | default: '#' }}" class="collection-index__link">
+              <span class="collection-index__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+              <span class="collection-index__title">{{ block.settings.title | default: c.title | default: 'Koleksiyon' }}</span>
+              <span class="collection-index__count">{%- if c -%}{{ c.products_count }}{%- endif -%}</span>
+              {%- assign img = block.settings.image | default: c.featured_image -%}
+              {%- if img -%}
+                {{ img | image_url: width: 700 | image_tag: loading: 'lazy', class: 'collection-index__img', alt: '' }}
+              {%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <div class="collection-grid" style="--cols: {{ section.blocks.size | at_most: 4 | at_least: 1 }}">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign c = block.settings.collection
+            assign img = block.settings.image | default: c.featured_image
+          -%}
+          <a href="{{ c.url | default: '#' }}" class="collection-tile" {{ block.shopify_attributes }} data-reveal style="--i: {{ forloop.index0 }}" data-cursor="{{ 'products.card.view' | t }}">
+            <div class="collection-tile__media img-reveal">
+              {%- if img -%}
+                {{ img | image_url: width: 1200 | image_tag:
+                  widths: '400, 600, 800, 1000, 1200',
+                  sizes: '(min-width: 750px) 33vw, 100vw',
+                  loading: 'lazy',
+                  alt: ''
+                }}
+              {%- else -%}
+                {{ 'collection-apparel-1' | placeholder_svg_tag: 'placeholder' }}
+              {%- endif -%}
+            </div>
+            <div class="collection-tile__info">
+              <h3>{{ block.settings.title | default: c.title | default: 'Koleksiyon' }}</h3>
+              <span class="collection-tile__arrow">{% render 'icon', name: 'arrow' %}</span>
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Koleksiyon listesi",
+  "class": "section-collection-list",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Üst yazı", "default": "Kategoriler" },
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Tarzını <em>seç</em>" },
+    {
+      "type": "select", "id": "style", "label": "Stil", "default": "grid",
+      "options": [ { "value": "grid", "label": "Görsel kartlar" }, { "value": "list", "label": "Büyük liste (üzerine gelince görsel)" } ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection", "name": "Koleksiyon",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Koleksiyon" },
+        { "type": "text", "id": "title", "label": "Özel başlık" },
+        { "type": "image_picker", "id": "image", "label": "Özel görsel" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Koleksiyon listesi",
+      "blocks": [ { "type": "collection" }, { "type": "collection" }, { "type": "collection" } ]
+    }
+  ]
+}
+{% endschema %}

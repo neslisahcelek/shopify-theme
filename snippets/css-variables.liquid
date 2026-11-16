@@ -1,0 +1,33 @@
+{%- liquid
+  assign bg = settings.color_background
+  assign fg = settings.color_foreground
+  assign dark_bg = settings.color_dark_background
+  assign dark_fg = settings.color_dark_foreground
+-%}
+<style>
+  :root {
+    --bg: {{ bg }};
+    --bg-2: {{ bg | color_darken: 4 }};
+    --fg: {{ fg }};
+    --muted: {{ fg | color_modify: 'alpha', 0.6 }};
+    --line: {{ fg | color_modify: 'alpha', 0.12 }};
+    --line-2: {{ fg | color_modify: 'alpha', 0.22 }};
+    --accent: {{ settings.color_accent }};
+    --accent-fg: {{ settings.color_accent_foreground }};
+    --sale: {{ settings.color_sale }};
+    --grad: linear-gradient(110deg, {{ settings.color_gradient_1 }}, {{ settings.color_gradient_2 }} 50%, {{ settings.color_gradient_3 }});
+    --dark-bg: {{ dark_bg }};
+    --dark-fg: {{ dark_fg }};
+    --radius: {{ settings.radius }}px;
+    --radius-btn: {% if settings.button_style == 'pill' %}999px{% else %}{{ settings.radius }}px{% endif %};
+    --page-width: {{ settings.page_width }}px;
+    --gutter: clamp(16px, 4vw, 48px);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --display: "Syne", system-ui, sans-serif;
+    --serif: "Instrument Serif", Georgia, serif;
+    --body: "Manrope", system-ui, sans-serif;
+    --heading-case: {% if settings.heading_uppercase %}uppercase{% else %}none{% endif %};
+    --marquee-speed: 1;
+  }
+</style>

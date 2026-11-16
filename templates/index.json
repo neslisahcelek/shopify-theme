@@ -1,0 +1,389 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "wardrobe": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "hero-luxury-closet.jpg",
+            "cutout": false,
+            "label": "",
+            "product": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "wardrobe"
+      ],
+      "settings": {
+        "layout": "slider",
+        "trio_style": "fill",
+        "fill_align": "center",
+        "show_labels": false,
+        "hide_mobile": false,
+        "curtain": true,
+        "height": "full",
+        "autoplay": false,
+        "speed": 6,
+        "background": "#ffffff",
+        "backdrop": "none",
+        "backdrop_word": "",
+        "overlay": 20,
+        "eyebrow": "New Season · Autumn / Winter 2026",
+        "heading": "Dressed For <em>Every</em> Day",
+        "text": "<p>Premium Cotton, Sharp Tailoring And Timeless Pieces, Curated For a Wardrobe That Works As Hard As You Do.</p>",
+        "button_label": "Discover Our Products",
+        "button_link": "shopify://collections/all",
+        "button2_label": "Explore collections",
+        "button2_link": "shopify://collections",
+        "perks": "Free Shipping Over $100 | Free 30-Day Returns | Secure Checkout"
+      }
+    },
+    "marquee_ticker": {
+      "type": "marquee-ticker",
+      "settings": {
+        "text": "NEW SEASON ARRIVALS | FREE SHIPPING OVER $100 | TAILORED ESSENTIALS | 30-DAY RETURNS",
+        "separator": "✦",
+        "speed": 28,
+        "pause_on_hover": true,
+        "bg_color": "#111111",
+        "text_color": "#fbf8f4"
+      }
+    },
+    "hanger_rack": {
+      "type": "hanger-rack",
+      "settings": {
+        "collection": "",
+        "products_limit": 8,
+        "heading": "Curated <em>Rack</em>",
+        "subheading": "Drag, swipe or click any piece on the rail to inspect.",
+        "cta_label": "SEE AVAILABILITY",
+        "aspect_ratio": "3/4",
+        "blur_strength": 3.5,
+        "bg_color": "#fbf8f4",
+        "text_color": "#111111",
+        "use_cutout_assets": true,
+        "autoplay": false
+      }
+    },
+    "manifesto": {
+      "type": "rich-text",
+      "settings": {
+        "eyebrow": "THE STYLE VIBEUS MANIFESTO",
+        "heading": "Built on <em>heavyweight</em> fabrics, relaxed silhouettes and timeless street character — crafted to move with you every day.",
+        "size": "large",
+        "scrub": true,
+        "text": "",
+        "button_label": "",
+        "button_link": "",
+        "align": "center",
+        "dark": false
+      }
+    },
+    "wardrobe": {
+      "type": "wardrobe",
+      "blocks": {
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "image_asset": "wardrobe-blue-shirt.webp",
+            "left": 3,
+            "width": 14,
+            "title": "Sky Linen Henley",
+            "price": "$49.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "piece_2": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "image_asset": "wardrobe-white-tee.webp",
+            "left": 17,
+            "width": 18,
+            "title": "Essential White Tee",
+            "price": "$29.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "piece_3": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "image_asset": "wardrobe-henley.webp",
+            "left": 35,
+            "width": 17,
+            "title": "White Linen Henley",
+            "price": "$49.00",
+            "link": "",
+            "tag": "New"
+          }
+        },
+        "piece_4": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "image_asset": "wardrobe-cream-tee.webp",
+            "left": 52,
+            "width": 15,
+            "title": "Cream Everyday Tee",
+            "price": "$29.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "piece_5": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "image_asset": "wardrobe-beige-tee.webp",
+            "left": 67,
+            "width": 9,
+            "title": "Sand Relaxed Tee",
+            "price": "$32.00",
+            "link": "",
+            "tag": ""
+          }
+        }
+      },
+      "block_order": [
+        "piece_1",
+        "piece_2",
+        "piece_3",
+        "piece_4",
+        "piece_5"
+      ],
+      "disabled": true,
+      "settings": {
+        "image_asset": "wardrobe-bg.jpg",
+        "show_hints": true
+      }
+    },
+    "closet": {
+      "type": "closet",
+      "blocks": {
+        "garment_1": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "coat",
+            "color": "#b98a5a",
+            "title": "Camel Wool Coat",
+            "price": "$189.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "garment_2": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "shirt",
+            "color": "#dfe6ee",
+            "title": "Oxford Shirt",
+            "price": "$59.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "garment_3": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "dress",
+            "color": "#3f7d5c",
+            "title": "Green Wrap Dress",
+            "price": "$89.00",
+            "link": "",
+            "tag": "New"
+          }
+        },
+        "garment_4": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "sweater",
+            "color": "#2f3a4a",
+            "title": "Merino Crewneck",
+            "price": "$79.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "garment_5": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "tee",
+            "color": "#f1ede6",
+            "title": "Heavyweight Tee",
+            "price": "$35.00",
+            "link": "",
+            "tag": ""
+          }
+        },
+        "garment_6": {
+          "type": "garment",
+          "settings": {
+            "product": "",
+            "type": "pants",
+            "color": "#8a8378",
+            "title": "Pleated Trousers",
+            "price": "$95.00",
+            "link": "",
+            "tag": ""
+          }
+        }
+      },
+      "block_order": [
+        "garment_1",
+        "garment_2",
+        "garment_3",
+        "garment_4",
+        "garment_5",
+        "garment_6"
+      ],
+      "disabled": true,
+      "settings": {
+        "eyebrow": "",
+        "heading": "",
+        "text": "",
+        "show_shelf": true
+      }
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "New in",
+        "heading": "Fresh <em>drops</em> this week",
+        "collection": "",
+        "limit": 12,
+        "columns": 4,
+        "columns_mobile": "2",
+        "layout": "grid",
+        "show_view_all": true,
+        "hide_head_mobile": true
+      }
+    },
+    "lookbook": {
+      "type": "lookbook",
+      "blocks": {
+        "look_1": {
+          "type": "look",
+          "settings": {
+            "image": "shopify://shop_images/O1CN01J7HKX11TQiSWxlzNl__2216798812377-0-cib.jpg",
+            "caption": "Heavyweight Street Layering",
+            "size": "tall",
+            "product": "",
+            "hotspot_x": 48,
+            "hotspot_y": 52
+          }
+        },
+        "look_2": {
+          "type": "look",
+          "settings": {
+            "image": "shopify://shop_images/O1CN01drqtdu2EYJ2jYrQTM__2220757478756-0-cib.jpg",
+            "caption": "Relaxed Vintage Silhouette",
+            "size": "wide",
+            "product": "",
+            "hotspot_x": 54,
+            "hotspot_y": 48
+          }
+        },
+        "look_3": {
+          "type": "look",
+          "settings": {
+            "caption": "Signature Washed Essentials",
+            "size": "small",
+            "product": "",
+            "hotspot_x": 50,
+            "hotspot_y": 55
+          }
+        },
+        "look_4": {
+          "type": "look",
+          "settings": {
+            "caption": "Curated Daily Uniform",
+            "size": "tall",
+            "product": "",
+            "hotspot_x": 52,
+            "hotspot_y": 50
+          }
+        }
+      },
+      "block_order": [
+        "look_1",
+        "look_2",
+        "look_3",
+        "look_4"
+      ],
+      "settings": {
+        "eyebrow": "Lookbook · 2026",
+        "heading": "Street & Studio <em>Edit</em>",
+        "dark": true,
+        "cutout": false,
+        "end_label": "Explore Full Collection",
+        "end_link": "shopify://collections/all",
+        "end_image": "shopify://shop_images/O1CN01J7HKX11TQiSWxlzNl__2216798812377-0-cib.jpg",
+        "end_image_zoom": 140,
+        "end_image_y": 20
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "image": "shopify://shop_images/O1CN01J7HKX11TQiSWxlzNl__2216798812377-0-cib.jpg",
+        "image_position": "left",
+        "image_hover": "shopify://shop_images/O1CN01drqtdu2EYJ2jYrQTM__2220757478756-0-cib.jpg",
+        "image_hover_asset": "story-rail.jpg",
+        "cutout": false,
+        "parallax": 10,
+        "badge": "",
+        "eyebrow": "Our story",
+        "heading": "Basics, <em>done right</em>.",
+        "text": "<p>We start with soft, heavyweight cotton and cut it for a relaxed, easy fit. Clean colours, solid stitching and pieces that work together, so getting dressed takes a minute, not a morning.</p>",
+        "button_label": "Shop essentials",
+        "button_link": "",
+        "dark": false
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "<em>10%</em> off your first order.",
+        "text": "<p>Join the list for new drops, restocks and early access to limited colours.</p>",
+        "show_side_image": false,
+        "show_bg": true,
+        "bg_height": "normal",
+        "bg_y": 53,
+        "overlay": 30
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "marquee_ticker",
+    "hanger_rack",
+    "manifesto",
+    "wardrobe",
+    "closet",
+    "featured",
+    "lookbook",
+    "story",
+    "newsletter"
+  ]
+}

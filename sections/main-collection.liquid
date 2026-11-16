@@ -1,0 +1,95 @@
+{%- assign s = section.settings -%}
+<section class="collection" style="--cols: {{ s.columns }}; --cols-mobile: {{ s.columns_mobile }}">
+  <header class="collection__hero page-width">
+    <span class="eyebrow" data-reveal>{{ 'collections.products_count' | t: count: collection.products_count }}</span>
+    <h1 class="h-display" data-split>{{ collection.title }}</h1>
+    {%- if s.show_description and collection.description != blank -%}
+      <div class="collection__desc rte" data-reveal style="--i: 2">{{ collection.description }}</div>
+    {%- endif -%}
+  </header>
+
+  {%- paginate collection.products by s.per_page -%}
+    <div class="page-width">
+      <form class="toolbar" data-filter-form>
+        {%- if s.enable_filters and collection.filters.size > 0 -%}
+          <details class="filters" data-filters>
+            <summary class="btn btn--ghost btn--small">{{ 'collections.filter' | t }}
+              {%- assign active_count = 0 -%}
+              {%- for filter in collection.filters -%}{%- assign active_count = active_count | plus: filter.active_values.size -%}{%- endfor -%}
+              {%- if active_count > 0 -%}<sup>{{ active_count }}</sup>{%- endif -%}
+            </summary>
+            <div class="filters__panel">
+              {%- for filter in collection.filters -%}
+                <fieldset class="filters__group">
+                  <legend>{{ filter.label }}</legend>
+                  {%- case filter.type -%}
+                    {%- when 'price_range' -%}
+                      <div class="filters__price">
+                        <input type="number" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}" placeholder="0" aria-label="{{ 'collections.min' | t }}">
+                        <span>–</span>
+                        <input type="number" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}" placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}" aria-label="{{ 'collections.max' | t }}">
+                      </div>
+                    {%- else -%}
+                      {%- for value in filter.values -%}
+                        <label class="check{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                          <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %}>
+                          <span>{{ value.label }}</span><small>{{ value.count }}</small>
+                        </label>
+                      {%- endfor -%}
+                  {%- endcase -%}
+                </fieldset>
+              {%- endfor -%}
+              <div class="filters__actions">
+                <a href="{{ collection.url }}?sort_by={{ collection.sort_by | default: collection.default_sort_by }}" class="link-underline">{{ 'collections.clear' | t }}</a>
+                <button type="submit" class="btn btn--primary btn--small">{{ 'collections.apply' | t }}</button>
+              </div>
+            </div>
+          </details>
+        {%- endif -%}
+
+        {%- if s.enable_sorting -%}
+          <label class="toolbar__sort">
+            <span class="visually-hidden">{{ 'collections.sort' | t }}</span>
+            <select name="sort_by" data-auto-submit>
+              {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name }}</option>
+              {%- endfor -%}
+            </select>
+            {% render 'icon', name: 'chevron' %}
+          </label>
+        {%- endif -%}
+      </form>
+
+      {%- if collection.products.size > 0 -%}
+        <div class="product-grid">
+          {%- for product in collection.products -%}
+            {% render 'product-card', product: product, index: forloop.index0 %}
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <div class="empty-state">
+          <p>{{ 'collections.empty' | t }}</p>
+          <a href="{{ collection.url }}" class="btn btn--ghost">{{ 'collections.clear' | t }}</a>
+        </div>
+      {%- endif -%}
+
+      {% render 'pagination', paginate: paginate %}
+    </div>
+  {%- endpaginate -%}
+</section>
+
+{% schema %}
+{
+  "name": "Koleksiyon ürünleri",
+  "class": "section-main-collection",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Sayfa başına ürün", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columns", "label": "Masaüstü sütun", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "select", "id": "columns_mobile", "label": "Mobil sütun", "default": "2", "options": [ { "value": "1", "label": "1" }, { "value": "2", "label": "2" } ] },
+    { "type": "checkbox", "id": "show_description", "label": "Koleksiyon açıklaması", "default": true },
+    { "type": "checkbox", "id": "enable_filters", "label": "Filtreler", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Sıralama", "default": true }
+  ]
+}
+{% endschema %}

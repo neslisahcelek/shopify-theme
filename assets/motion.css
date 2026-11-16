@@ -1,0 +1,235 @@
+/* =========================================================
+   Style Vibeus — Global Motion & Micro-Interactions
+   GPU-composited only (transform, opacity, filter)
+   ========================================================= */
+
+/* ---------- Glassmorphic Sticky Header ---------- */
+.header.is-scrolled {
+  background: rgba(251, 248, 244, 0.82);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom-color: rgba(17, 17, 17, 0.1);
+}
+
+/* ---------- Product Card Glassmorphic Quick-Size Overlay ---------- */
+.card__quick-sizes {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(251, 248, 244, 0.84);
+  backdrop-filter: blur(14px) saturate(1.35);
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  box-shadow: 0 12px 30px -12px rgba(17, 17, 17, 0.28);
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  pointer-events: none;
+  transition:
+    opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .card__quick-sizes,
+.card:focus-within .card__quick-sizes {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.card__quick-sizes-form {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.card__quick-sizes-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.58);
+  line-height: 1.1;
+}
+
+.card__quick-sizes-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.card__quick-size {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+  color: #111111;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card__quick-size:hover,
+.card__quick-size:focus-visible,
+.card__quick-size.is-selected {
+  background: #111111;
+  color: #fbf8f4;
+  border-color: #111111;
+}
+
+.card__quick-size:active {
+  transform: scale3d(0.95, 0.95, 1);
+}
+
+@media (max-width: 749px) {
+  .card__quick-sizes {
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    padding: 5px 6px;
+    border-radius: 10px;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .card__quick-sizes-label {
+    display: none;
+  }
+
+  .card__quick-size {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    font-size: 9.5px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Below-the-fold section scroll reveal (tagged by motion.js) */
+  .motion .shopify-section[data-motion-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    transition:
+      opacity 0.44s var(--motion-ease-out),
+      transform 0.5s var(--motion-ease-drawer);
+  }
+
+  .motion .shopify-section[data-motion-reveal].is-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Refined product card hover micro-interactions (pointer-fine only) */
+  .card__media-wrap {
+    transition: transform 0.28s var(--motion-ease-out);
+  }
+
+  .card--hover .card__img--secondary {
+    transition:
+      opacity 0.28s var(--motion-ease-out),
+      transform 0.45s var(--motion-ease-out),
+      clip-path 0.42s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .card__media-wrap {
+      transform: translate3d(0, -3px, 0);
+    }
+
+    .card:hover .card__img--primary {
+      transform: scale3d(1.05, 1.05, 1);
+    }
+
+    .card--hover:hover .card__img--secondary {
+      transform: scale3d(1.05, 1.05, 1);
+    }
+
+    .card__quick-size:hover {
+      transform: translate3d(0, -1px, 0);
+    }
+  }
+
+  /* Refined button tactile micro-interactions */
+  .btn {
+    transition:
+      transform 160ms var(--motion-ease-out),
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 220ms var(--motion-ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      transform: translate3d(0, -1px, 0);
+    }
+  }
+
+  .btn:active {
+    transform: scale3d(0.97, 0.97, 1);
+  }
+
+  /* Refined Cart Drawer transition & staggered line items */
+  .drawer {
+    transition: transform 0.42s var(--motion-ease-drawer);
+  }
+
+  .drawer-overlay {
+    transition: opacity 0.32s var(--motion-ease-drawer), visibility 0.32s;
+  }
+
+  .drawer__items .line-item {
+    opacity: 0;
+    transform: translate3d(18px, 0, 0);
+    transition:
+      opacity 0.38s var(--motion-ease-out),
+      transform 0.42s var(--motion-ease-drawer);
+    transition-delay: calc(0.1s + var(--i, 0) * 55ms);
+  }
+
+  .cart-open .drawer__items .line-item {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shopify-section[data-motion-reveal],
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .card:hover .card__media-wrap,
+  .card:hover .card__img--primary,
+  .card--hover:hover .card__img--secondary,
+  .card__quick-sizes,
+  .card__quick-size:hover,
+  .card__quick-size:active,
+  .btn:hover,
+  .btn:active {
+    transform: none !important;
+  }
+}

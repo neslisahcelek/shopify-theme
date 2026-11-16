@@ -1,0 +1,72 @@
+{%- liquid
+  assign s = section.settings
+  assign scheme = ''
+  if s.style == 'dark'
+    assign scheme = 'scheme-dark'
+  elsif s.style == 'gradient'
+    assign scheme = 'scheme-gradient'
+  endif
+-%}
+<section class="marquee-section {{ scheme }}{% if s.tilt %} marquee-section--tilt{% endif %}" style="--marquee-duration: {{ s.speed }}s">
+  <div class="marquee marquee--{{ s.size }}{% if s.reverse %} marquee--reverse{% endif %}{% if s.scroll_boost %} marquee--boost{% endif %}">
+    <div class="marquee__track">
+      {%- for i in (1..2) -%}
+        <div class="marquee__group"{% if forloop.last %} aria-hidden="true"{% endif %}>
+          {%- for block in section.blocks -%}
+            <span class="marquee__item" {% if forloop.parentloop.first %}{{ block.shopify_attributes }}{% endif %}>
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 240 | image_tag: loading: 'lazy', class: 'marquee__img', alt: '' }}
+              {%- endif -%}
+              {%- if block.settings.italic -%}<em>{{ block.settings.text }}</em>{%- else -%}{{ block.settings.text }}{%- endif -%}
+            </span>
+            <i class="marquee__sep" aria-hidden="true">{{ s.separator }}</i>
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kayan yazı",
+  "class": "section-marquee",
+  "settings": [
+    {
+      "type": "select", "id": "size", "label": "Yazı boyutu", "default": "large",
+      "options": [ { "value": "small", "label": "Küçük" }, { "value": "medium", "label": "Orta" }, { "value": "large", "label": "Büyük" } ]
+    },
+    { "type": "range", "id": "speed", "label": "Tur süresi", "min": 10, "max": 80, "step": 2, "unit": "sn", "default": 30 },
+    { "type": "checkbox", "id": "reverse", "label": "Ters yönde kay", "default": false },
+    { "type": "checkbox", "id": "scroll_boost", "label": "Sayfa kaydırıldıkça hızlansın", "default": true },
+    { "type": "checkbox", "id": "tilt", "label": "Hafif eğik", "default": false },
+    { "type": "text", "id": "separator", "label": "Ayraç", "default": "✦" },
+    {
+      "type": "select", "id": "style", "label": "Görünüm", "default": "light",
+      "options": [ { "value": "light", "label": "Açık" }, { "value": "dark", "label": "Koyu" }, { "value": "gradient", "label": "Gradyan" } ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item", "name": "Öğe",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Metin", "default": "Yeni sezon" },
+        { "type": "checkbox", "id": "italic", "label": "İtalik serif", "default": false },
+        { "type": "image_picker", "id": "image", "label": "Küçük görsel" }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Kayan yazı",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Yeni sezon" } },
+        { "type": "item", "settings": { "text": "zamansız", "italic": true } },
+        { "type": "item", "settings": { "text": "Bilinçli üretim" } },
+        { "type": "item", "settings": { "text": "el işçiliği", "italic": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

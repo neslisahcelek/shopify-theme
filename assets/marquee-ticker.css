@@ -1,0 +1,68 @@
+/* =========================================================
+   Style Vibeus — Infinite Marquee Ticker
+   GPU-accelerated translate3d seamless strip
+   ========================================================= */
+
+.marquee-ticker {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: var(--mt-bg, #111111);
+  color: var(--mt-fg, #fbf8f4);
+  border-top: 1px solid color-mix(in srgb, var(--mt-fg, #fbf8f4) 12%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--mt-fg, #fbf8f4) 12%, transparent);
+}
+
+.marquee-ticker__viewport {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-ticker__viewport {
+    animation: sv-marquee-ticker var(--mt-speed, 28s) linear infinite;
+  }
+
+  .marquee-ticker--pause-hover:hover .marquee-ticker__viewport,
+  .marquee-ticker--pause-hover:focus-within .marquee-ticker__viewport {
+    animation-play-state: paused;
+  }
+}
+
+.marquee-ticker__group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 14px 0;
+}
+
+.marquee-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  padding-inline: 24px;
+  font-family: var(--display, "Syne", system-ui, sans-serif);
+  font-size: clamp(12px, 1.1vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee-ticker__sep {
+  font-family: var(--serif, "Instrument Serif", Georgia, serif);
+  font-style: italic;
+  font-size: 1.15em;
+  opacity: 0.65;
+}
+
+@keyframes sv-marquee-ticker {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}

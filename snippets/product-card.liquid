@@ -1,0 +1,147 @@
+{%- comment -%}
+  Usage: {% render 'product-card', product: product, index: forloop.index0 %}
+  Renders a placeholder card when product is blank.
+{%- endcomment -%}
+{%- liquid
+  assign ratio_class = 'ratio--' | append: settings.card_ratio
+  assign second_image = product.media[1].preview_image
+  assign has_hover = false
+  if settings.card_hover_image and second_image
+    assign has_hover = true
+  endif
+  assign single_variant = false
+  if product.has_only_default_variant
+    assign single_variant = true
+  endif
+-%}
+<article class="card{% if has_hover %} card--hover{% endif %}" data-reveal style="--i: {{ index | default: 0 | modulo: 4 }}">
+  {%- if product != blank -%}
+    <div class="card__media-wrap">
+    <a href="{{ product.url }}" class="card__media {{ ratio_class }}" data-cursor="{{ 'products.card.view' | t }}">
+      {%- if product.featured_media -%}
+        {{ product.featured_media.preview_image | image_url: width: 900 | image_tag:
+          widths: '300, 450, 600, 750, 900',
+          sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+          loading: 'lazy',
+          class: 'card__img card__img--primary',
+          alt: product.featured_media.alt | default: product.title | escape
+        }}
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'card__img placeholder' }}
+      {%- endif -%}
+      {%- if has_hover -%}
+        {{ second_image | image_url: width: 900 | image_tag:
+          widths: '300, 450, 600, 750, 900',
+          sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+          loading: 'lazy',
+          class: 'card__img card__img--secondary',
+          alt: ''
+        }}
+      {%- endif -%}
+
+      <div class="card__badges">
+        {%- unless product.available -%}
+          <span class="badge">{{ 'products.product.sold_out' | t }}</span>
+        {%- elsif product.compare_at_price > product.price -%}
+          <span class="badge badge--sale">{{ 'products.product.on_sale' | t }}</span>
+        {%- endunless -%}
+      </div>
+    </a>
+
+    {%- if settings.card_quick_add and product.available -%}
+      {%- if single_variant -%}
+        <form action="{{ routes.cart_add_url }}" method="post" class="card__quick" data-product-form>
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="card__quick-btn">
+            {% render 'icon', name: 'plus' %}<span>{{ 'products.card.quick_add' | t }}</span>
+          </button>
+        </form>
+      {%- else -%}
+        {%- liquid
+          assign size_opt_idx = -1
+          for opt in product.options_with_values
+            assign opt_down = opt.name | downcase | strip
+            if opt_down contains 'size' or opt_down contains 'beden' or opt_down contains 'ölçü' or opt_down contains 'olcu'
+              assign size_opt_idx = forloop.index0
+              break
+            endif
+          endfor
+          if size_opt_idx == -1
+            for opt in product.options_with_values
+              assign opt_down = opt.name | downcase | strip
+              unless opt_down contains 'color' or opt_down contains 'colour' or opt_down contains 'renk'
+                assign size_opt_idx = forloop.index0
+                break
+              endunless
+            endfor
+          endif
+          if size_opt_idx == -1
+            assign size_opt_idx = 0
+          endif
+          assign seen_sizes = '|'
+          assign shown_sizes = 0
+        -%}
+        <div class="card__quick-sizes" data-quick-sizes>
+          <form action="{{ routes.cart_add_url }}" method="post" class="card__quick-sizes-form" data-product-form>
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-quick-variant-id>
+            <input type="hidden" name="quantity" value="1">
+            <span class="card__quick-sizes-label">{{ 'products.card.quick_add' | t }}</span>
+            <div class="card__quick-sizes-list">
+              {%- for v in product.variants -%}
+                {%- if v.available and shown_sizes < 6 -%}
+                  {%- assign pill_label = v.options[size_opt_idx] | default: v.title | strip -%}
+                  {%- assign size_token = '|' | append: pill_label | append: '|' -%}
+                  {%- unless seen_sizes contains size_token -%}
+                    {%- assign seen_sizes = seen_sizes | append: pill_label | append: '|' -%}
+                    {%- assign shown_sizes = shown_sizes | plus: 1 -%}
+                    <button
+                      type="submit"
+                      class="card__quick-size"
+                      data-quick-size-btn
+                      data-variant-id="{{ v.id }}"
+                      aria-label="{{ 'products.card.quick_add' | t }} {{ pill_label | escape }}"
+                    >
+                      {{ pill_label }}
+                    </button>
+                  {%- endunless -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </form>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+    </div>
+
+    <div class="card__info">
+      {%- if settings.card_show_vendor -%}
+        <span class="card__vendor">{{ product.vendor }}</span>
+      {%- endif -%}
+      <h3 class="card__title"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+      {% render 'price', product: product %}
+      {%- assign color_option = product.options_with_values | where: 'name', 'Color' | first -%}
+      {%- unless color_option -%}{%- assign color_option = product.options_with_values | where: 'name', 'Renk' | first -%}{%- endunless -%}
+      {%- if color_option and color_option.values.size > 1 -%}
+        <ul class="card__swatches" aria-label="{{ color_option.name }}">
+          {%- for value in color_option.values limit: 5 -%}
+            <li style="--swatch: {% if value.swatch.color %}{{ value.swatch.color }}{% else %}{{ value | handle }}{% endif %}" title="{{ value }}"></li>
+          {%- endfor -%}
+          {%- if color_option.values.size > 5 -%}<li class="card__swatches-more">+{{ color_option.values.size | minus: 5 }}</li>{%- endif -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    {%- liquid
+      assign placeholder_num = index | default: 0 | modulo: 4 | plus: 1
+      assign placeholder_name = 'product-apparel-' | append: placeholder_num
+    -%}
+    <div class="card__media {{ ratio_class }}">
+      {{ placeholder_name | placeholder_svg_tag: 'card__img placeholder' }}
+    </div>
+    <div class="card__info">
+      <h3 class="card__title">{{ 'products.card.placeholder_title' | t }}</h3>
+      <div class="price"><span class="price__current">{{ 1999 | times: 100 | money }}</span></div>
+    </div>
+  {%- endif -%}
+</article>

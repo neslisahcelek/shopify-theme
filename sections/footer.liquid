@@ -1,0 +1,147 @@
+<footer class="footer scheme-dark">
+  <div class="footer__top page-width">
+    <div class="footer__brand" data-reveal>
+      <a href="{{ routes.root_url }}" class="footer__logo" aria-label="{{ shop.name }}">
+        {%- if section.settings.logo_svg != blank -%}
+          <span class="footer__logo-svg" style="width: {{ section.settings.logo_width }}px">{{ section.settings.logo_svg }}</span>
+        {%- elsif section.settings.logo != blank -%}
+          {{ section.settings.logo | image_url: width: 600 | image_tag:
+            width: section.settings.logo_width,
+            widths: '200, 400, 600',
+            sizes: '200px',
+            loading: 'lazy',
+            alt: shop.name,
+            class: 'footer__logo-img'
+          }}
+        {%- else -%}
+          {{ shop.name }}
+        {%- endif -%}
+      </a>
+      {%- if section.settings.text != blank -%}
+        <div class="footer__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.settings.show_newsletter -%}
+        {%- form 'customer', class: 'newsletter-form', id: 'FooterNewsletter' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          {%- if form.posted_successfully? -%}
+            <p class="newsletter-form__success">{{ 'sections.newsletter.success' | t }}</p>
+          {%- else -%}
+            <div class="newsletter-form__field">
+              <label for="FooterEmail" class="visually-hidden">{{ 'sections.newsletter.email' | t }}</label>
+              <input id="FooterEmail" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ 'sections.newsletter.email' | t }}">
+              <button type="submit" class="icon-btn" aria-label="{{ 'sections.newsletter.subscribe' | t }}">{% render 'icon', name: 'arrow' %}</button>
+            </div>
+            {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+          {%- endif -%}
+        {%- endform -%}
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Columns are <details>: always open on desktop, tap-to-open accordions on phones. {%- endcomment -%}
+    <div class="footer__cols" data-footer-cols>
+      {%- for block in section.blocks -%}
+        <details class="footer__col" open {{ block.shopify_attributes }} data-reveal style="--i: {{ forloop.index }}">
+          <summary>
+            <h4>{{ block.settings.title | default: '&nbsp;' }}</h4>
+            <span class="footer__col-icon" aria-hidden="true"></span>
+          </summary>
+          {%- case block.type -%}
+            {%- when 'menu' -%}
+              <ul>
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}" class="link-underline">{% render 'menu-title', title: link.title %}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- when 'policies' -%}
+              <ul>
+                {%- for policy in shop.policies -%}
+                  <li><a href="{{ policy.url }}" class="link-underline">{{ policy.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- when 'text' -%}
+              <div class="rte">{{ block.settings.text }}</div>
+          {%- endcase -%}
+        </details>
+      {%- endfor -%}
+    </div>
+    <script>
+      (() => {
+        const cols = document.querySelectorAll('[data-footer-cols] > details');
+        const mq = matchMedia('(max-width: 749px)');
+        const sync = () => cols.forEach((d) => { d.open = !mq.matches; });
+        sync();
+        mq.addEventListener('change', sync);
+      })();
+    </script>
+  </div>
+
+  {%- if section.settings.show_big_name -%}
+    <div class="footer__big" aria-hidden="true" data-footer-big><span>{{ section.settings.big_text | default: shop.name }}</span></div>
+  {%- endif -%}
+
+  <div class="footer__bottom page-width">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}. {{ 'sections.footer.rights' | t }}</span>
+
+    <ul class="footer__social">
+      {%- liquid
+        assign socials = 'instagram,tiktok,pinterest,facebook,youtube' | split: ','
+      -%}
+      {%- for name in socials -%}
+        {%- assign key = 'social_' | append: name -%}
+        {%- if settings[key] != blank -%}
+          <li><a href="{{ settings[key] }}" class="icon-btn" target="_blank" rel="noopener" aria-label="{{ name | capitalize }}">{% render 'icon', name: name %}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+    {%- if section.settings.show_payment -%}
+      <ul class="footer__payment" aria-label="{{ 'sections.footer.payment' | t }}">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "html", "id": "logo_svg", "label": "SVG logo kodu", "info": "Her boyutta keskin görünür ve footer'ın yazı rengini alır. Doluysa yukarıdaki görsel yerine bu kullanılır." },
+    { "type": "range", "id": "logo_width", "label": "Logo genişliği", "min": 60, "max": 320, "step": 10, "unit": "px", "default": 180 },
+    { "type": "richtext", "id": "text", "label": "Marka metni", "default": "<p>Zamansız parçalar, bilinçli üretim. Her sezon yeniden.</p>" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Bülten formu", "default": true },
+    { "type": "checkbox", "id": "show_big_name", "label": "Dev marka yazısı", "default": false },
+    { "type": "text", "id": "big_text", "label": "Dev yazı metni", "info": "Boş bırakırsanız mağaza adı kullanılır." },
+    { "type": "checkbox", "id": "show_payment", "label": "Ödeme ikonları", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "menu", "name": "Menü",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Başlık", "default": "Mağaza" },
+        { "type": "link_list", "id": "menu", "label": "Menü", "default": "footer" }
+      ]
+    },
+    {
+      "type": "text", "name": "Metin",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Başlık", "default": "İletişim" },
+        { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Hafta içi 09:00 – 18:00</p>" }
+      ]
+    },
+    {
+      "type": "policies", "name": "Politikalar", "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Başlık", "default": "Legal" },
+        { "type": "paragraph", "content": "Ayarlar → Politikalar'da doldurulan her politika burada otomatik listelenir." }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "enabled_on": { "groups": ["footer"] }
+}
+{% endschema %}

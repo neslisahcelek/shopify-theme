@@ -1,0 +1,67 @@
+{%- comment -%}
+  schema.org data for Google: the brand on every page, the site search box on the
+  home page, and breadcrumbs on product and collection pages. The Product itself
+  is described in main-product.
+  Usage: {% render 'structured-data', brand: brand %}
+{%- endcomment -%}
+{%- liquid
+  assign socials = 'instagram,tiktok,pinterest,facebook,youtube' | split: ','
+  assign same_as = ''
+  for name in socials
+    assign key = 'social_' | append: name
+    if settings[key] != blank
+      assign same_as = same_as | append: settings[key] | append: '|'
+    endif
+  endfor
+  assign same_as = same_as | split: '|'
+-%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": {{ brand | json }},
+    "url": {{ request.origin | json }},
+    "logo": {{ 'favicon-192.png' | asset_url | prepend: 'https:' | json }}
+    {%- if same_as.size > 0 -%},
+    "sameAs": {{ same_as | json }}
+    {%- endif %}
+  }
+</script>
+
+{%- if request.page_type == 'index' -%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": {{ brand | json }},
+    "url": {{ request.origin | json }},
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ request.origin }}{{ routes.search_url }}?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+</script>
+{%- endif -%}
+
+{%- if request.page_type == 'product' or request.page_type == 'collection' -%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ request.origin | json }} }
+      {%- if request.page_type == 'collection' -%},
+      { "@type": "ListItem", "position": 2, "name": {{ collection.title | json }}, "item": {{ request.origin | append: collection.url | json }} }
+      {%- else -%}
+        {%- if collection -%},
+      { "@type": "ListItem", "position": 2, "name": {{ collection.title | json }}, "item": {{ request.origin | append: collection.url | json }} },
+      { "@type": "ListItem", "position": 3, "name": {{ product.title | json }}, "item": {{ request.origin | append: product.url | json }} }
+        {%- else -%},
+      { "@type": "ListItem", "position": 2, "name": {{ product.title | json }}, "item": {{ request.origin | append: product.url | json }} }
+        {%- endif -%}
+      {%- endif %}
+    ]
+  }
+</script>
+{%- endif -%}

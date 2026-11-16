@@ -1,0 +1,121 @@
+{%- comment -%}
+  Contact page: ways to reach us, the legal company details and a contact form.
+  Lives in the default page template but only renders on the page whose handle
+  matches the "Sayfa adresi" setting, so other pages are unaffected.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign show = true
+  if request.page_type == 'page' and page.handle != s.page_handle
+    assign show = false
+  endif
+  assign phone_digits = s.phone | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')'
+  assign wa_digits = s.whatsapp | default: s.phone | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')'
+-%}
+{%- if show -%}
+<section class="section contact">
+  <div class="page-width">
+  <div class="contact__grid">
+    <div class="contact__info">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+      {%- if s.heading != blank -%}<h1 class="h-display contact__title" data-split>{{ s.heading }}</h1>{%- endif -%}
+      {%- if s.text != blank -%}<div class="rte contact__intro" data-reveal>{{ s.text }}</div>{%- endif -%}
+
+      <ul class="contact__methods" data-reveal>
+        {%- if s.email != blank -%}
+          <li>
+            <a href="mailto:{{ s.email }}" class="contact__method">
+              <span class="contact__icon">{% render 'icon', name: 'mail' %}</span>
+              <span><small>Email</small>{{ s.email }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if wa_digits != blank -%}
+          <li>
+            <a href="https://wa.me/{{ wa_digits }}" class="contact__method" target="_blank" rel="noopener">
+              <span class="contact__icon">{% render 'icon', name: 'whatsapp' %}</span>
+              <span><small>WhatsApp</small>{{ s.whatsapp | default: s.phone }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if s.phone != blank -%}
+          <li>
+            <a href="tel:+{{ phone_digits }}" class="contact__method">
+              <span class="contact__icon">{% render 'icon', name: 'phone' %}</span>
+              <span><small>Phone</small>{{ s.phone }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+      {%- if s.hours != blank -%}<p class="contact__hours" data-reveal>{{ s.hours }}</p>{%- endif -%}
+
+      {%- if s.company_name != blank -%}
+        <div class="contact__company" data-reveal>
+          <span class="contact__icon">{% render 'icon', name: 'building' %}</span>
+          <div>
+            <p class="contact__company-name">{{ s.company_name }}</p>
+            {%- if s.company_details != blank -%}<div class="rte">{{ s.company_details }}</div>{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if s.show_form -%}
+      <div class="contact__form-wrap" data-reveal>
+        {%- form 'contact', class: 'contact__form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="contact__success">{{ s.success_text }}</p>
+          {%- else -%}
+            {%- if s.form_heading != blank -%}<h2 class="contact__form-title">{{ s.form_heading }}</h2>{%- endif -%}
+            <div class="contact__row">
+              <label class="contact__field">
+                <span>Name</span>
+                <input type="text" name="contact[name]" autocomplete="name" value="{{ form.name }}">
+              </label>
+              <label class="contact__field">
+                <span>Email *</span>
+                <input type="email" name="contact[email]" autocomplete="email" required value="{{ form.email }}">
+              </label>
+            </div>
+            <label class="contact__field">
+              <span>Order number (optional)</span>
+              <input type="text" name="contact[order]" value="{{ form.order }}">
+            </label>
+            <label class="contact__field">
+              <span>Message *</span>
+              <textarea name="contact[body]" rows="6" required>{{ form.body }}</textarea>
+            </label>
+            {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+            <button type="submit" class="btn btn--primary contact__submit">Send message{% render 'icon', name: 'arrow' %}</button>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+  </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "İletişim bilgileri",
+  "settings": [
+    { "type": "text", "id": "page_handle", "label": "Sayfa adresi", "default": "contact", "info": "Bu bölüm yalnızca bu adresteki sayfada görünür (stylevibeus.com/pages/contact → contact)." },
+    { "type": "text", "id": "eyebrow", "label": "Üst yazı", "default": "Get in touch" },
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Contact <em>us</em>" },
+    { "type": "richtext", "id": "text", "label": "Giriş metni", "default": "<p>Questions about sizing, an order or a return? Send us a message and we will get back to you within one business day.</p>" },
+    { "type": "header", "content": "İletişim kanalları" },
+    { "type": "text", "id": "email", "label": "E-posta" },
+    { "type": "text", "id": "whatsapp", "label": "WhatsApp numarası", "info": "Ülke koduyla, örn. +90 552 385 00 20. Boşsa telefon numarası kullanılır." },
+    { "type": "text", "id": "phone", "label": "Telefon numarası", "info": "Ülke koduyla yazın." },
+    { "type": "text", "id": "hours", "label": "Çalışma saatleri" },
+    { "type": "header", "content": "Şirket bilgileri" },
+    { "type": "text", "id": "company_name", "label": "Şirket adı" },
+    { "type": "richtext", "id": "company_details", "label": "Şirket detayları" },
+    { "type": "header", "content": "Form" },
+    { "type": "checkbox", "id": "show_form", "label": "İletişim formunu göster", "default": true },
+    { "type": "text", "id": "form_heading", "label": "Form başlığı", "default": "Send us a message" },
+    { "type": "text", "id": "success_text", "label": "Gönderildi mesajı", "default": "Thanks — your message is on its way. We'll reply within one business day." }
+  ]
+}
+{% endschema %}

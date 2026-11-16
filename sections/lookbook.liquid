@@ -1,0 +1,184 @@
+{%- comment -%}
+  Pinned horizontal scroll: vertical scrolling moves the strip sideways on desktop.
+  Falls back to native swipeable scroll-snap on touch devices and with reduced motion.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="lookbook{% if s.dark %} scheme-dark{% endif %}{% if s.cutout %} lookbook--cutout{% endif %}" data-lookbook>
+  <div class="lookbook__pin">
+    <div class="lookbook__head page-width">
+      {%- if s.eyebrow != blank -%}<span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>{%- endif -%}
+      {%- if s.heading != blank -%}<h2 class="h-section" data-split>{{ s.heading }}</h2>{%- endif -%}
+      <div class="lookbook__progress" aria-hidden="true"><i></i></div>
+    </div>
+
+    <div class="lookbook__rail">
+    <div class="lookbook__track" data-lookbook-track>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign product = block.settings.product
+          if product == blank and collections.all.products.size > forloop.index0
+            assign product = collections.all.products[forloop.index0]
+          endif
+          assign look_image = block.settings.image
+          if look_image == blank and product != blank and product.featured_media != blank
+            assign look_image = product.featured_media.preview_image
+          endif
+        -%}
+        <figure class="look look--{{ block.settings.size }}" {{ block.shopify_attributes }}>
+          <div class="look__media"{% if s.cutout and look_image != blank %} data-lift{% endif %}>
+            {%- if look_image != blank -%}
+              {%- if s.cutout -%}
+                {{ look_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'lift-glow', alt: '', aria-hidden: 'true' }}
+              {%- endif -%}
+              {{ look_image | image_url: width: 1400 | image_tag:
+                widths: '500, 800, 1100, 1400',
+                sizes: '(min-width: 750px) 45vw, 80vw',
+                loading: 'lazy',
+                class: 'look__img',
+                alt: look_image.alt | default: block.settings.caption | escape
+              }}
+            {%- else -%}
+              {%- assign ph = forloop.index0 | modulo: 2 | plus: 1 -%}
+              {{ 'lifestyle-' | append: ph | placeholder_svg_tag: 'look__img placeholder' }}
+            {%- endif -%}
+
+            {%- if product != blank -%}
+              <a href="{{ product.url }}" class="hotspot" style="--x: {{ block.settings.hotspot_x }}%; --y: {{ block.settings.hotspot_y }}%">
+                <span class="hotspot__dot" aria-hidden="true"></span>
+                <span class="hotspot__card">
+                  {%- if product.featured_media -%}
+                    {{ product.featured_media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}
+                  {%- endif -%}
+                  <span>
+                    <b>{{ product.title }}</b>
+                    {{ product.price | money }}
+                  </span>
+                </span>
+              </a>
+            {%- endif -%}
+          </div>
+          {%- if block.settings.caption != blank -%}
+            <figcaption class="look__caption">
+              <span>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>{{ block.settings.caption }}
+            </figcaption>
+          {%- endif -%}
+        </figure>
+      {%- endfor -%}
+
+      {%- if s.end_label != blank -%}
+        {%- if s.end_image != blank -%}
+          {%- comment -%} With a photo the round end link is filled with a zoomed crop of it. {%- endcomment -%}
+          <a href="{{ s.end_link | default: routes.collections_url }}" class="look-end look-end-card" style="--zoom: {{ s.end_image_zoom | divided_by: 100.0 }}; --focus-y: {{ s.end_image_y }}%" data-magnetic>
+            <span class="look-end-card__media">
+              {{ s.end_image | image_url: width: 1200 | image_tag:
+                widths: '500, 800, 1200',
+                sizes: '(min-width: 750px) 30vw, 80vw',
+                loading: 'lazy',
+                alt: s.end_image.alt | default: s.end_label | escape
+              }}
+            </span>
+            <span class="look-end-card__label">
+              <span>{{ s.end_label }}</span>
+              <span class="look-end-card__arrow">{% render 'icon', name: 'arrow' %}</span>
+            </span>
+          </a>
+        {%- else -%}
+          <a href="{{ s.end_link | default: routes.collections_url }}" class="look-end" data-magnetic>
+            <span>{{ s.end_label }}</span>{% render 'icon', name: 'arrow' %}
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+    {%- liquid
+      assign lb_count = section.blocks.size
+      if s.end_label != blank
+        assign lb_count = lb_count | plus: 1
+      endif
+    -%}
+    {%- if lb_count > 1 -%}
+      {%- comment -%} Yalnızca mobilde görünür: tek görünüm + ok / kaydırma {%- endcomment -%}
+      <button type="button" class="ss-arrow ss-arrow--prev" data-lb-prev aria-label="Previous">{% render 'icon', name: 'arrow' %}</button>
+      <button type="button" class="ss-arrow ss-arrow--next" data-lb-next aria-label="Next">{% render 'icon', name: 'arrow' %}</button>
+      <div class="ss-mdots" aria-hidden="true">
+        {%- for i in (1..lb_count) -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
+      </div>
+    {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const rail = document.querySelector('#shopify-section-{{ section.id }} .lookbook__rail');
+    const prev = rail && rail.querySelector('[data-lb-prev]');
+    if (!prev) return;
+    const track = rail.querySelector('.lookbook__track');
+    const dots = [...rail.querySelectorAll('.ss-mdots i')];
+    const items = [...track.children].filter((el) => el.matches('.look, .look-end'));
+    const n = items.length;
+    // her öğenin ortalandığı kaydırma konumu (genişlikler farklı olabilir)
+    const pos = (el) => el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
+    const current = () => {
+      let best = 0, d = Infinity;
+      items.forEach((el, i) => { const k = Math.abs(pos(el) - track.scrollLeft); if (k < d) { d = k; best = i; } });
+      return best;
+    };
+    const go = (dir) => track.scrollTo({ left: pos(items[(current() + dir + n) % n]), behavior: 'smooth' });
+    prev.addEventListener('click', () => go(-1));
+    rail.querySelector('[data-lb-next]').addEventListener('click', () => go(1));
+    let raf = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => dots.forEach((d, i) => d.classList.toggle('is-active', i === current())));
+    }, { passive: true });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Lookbook (yatay kaydırma)",
+  "class": "section-lookbook",
+  "settings": [
+    { "type": "paragraph", "content": "Masaüstünde sayfa aşağı kaydırıldıkça görseller yana kayar. Mobilde parmakla kaydırılır." },
+    { "type": "text", "id": "eyebrow", "label": "Üst yazı", "default": "Lookbook" },
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Şehirde bir <em>sonbahar</em>" },
+    { "type": "checkbox", "id": "dark", "label": "Koyu arka plan", "default": true },
+    { "type": "checkbox", "id": "cutout", "label": "Arka plansız görseller", "default": true, "info": "Arka planı silinmiş PNG'ler için: kart kutusu kalkar, ürün zeminin üstünde süzülür. Normal fotoğraflarda kapatın." },
+    { "type": "text", "id": "end_label", "label": "Son kart metni", "default": "Tüm koleksiyon" },
+    { "type": "url", "id": "end_link", "label": "Son kart bağlantısı" },
+    { "type": "image_picker", "id": "end_image", "label": "Son kart görseli", "info": "Yuvarlak düğmenin içini doldurur." },
+    { "type": "range", "id": "end_image_zoom", "label": "Görsel yakınlığı", "min": 100, "max": 300, "step": 10, "unit": "%", "default": 140 },
+    { "type": "range", "id": "end_image_y", "label": "Görsel odağı (yukarı / aşağı)", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 20 }
+  ],
+  "blocks": [
+    {
+      "type": "look", "name": "Görünüm",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Görsel" },
+        { "type": "text", "id": "caption", "label": "Alt yazı", "default": "Yün kaban & ipek eşarp" },
+        {
+          "type": "select", "id": "size", "label": "Boyut", "default": "tall",
+          "options": [ { "value": "tall", "label": "Dikey" }, { "value": "wide", "label": "Yatay" }, { "value": "small", "label": "Küçük" } ]
+        },
+        { "type": "header", "content": "Ürün etiketi" },
+        { "type": "product", "id": "product", "label": "Ürün" },
+        { "type": "range", "id": "hotspot_x", "label": "Yatay konum", "min": 5, "max": 95, "step": 1, "unit": "%", "default": 50 },
+        { "type": "range", "id": "hotspot_y", "label": "Dikey konum", "min": 5, "max": 95, "step": 1, "unit": "%", "default": 55 }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Lookbook (yatay kaydırma)",
+      "blocks": [
+        { "type": "look", "settings": { "size": "tall", "caption": "Yün kaban & ipek eşarp" } },
+        { "type": "look", "settings": { "size": "wide", "caption": "Keten takım" } },
+        { "type": "look", "settings": { "size": "small", "caption": "Deri çanta" } },
+        { "type": "look", "settings": { "size": "tall", "caption": "Kaşmir triko" } },
+        { "type": "look", "settings": { "size": "wide", "caption": "Akşam şıklığı" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

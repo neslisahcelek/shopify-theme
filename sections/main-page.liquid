@@ -1,0 +1,16 @@
+{%- comment -%} Steps aside on the page that the contact-details section takes over. {%- endcomment -%}
+{%- unless section.settings.hide_on != blank and page.handle == section.settings.hide_on -%}
+<section class="section page-content page-width page-width--narrow">
+  <h1 class="h-display" data-split>{{ page.title }}</h1>
+  <div class="rte" data-reveal>{{ page.content }}</div>
+</section>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Sayfa",
+  "settings": [
+    { "type": "text", "id": "hide_on", "label": "Bu adresteki sayfada gizle", "info": "Örn. contact: iletişim sayfasında yerine İletişim bilgileri bölümü gösterilir." }
+  ]
+}
+{% endschema %}

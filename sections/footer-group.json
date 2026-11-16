@@ -1,0 +1,64 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "menu1": {
+          "type": "menu",
+          "settings": {
+            "title": "Shop",
+            "menu": "main-menu"
+          }
+        },
+        "menu2": {
+          "type": "menu",
+          "settings": {
+            "title": "Help",
+            "menu": "footer"
+          }
+        },
+        "text1": {
+          "type": "text",
+          "settings": {
+            "title": "Contact",
+            "text": "<p>Questions about sizing? We're here weekdays 09:00 – 18:00.</p>"
+          }
+        },
+        "legal": {
+          "type": "policies",
+          "settings": {
+            "title": "Legal"
+          }
+        }
+      },
+      "block_order": [
+        "menu1",
+        "menu2",
+        "legal",
+        "text1"
+      ],
+      "settings": {
+        "show_newsletter": true,
+        "show_big_name": false,
+        "show_payment": true,
+        "logo_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 342 92\" role=\"img\" aria-label=\"stylevibe\"><text x=\"0\" y=\"66\" fill=\"currentColor\" font-family=\"Manrope, system-ui, sans-serif\" font-weight=\"500\" font-size=\"72\" textLength=\"342\" lengthAdjust=\"spacing\">stylevibe</text></svg>",
+        "logo_width": 220,
+        "text": "<p>Everyday clothing in soft cotton. Clean, easy, made to wear.</p>"
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

@@ -1,0 +1,84 @@
+{{ 'marquee-ticker.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign raw_items = s.text | split: '|'
+-%}
+
+<section
+  class="marquee-ticker{% if s.pause_on_hover %} marquee-ticker--pause-hover{% endif %}"
+  style="--mt-bg: {{ s.bg_color }}; --mt-fg: {{ s.text_color }}; --mt-speed: {{ s.speed }}s;"
+  aria-label="{{ s.text | strip_html | truncate: 80 | escape }}"
+>
+  <div class="marquee-ticker__viewport">
+    {%- for loop_group in (1..2) -%}
+      <div class="marquee-ticker__group"{% if forloop.last %} aria-hidden="true"{% endif %}>
+        {%- for repeat in (1..3) -%}
+          {%- for part in raw_items -%}
+            {%- assign clean_part = part | strip -%}
+            {%- if clean_part != blank -%}
+              <span class="marquee-ticker__item">
+                <span>{{ clean_part }}</span>
+                <span class="marquee-ticker__sep" aria-hidden="true">{{ s.separator }}</span>
+              </span>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Marquee Ticker",
+  "class": "section-marquee-ticker",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Ticker text (separate items with |)",
+      "default": "NEW SEASON ARRIVALS | FREE SHIPPING OVER $100 | TAILORED ESSENTIALS | 30-DAY RETURNS"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator",
+      "default": "✦"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Loop duration",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "s",
+      "default": 28
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#fbf8f4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Ticker"
+    }
+  ]
+}
+{% endschema %}

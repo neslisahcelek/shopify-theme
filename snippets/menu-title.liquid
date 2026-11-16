@@ -1,0 +1,12 @@
+{%- comment -%}
+  Usage: {% render 'menu-title', title: link.title %}
+  The store's default menus were created in Turkish; their stock titles are shown
+  in English here. Any title renamed in Navigation is printed as typed.
+{%- endcomment -%}
+{%- case title -%}
+  {%- when 'Ana sayfa' -%}Home
+  {%- when 'Katalog' -%}Shop
+  {%- when 'İletişim' -%}Contact
+  {%- when 'Arama' -%}Search
+  {%- else -%}{{ title }}
+{%- endcase -%}

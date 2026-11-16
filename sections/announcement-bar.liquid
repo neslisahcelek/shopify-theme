@@ -1,0 +1,66 @@
+{%- if section.blocks.size > 0 -%}
+  <div class="announcement{% if section.settings.style == 'dark' %} scheme-dark{% elsif section.settings.style == 'gradient' %} scheme-gradient{% endif %}" style="--marquee-duration: {{ section.settings.speed }}s">
+    {%- if section.settings.scroll -%}
+      <div class="marquee marquee--small" aria-label="{{ 'sections.announcement.label' | t }}">
+        <div class="marquee__track">
+          {%- for i in (1..2) -%}
+            <div class="marquee__group"{% if forloop.last %} aria-hidden="true"{% endif %}>
+              {%- for block in section.blocks -%}
+                {%- for j in (1..3) -%}
+                  <span {% if forloop.parentloop.parentloop.first and forloop.first %}{{ block.shopify_attributes }}{% endif %}>
+                    {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{{ block.settings.text }}</a>{%- else -%}{{ block.settings.text }}{%- endif -%}
+                  </span><i aria-hidden="true">✦</i>
+                {%- endfor -%}
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="announcement__static page-width">
+        {%- for block in section.blocks -%}
+          <p {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{{ block.settings.text }}</a>{%- else -%}{{ block.settings.text }}{%- endif -%}
+          </p>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Duyuru şeridi",
+  "class": "section-announcement",
+  "settings": [
+    { "type": "checkbox", "id": "scroll", "label": "Kayan yazı", "default": true },
+    { "type": "range", "id": "speed", "label": "Kayma süresi", "min": 10, "max": 80, "step": 2, "unit": "sn", "default": 36 },
+    {
+      "type": "select", "id": "style", "label": "Görünüm", "default": "dark",
+      "options": [ { "value": "light", "label": "Açık" }, { "value": "dark", "label": "Koyu" }, { "value": "gradient", "label": "Gradyan" } ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Duyuru",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Metin", "default": "Free shipping on orders over $100 / €100" },
+        { "type": "url", "id": "link", "label": "Bağlantı" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Duyuru şeridi",
+      "blocks": [
+        { "type": "announcement", "settings": { "text": "Free shipping on orders over $100 / €100" } },
+        { "type": "announcement", "settings": { "text": "Yeni sezon koleksiyonu yayında" } },
+        { "type": "announcement", "settings": { "text": "30 gün içinde ücretsiz iade" } }
+      ]
+    }
+  ],
+  "enabled_on": { "groups": ["header"] }
+}
+{% endschema %}

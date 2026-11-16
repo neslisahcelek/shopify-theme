@@ -1,0 +1,103 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "general": {
+    "page": "Sayfa {{ page }}",
+    "error": "Bir şeyler ters gitti. Lütfen tekrar dene.",
+    "close": "Kapat",
+    "pagination": "Sayfalama",
+    "previous": "Önceki sayfa",
+    "next": "Sonraki sayfa",
+    "404_title": "Bu sayfa podyumdan inmiş.",
+    "404_text": "Aradığın sayfa mevcut değil ya da taşınmış."
+  },
+  "accessibility": { "skip_to_content": "İçeriğe geç" },
+  "products": {
+    "product": {
+      "add_to_cart": "Sepete ekle",
+      "sold_out": "Tükendi",
+      "unavailable": "Mevcut değil",
+      "added": "Sepete eklendi",
+      "on_sale": "İndirim",
+      "from_price": "{{ price }}'den başlayan",
+      "tax_included": "KDV dahil."
+    },
+    "card": {
+      "view": "İncele",
+      "quick_add": "Hızlı ekle",
+      "choose_options": "Seçenekleri gör",
+      "placeholder_title": "Ürün adı"
+    }
+  },
+  "sections": {
+    "announcement": { "label": "Duyurular" },
+    "hero": { "pick_product": "Tema editöründen bir ürün seçin" },
+    "slideshow": { "label": "Slaytlar" },
+    "header": {
+      "menu": "Menü",
+      "main_nav": "Ana menü",
+      "search": "Ara",
+      "search_placeholder": "Ne arıyorsun?",
+      "account": "Hesabım",
+      "cart": "Sepet",
+      "view_all": "Tümünü gör"
+    },
+    "featured_collection": { "view_all": "Tümünü gör" },
+    "newsletter": {
+      "success": "Abone olduğun için teşekkürler!",
+      "email": "E-posta adresi",
+      "subscribe": "Abone ol"
+    },
+    "footer": { "rights": "Tüm hakları saklıdır.", "payment": "Ödeme yöntemleri" }
+  },
+  "cart": {
+    "title": "Sepetin",
+    "free_shipping_remaining": "Ücretsiz kargo için {{ amount }} kaldı",
+    "free_shipping_unlocked": "Ücretsiz kargo kazandın!",
+    "decrease": "Adedi azalt",
+    "increase": "Adedi artır",
+    "quantity": "Adet",
+    "remove": "Kaldır",
+    "empty": "Sepetin boş.",
+    "continue": "Alışverişe devam et",
+    "subtotal": "Ara toplam",
+    "taxes_note": "Vergiler ve kargo ödeme adımında hesaplanır.",
+    "checkout": "Ödemeye geç",
+    "view_cart": "Sepeti görüntüle",
+    "note": "Sipariş notu",
+    "update": "Sepeti güncelle"
+  },
+  "collections": {
+    "products_count": { "one": "{{ count }} ürün", "other": "{{ count }} ürün" },
+    "filter": "Filtrele",
+    "min": "En düşük fiyat",
+    "max": "En yüksek fiyat",
+    "clear": "Temizle",
+    "apply": "Uygula",
+    "sort": "Sırala",
+    "empty": "Bu filtrelere uyan ürün yok.",
+    "all_title": "Koleksiyonlar"
+  },
+  "search": {
+    "title": "Arama",
+    "results_count": { "one": "\"{{ terms }}\" için {{ count }} sonuç", "other": "\"{{ terms }}\" için {{ count }} sonuç" },
+    "no_results": "Sonuç bulunamadı. Başka bir şey ara."
+  },
+  "blog": { "read": "Oku", "back": "Bloga dön" },
+  "password": { "owner": "Mağaza sahibi misin?", "password": "Şifre", "enter": "Giriş" },
+  "gift_card": {
+    "title": "Hediye kartın",
+    "initial": "İlk değer: {{ value }}",
+    "expired": "Süresi doldu",
+    "code": "Hediye kartı kodu",
+    "shop": "Alışverişe başla",
+    "print": "Yazdır"
+  }
+}

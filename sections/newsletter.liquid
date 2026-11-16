@@ -1,0 +1,84 @@
+{%- assign s = section.settings -%}
+<section class="section newsletter">
+  <div class="page-width">
+    <div class="newsletter__box scheme-dark{% if s.show_bg %} has-bg{% endif %} newsletter__box--{{ s.bg_height | default: 'normal' }}{% if s.show_side_image %} newsletter__box--split{% endif %}" data-reveal>
+      {%- if s.show_side_image -%}
+        <div class="newsletter__media">
+          {%- if s.side_image != blank -%}
+            {{ s.side_image | image_url: width: 1400 | image_tag: widths: '500, 800, 1100, 1400', sizes: '(min-width: 750px) 45vw, 100vw', loading: 'lazy', alt: s.side_image.alt | default: '' }}
+          {%- else -%}
+            <img src="{{ 'newsletter-rug.jpg' | asset_url }}" alt="StyleVibe rug" width="842" height="1264" loading="lazy">
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      {%- if s.show_bg -%}
+        {%- if s.bg_image != blank -%}
+          {%- liquid
+            assign fp = s.bg_image.presentation.focal_point | default: 'center 50%'
+            if s.bg_y != blank and s.bg_y != 50
+              assign fp = '50% ' | append: s.bg_y | append: '%'
+            endif
+            assign bg_style = 'object-position: ' | append: fp
+          -%}
+          {{ s.bg_image | image_url: width: 2400 | image_tag:
+            widths: '800, 1200, 1600, 2000, 2400',
+            sizes: '(min-width: 1400px) 1340px, 100vw',
+            loading: 'lazy',
+            alt: '',
+            class: 'newsletter__bg',
+            style: bg_style
+          }}
+        {%- else -%}
+          <img class="newsletter__bg" src="{{ 'newsletter-rug.jpg' | asset_url }}" alt="" width="842" height="1264" loading="lazy" style="object-position: 50% {{ s.bg_y | default: 50 }}%">
+        {%- endif -%}
+        <div class="newsletter__overlay" aria-hidden="true" style="--nl-dim: {{ s.overlay | divided_by: 100.0 }}"></div>
+      {%- endif -%}
+      {%- unless s.show_bg -%}
+        <div class="newsletter__aurora" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      {%- endunless -%}
+      <div class="newsletter__glow" aria-hidden="true"></div>
+      <div class="newsletter__content">
+      {%- if s.heading != blank -%}<h2 class="h-section" data-split>{{ s.heading }}</h2>{%- endif -%}
+      {%- if s.text != blank -%}<div class="rte">{{ s.text }}</div>{%- endif -%}
+      {%- form 'customer', class: 'newsletter-form', id: 'NewsletterForm' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        {%- if form.posted_successfully? -%}
+          <p class="newsletter-form__success">{{ 'sections.newsletter.success' | t }}</p>
+        {%- else -%}
+          <div class="newsletter-form__field">
+            <label for="NewsletterEmail-{{ section.id }}" class="visually-hidden">{{ 'sections.newsletter.email' | t }}</label>
+            <input id="NewsletterEmail-{{ section.id }}" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ 'sections.newsletter.email' | t }}">
+            <button type="submit" class="btn btn--light" data-magnetic>{{ 'sections.newsletter.subscribe' | t }}</button>
+          </div>
+          {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+        {%- endif -%}
+      {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bülten",
+  "class": "section-newsletter",
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "İlk siparişine <em>%10</em> indirim." },
+    { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Yeni koleksiyonlardan ve özel davetlerden ilk sen haberdar ol.</p>" },
+    { "type": "header", "content": "Yan görsel" },
+    { "type": "checkbox", "id": "show_side_image", "label": "Yanda görsel göster", "default": true },
+    { "type": "image_picker", "id": "side_image", "label": "Yan görsel", "info": "Boş bırakılırsa temadaki halı fotoğrafı kullanılır." },
+    { "type": "header", "content": "Arka plan" },
+    { "type": "checkbox", "id": "show_bg", "label": "Arka plan görseli göster", "default": true },
+    { "type": "image_picker", "id": "bg_image", "label": "Arka plan görseli", "info": "Boş bırakılırsa temadaki varsayılan görsel kullanılır. Odak noktasını görsel düzenleyiciden ayarlayabilirsiniz." },
+    {
+      "type": "select", "id": "bg_height", "label": "Kutu yüksekliği", "default": "normal",
+      "info": "Yükseldikçe görselin daha büyük kısmı görünür (daha uzaktan).",
+      "options": [ { "value": "normal", "label": "Normal" }, { "value": "tall", "label": "Yüksek" }, { "value": "xtall", "label": "Çok yüksek" } ]
+    },
+    { "type": "range", "id": "bg_y", "label": "Görsel dikey konumu", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50, "info": "0 üst kısmı, 100 alt kısmı gösterir. 50'de görselin kendi odak noktası kullanılır." },
+    { "type": "range", "id": "overlay", "label": "Karartma", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55 }
+  ],
+  "presets": [ { "name": "Bülten" } ]
+}
+{% endschema %}

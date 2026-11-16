@@ -1,0 +1,743 @@
+/* =========================================================
+   Style Vibeus — Interactive 3D Hanger Rack (SNUG WRLD Physics)
+   Frameless garments on wooden hangers, 60fps spring-pendulum
+   riffle physics, 3D turn-to-front focus & Front/Back inspect mode
+   ========================================================= */
+
+.hanger-rack {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(52px, 6.5vw, 96px) 0 clamp(48px, 6vw, 88px);
+  background: var(--hr-bg, var(--bg, #fbf8f4));
+  color: var(--hr-fg, var(--fg, #111111));
+  --hr-line: color-mix(in srgb, var(--hr-fg, #111111) 14%, transparent);
+  --hr-muted: color-mix(in srgb, var(--hr-fg, #111111) 62%, transparent);
+  --hr-blur-max: 4px;
+  --hr-card-w: clamp(190px, 19.5vw, 256px);
+  --hr-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --hr-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- Section Header ---------- */
+.hanger-rack__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: clamp(24px, 3.5vw, 42px);
+}
+
+.hanger-rack__title {
+  font-family: var(--display, "Syne", system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(32px, 4.4vw, 60px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.hanger-rack__title em {
+  font-family: var(--serif, "Instrument Serif", Georgia, serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.08em;
+}
+
+.hanger-rack__sub {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--hr-muted);
+  max-width: 52ch;
+}
+
+.hanger-rack__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hanger-rack__nav-btn,
+.hanger-rack__autoplay-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--hr-line);
+  background: transparent;
+  color: var(--hr-fg, #111111);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 160ms var(--hr-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hanger-rack__nav-btn:hover,
+  .hanger-rack__autoplay-btn:hover {
+    background: var(--hr-fg, #111111);
+    color: var(--hr-bg, #fbf8f4);
+    border-color: var(--hr-fg, #111111);
+  }
+}
+
+.hanger-rack__nav-btn:active,
+.hanger-rack__autoplay-btn:active {
+  transform: scale(0.96);
+}
+
+.hanger-rack__nav-btn:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.hanger-rack__counter {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hr-muted);
+  min-width: 52px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Metallic Boutique Rail & 3D Stage ---------- */
+.hanger-rack__stage-wrap {
+  position: relative;
+  width: 100%;
+  outline-offset: -4px;
+  padding-top: 8px;
+}
+
+.hanger-rack__stage-wrap:focus-visible {
+  outline: 2px solid var(--hr-fg, #111111);
+  border-radius: var(--radius, 14px);
+}
+
+.hanger-rack__rail {
+  position: relative;
+  width: min(94%, 1320px);
+  height: 18px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.hanger-rack__rail-bar {
+  display: block;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    color-mix(in srgb, var(--hr-fg, #111111) 38%, #9b958d) 45%,
+    color-mix(in srgb, var(--hr-fg, #111111) 68%, #4d4944) 100%
+  );
+  box-shadow: 0 3px 8px rgba(17, 17, 17, 0.12);
+}
+
+.hanger-rack__rail-mount {
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--hr-fg, #111111) 52%, #7d776f);
+  flex-shrink: 0;
+}
+
+.hanger-rack__viewport {
+  position: relative;
+  width: 100%;
+  height: calc(var(--hr-card-w) * var(--hr-ratio-h, 1.3333) * 1.36 + 78px);
+  margin-top: -12px;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+  overflow: visible;
+  perspective: 1400px;
+  perspective-origin: 50% 38%;
+}
+
+.hanger-rack__viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.hanger-rack__track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+/* ---------- 3D Hanging Garment Slot ---------- */
+.hanger-rack__item {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--hr-card-w);
+  margin-left: calc(var(--hr-card-w) / -2);
+  transform-origin: 50% 4px;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  transform:
+    translate3d(var(--hr-tx, 0px), var(--hr-ty, 0px), var(--hr-tz, 0px))
+    rotateY(var(--hr-rot-y, 48deg))
+    scale(var(--hr-scale, 0.78));
+  opacity: var(--hr-opacity, 0.58);
+  filter: blur(var(--hr-blur, 3.5px));
+  z-index: var(--hr-z, 1);
+  transition:
+    transform 0.52s var(--hr-ease-out),
+    opacity 0.38s var(--hr-ease-out),
+    filter 0.38s var(--hr-ease-out);
+}
+
+.hanger-rack__item.is-active {
+  filter: none;
+  opacity: 1;
+}
+
+.hanger-rack__viewport.is-dragging .hanger-rack__item {
+  transition:
+    opacity 0.25s ease-out,
+    filter 0.25s ease-out;
+}
+
+/* ---------- 60fps Spring-Pendulum Layer ---------- */
+.hanger-rack__pendulum {
+  position: relative;
+  width: 100%;
+  transform-origin: 50% 4px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform:
+    translate3d(var(--hr-push-x, 0px), 0, 0)
+    rotateZ(var(--hr-sway-z, 0deg))
+    rotateY(calc(var(--hr-sway-y, 0deg) + var(--hr-tilt-y, 0deg)))
+    rotateX(var(--hr-tilt-x, 0deg));
+}
+
+/* ---------- Minimalist Luxury Hanger & Metallic Hook ---------- */
+.hanger-rack__hanger {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: 48px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: var(--hr-hanger-opacity, 0.42);
+  color: var(--hr-fg, #111111);
+  transition: opacity 0.3s ease;
+}
+
+.hanger-rack__item.is-active .hanger-rack__hanger,
+.hanger-rack__item:hover .hanger-rack__hanger {
+  opacity: calc(var(--hr-hanger-opacity, 0.42) * 1.35);
+}
+
+.hanger-rack__hook-svg {
+  width: 68%;
+  max-width: 170px;
+  height: 48px;
+  overflow: visible;
+  filter: none;
+}
+
+/* ---------- Frameless Garment & 3D Two-Sided Flipper ---------- */
+.hanger-rack__card {
+  display: block;
+  position: relative;
+  width: 100%;
+  margin-top: -8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  text-decoration: none;
+  color: inherit;
+  z-index: 2;
+}
+
+.hanger-rack__flipper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--hr-aspect, 3 / 4);
+  margin-top: -12px;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.hanger-rack__face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.64s var(--hr-ease-out), opacity 0.25s ease, visibility 0.25s;
+}
+
+.hanger-rack__face--front {
+  transform: rotateY(var(--hr-flip-y, 0deg));
+  visibility: visible;
+  opacity: 1;
+}
+
+.hanger-rack__item.is-flipped .hanger-rack__face--front {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.hanger-rack__face--back {
+  transform: rotateY(calc(var(--hr-flip-y, 0deg) - 180deg));
+  visibility: hidden;
+  opacity: 0;
+}
+
+.hanger-rack__item.is-flipped .hanger-rack__face--back {
+  visibility: visible;
+  opacity: 1;
+}
+
+.hanger-rack__media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  mix-blend-mode: multiply;
+  clip-path: polygon(15% 0%, 85% 0%, 100% 9%, 100% 100%, 0% 100%, 0% 9%);
+  border-radius: 22px 22px 12px 12px;
+  overflow: hidden;
+}
+
+.hanger-rack__media--cutout {
+  clip-path: none;
+  mix-blend-mode: normal;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+.hanger-rack__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  filter: contrast(1.04) brightness(1.02);
+}
+
+.hanger-rack__img--cutout {
+  object-fit: contain;
+  object-position: 50% 0%;
+  background: transparent;
+  filter: drop-shadow(0 24px 26px rgba(17, 17, 17, 0.22));
+  transition: filter 0.38s var(--hr-ease-out);
+}
+
+.hanger-rack__item.is-active .hanger-rack__img--cutout {
+  filter: drop-shadow(0 30px 34px rgba(17, 17, 17, 0.27));
+}
+
+.hanger-rack__img--back-fallback {
+  transform: scaleX(-1);
+}
+
+.hanger-rack__placeholder {
+  width: 100%;
+  height: 100%;
+  fill: var(--hr-line);
+  background: rgba(246, 238, 229, 0.55);
+}
+
+/* ---------- Active Product Details & Inspect Mode Bar ---------- */
+.hanger-rack__details {
+  position: relative;
+  z-index: 8;
+  margin-top: clamp(16px, 2.5vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 0 var(--gutter, 24px);
+}
+
+.hanger-rack__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hanger-rack__status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hanger-rack__status--sale {
+  background: var(--sale, #c98a8a);
+  color: #ffffff;
+}
+
+.hanger-rack__status--soldout {
+  background: var(--hr-fg, #111111);
+  color: var(--hr-bg, #fbf8f4);
+}
+
+.hanger-rack__product-title {
+  font-family: var(--display, "Syne", system-ui, sans-serif);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.hanger-rack__product-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hr-muted);
+}
+
+.hanger-rack__product-price s {
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+.hanger-rack__browse-actions {
+  display: flex;
+  justify-content: center;
+  transition:
+    opacity 200ms var(--hr-ease-out),
+    transform 200ms var(--hr-ease-out);
+}
+
+.hanger-rack.is-inspecting .hanger-rack__browse-actions {
+  display: none;
+}
+
+.hanger-rack__cta {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 30px;
+  border-radius: 999px;
+  border: 1px solid var(--hr-fg, #111111);
+  background: var(--hr-fg, #111111);
+  color: var(--hr-bg, #fbf8f4);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--hr-ease-out),
+    box-shadow 220ms var(--hr-ease-out),
+    opacity 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hanger-rack__cta:hover {
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 14px 32px -12px color-mix(in srgb, var(--hr-fg, #111111) 45%, transparent);
+  }
+}
+
+.hanger-rack__cta:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Stage 4: Inspect Mode Panel (FRONT / BACK + Sizes + ATC) ---------- */
+.hanger-rack__inspect-bar {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 14px 20px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--hr-bg, #fbf8f4) 88%, #f6eee5);
+  border: 1px solid var(--hr-line);
+  box-shadow: 0 18px 44px -18px rgba(17, 17, 17, 0.16);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(0.97);
+  transition:
+    opacity 240ms var(--hr-ease-out),
+    transform 240ms var(--hr-ease-out);
+}
+
+.hanger-rack.is-inspecting .hanger-rack__inspect-bar {
+  display: flex;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.hanger-rack__inspect-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 16px;
+}
+
+.hanger-rack__flip-group {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hr-fg, #111111) 8%, transparent);
+  border: 1px solid var(--hr-line);
+}
+
+.hanger-rack__flip-btn {
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--hr-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 150ms var(--hr-ease-out);
+}
+
+.hanger-rack__flip-btn.is-active {
+  background: var(--hr-fg, #111111);
+  color: var(--hr-bg, #fbf8f4);
+}
+
+.hanger-rack__flip-btn:active {
+  transform: scale(0.96);
+}
+
+.hanger-rack__inspect-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--hr-line);
+}
+
+.hanger-rack__sizes {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hanger-rack__size-pill {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid var(--hr-line);
+  background: transparent;
+  color: var(--hr-fg, #111111);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 150ms var(--hr-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hanger-rack__size-pill:hover:not(:disabled) {
+    border-color: var(--hr-fg, #111111);
+  }
+}
+
+.hanger-rack__size-pill.is-selected {
+  background: var(--hr-fg, #111111);
+  color: var(--hr-bg, #fbf8f4);
+  border-color: var(--hr-fg, #111111);
+}
+
+.hanger-rack__size-pill.is-unavailable {
+  opacity: 0.38;
+  text-decoration: line-through;
+}
+
+.hanger-rack__size-pill:active {
+  transform: scale(0.95);
+}
+
+.hanger-rack__inspect-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+}
+
+.hanger-rack__atc-form {
+  margin: 0;
+}
+
+.hanger-rack__atc-btn {
+  min-height: 44px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1px solid var(--hr-fg, #111111);
+  background: var(--hr-fg, #111111);
+  color: var(--hr-bg, #fbf8f4);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--hr-ease-out),
+    opacity 180ms ease;
+}
+
+.hanger-rack__atc-btn:active {
+  transform: scale(0.97);
+}
+
+.hanger-rack__atc-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hanger-rack__view-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hr-fg, #111111);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hanger-rack__back-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--hr-line);
+  background: transparent;
+  color: var(--hr-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 150ms var(--hr-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hanger-rack__back-btn:hover {
+    color: var(--hr-fg, #111111);
+    border-color: var(--hr-fg, #111111);
+  }
+}
+
+.hanger-rack__back-btn:active {
+  transform: scale(0.96);
+}
+
+/* ---------- Pagination Dots ---------- */
+.hanger-rack__dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.hanger-rack__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--hr-line);
+  padding: 0;
+  cursor: pointer;
+  transition:
+    transform 180ms var(--hr-ease-out),
+    background-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.hanger-rack__dot.is-active {
+  transform: scale(1.45);
+  background: var(--hr-fg, #111111);
+}
+
+.hanger-rack__dot:active {
+  transform: scale(0.9);
+}
+
+/* ---------- Focus States ---------- */
+.hanger-rack :where(button, a):focus-visible {
+  outline: 2px solid var(--hr-fg, #111111);
+  outline-offset: 3px;
+}
+
+/* ---------- Mobile Tuning ---------- */
+@media (max-width: 749px) {
+  .hanger-rack {
+    --hr-card-w: clamp(168px, 46vw, 215px);
+  }
+
+  .hanger-rack__head {
+    align-items: flex-start;
+  }
+
+  .hanger-rack__viewport {
+    height: calc(var(--hr-card-w) * var(--hr-ratio-h, 1.3333) * 1.32 + 74px);
+  }
+
+  .hanger-rack__inspect-divider {
+    display: none;
+  }
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hanger-rack__item,
+  .hanger-rack__face,
+  .hanger-rack__inspect-bar {
+    transition-duration: 120ms;
+  }
+}

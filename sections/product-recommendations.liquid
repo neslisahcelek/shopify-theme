@@ -1,0 +1,33 @@
+{%- assign s = section.settings -%}
+<section
+  class="section recommendations"
+  data-recommendations
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ s.limit }}&intent=related"
+  style="--cols: {{ s.columns }}; --cols-mobile: 2"
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class="page-width">
+      <div class="section__head">
+        <h2 class="h-section" data-split>{{ s.heading }}</h2>
+      </div>
+      <div class="product-grid product-grid--slider" data-drag-scroll>
+        {%- for product in recommendations.products -%}
+          {% render 'product-card', product: product, index: forloop.index0 %}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Önerilen ürünler",
+  "class": "section-recommendations",
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Bunlarla <em>harika</em> gider" },
+    { "type": "range", "id": "limit", "label": "Ürün sayısı", "min": 2, "max": 10, "step": 1, "default": 6 },
+    { "type": "range", "id": "columns", "label": "Masaüstü sütun", "min": 2, "max": 5, "step": 1, "default": 4 }
+  ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}

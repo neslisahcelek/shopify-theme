@@ -1,0 +1,9 @@
+{%- comment -%}
+  Wooden hanger. inline: true outputs bare shapes for use inside another SVG
+  (same 200-unit-wide coordinate system); otherwise a standalone SVG.
+{%- endcomment -%}
+{%- unless inline -%}<svg class="closet__hanger" viewBox="0 0 200 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">{%- endunless -%}
+<path d="M100 40 V28 C100 22 108 20 108 12 C108 6 104 3 99 3 C94 3 91 7 91 10" fill="none" stroke="#a8a8a8" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M100 38 L32 64 Q27 68 33 69 L167 69 Q173 68 168 64 Z" fill="#c69a6a"/>
+<path d="M100 38 L32 64 Q27 68 33 69 L167 69" fill="none" stroke="#000" stroke-opacity=".15" stroke-width="1.5"/>
+{%- unless inline -%}</svg>{%- endunless -%}

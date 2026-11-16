@@ -1,0 +1,17 @@
+<article class="section article page-width page-width--narrow">
+  <header class="article__head">
+    <small class="eyebrow">{{ article.published_at | time_tag: format: 'date' }}{% if article.author != blank %} · {{ article.author }}{% endif %}</small>
+    <h1 class="h-display" data-split>{{ article.title }}</h1>
+  </header>
+  {%- if article.image -%}
+    <div class="article__media img-reveal" data-reveal>
+      {{ article.image | image_url: width: 1800 | image_tag: widths: '750, 1100, 1500, 1800', sizes: '100vw', loading: 'eager', alt: article.image.alt | escape }}
+    </div>
+  {%- endif -%}
+  <div class="rte" data-reveal>{{ article.content }}</div>
+  <a href="{{ blog.url }}" class="link-underline article__back">{% render 'icon', name: 'arrow-left' %}{{ 'blog.back' | t }}</a>
+</article>
+
+{% schema %}
+{ "name": "Blog yazısı", "settings": [] }
+{% endschema %}

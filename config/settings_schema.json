@@ -1,0 +1,97 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Atelier",
+    "theme_version": "0.1.0",
+    "theme_author": "Vitrin",
+    "theme_documentation_url": "https://vitrin.co",
+    "theme_support_email": "merhaba@vitrin.co"
+  },
+  {
+    "name": "Renkler",
+    "settings": [
+      { "type": "header", "content": "Açık tema" },
+      { "type": "color", "id": "color_background", "label": "Arka plan", "default": "#ffffff" },
+      { "type": "color", "id": "color_foreground", "label": "Metin", "default": "#121212" },
+      { "type": "header", "content": "Koyu bölümler" },
+      { "type": "color", "id": "color_dark_background", "label": "Arka plan", "default": "#09090d" },
+      { "type": "color", "id": "color_dark_foreground", "label": "Metin", "default": "#f4f2ee" },
+      { "type": "header", "content": "Vurgular" },
+      { "type": "color", "id": "color_accent", "label": "Düğme rengi", "default": "#121212" },
+      { "type": "color", "id": "color_accent_foreground", "label": "Düğme metni", "default": "#ffffff" },
+      { "type": "color", "id": "color_sale", "label": "İndirim etiketi", "default": "#ff5ca8" },
+      { "type": "color", "id": "color_gradient_1", "label": "Gradyan 1", "default": "#7c5cff" },
+      { "type": "color", "id": "color_gradient_2", "label": "Gradyan 2", "default": "#ff5ca8" },
+      { "type": "color", "id": "color_gradient_3", "label": "Gradyan 3", "default": "#ffb547" }
+    ]
+  },
+  {
+    "name": "Yerleşim ve stil",
+    "settings": [
+      { "type": "range", "id": "page_width", "label": "Sayfa genişliği", "min": 1000, "max": 1800, "step": 20, "unit": "px", "default": 1440 },
+      { "type": "range", "id": "radius", "label": "Köşe yuvarlaklığı", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 14 },
+      {
+        "type": "select", "id": "button_style", "label": "Düğme şekli", "default": "pill",
+        "options": [ { "value": "pill", "label": "Hap" }, { "value": "rounded", "label": "Köşeli" } ]
+      },
+      { "type": "checkbox", "id": "heading_uppercase", "label": "Başlıkları büyük harf yap", "default": false },
+      { "type": "image_picker", "id": "favicon", "label": "Favicon" }
+    ]
+  },
+  {
+    "name": "Animasyonlar",
+    "settings": [
+      { "type": "paragraph", "content": "Ziyaretçi cihazında \"hareketi azalt\" seçiliyse animasyonlar otomatik kapanır." },
+      { "type": "checkbox", "id": "enable_animations", "label": "Kaydırma animasyonlarını aç", "default": true },
+      { "type": "checkbox", "id": "enable_page_transitions", "label": "Sayfa geçiş efekti", "default": true },
+      { "type": "checkbox", "id": "enable_cursor", "label": "Özel imleç (masaüstü)", "default": true },
+      { "type": "checkbox", "id": "enable_magnetic", "label": "Manyetik düğmeler", "default": true },
+      { "type": "checkbox", "id": "enable_scroll_progress", "label": "Kaydırma ilerleme çubuğu", "default": true },
+      { "type": "checkbox", "id": "enable_grain", "label": "Film greni dokusu", "default": false },
+      { "type": "checkbox", "id": "enable_preloader", "label": "Açılış animasyonu (oturum başına bir kez)", "default": false }
+    ]
+  },
+  {
+    "name": "Sepet",
+    "settings": [
+      {
+        "type": "select", "id": "cart_type", "label": "Sepete ekleyince", "default": "drawer",
+        "options": [ { "value": "drawer", "label": "Yan sepeti aç" }, { "value": "page", "label": "Sepet sayfasına git" } ]
+      },
+      { "type": "text", "id": "free_shipping_threshold", "label": "Ücretsiz kargo limiti", "info": "Sadece rakam girin, örn. 1500. Boş bırakırsanız ilerleme çubuğu gizlenir." }
+    ]
+  },
+  {
+    "name": "Ürün kartları",
+    "settings": [
+      {
+        "type": "select", "id": "card_ratio", "label": "Görsel oranı", "default": "portrait",
+        "options": [ { "value": "portrait", "label": "Dikey (3:4)" }, { "value": "square", "label": "Kare" }, { "value": "tall", "label": "Uzun (2:3)" } ]
+      },
+      { "type": "checkbox", "id": "card_hover_image", "label": "Üzerine gelince ikinci görseli göster", "default": true },
+      { "type": "checkbox", "id": "card_quick_add", "label": "Hızlı ekle düğmesi", "default": true },
+      { "type": "checkbox", "id": "card_show_vendor", "label": "Markayı göster", "default": false }
+    ]
+  },
+  {
+    "name": "Sosyal medya",
+    "settings": [
+      { "type": "text", "id": "social_instagram", "label": "Instagram", "placeholder": "https://instagram.com/..." },
+      { "type": "text", "id": "social_tiktok", "label": "TikTok", "placeholder": "https://tiktok.com/@..." },
+      { "type": "text", "id": "social_pinterest", "label": "Pinterest", "placeholder": "https://pinterest.com/..." },
+      { "type": "text", "id": "social_facebook", "label": "Facebook", "placeholder": "https://facebook.com/..." },
+      { "type": "text", "id": "social_youtube", "label": "YouTube", "placeholder": "https://youtube.com/..." }
+    ]
+  },
+  {
+    "name": "SEO",
+    "settings": [
+      { "type": "paragraph", "content": "Google'da ve link paylaşımlarında görünen bilgiler. Ürün ve sayfa başına SEO, admin panelinde her ürünün altındaki 'Arama motoru listelemesi' bölümünden yapılır." },
+      { "type": "text", "id": "seo_brand", "label": "Marka adı", "default": "StyleVibe", "info": "Sayfa başlıklarında, paylaşım önizlemelerinde ve Google'ın yapılandırılmış verisinde kullanılır. Boşsa mağaza adı kullanılır." },
+      { "type": "text", "id": "seo_home_title", "label": "Ana sayfa başlığı", "default": "StyleVibe | Everyday Clothing & Essentials", "info": "Google sonuçlarındaki mavi başlık. 50–60 karakter ideal." },
+      { "type": "textarea", "id": "seo_home_description", "label": "Ana sayfa açıklaması", "default": "Soft cotton tees, hoodies and everyday essentials with a relaxed fit. Free shipping over $100 / €100 and free 30-day returns.", "info": "Google sonuçlarındaki gri açıklama. 140–160 karakter ideal." },
+      { "type": "text", "id": "seo_home_h1", "label": "Ana sayfa gizli H1", "default": "Everyday clothing and essentials", "info": "Ekranda görünmez; Google'a ana sayfanın konusunu söyler." },
+      { "type": "image_picker", "id": "seo_share_image", "label": "Varsayılan paylaşım görseli", "info": "Görseli olmayan sayfalar paylaşıldığında görünür. 1200×630 önerilir. Boşsa temadaki hazır görsel kullanılır." }
+    ]
+  }
+]

@@ -1,0 +1,156 @@
+{%- liquid
+  assign s = section.settings
+  assign has_image = false
+  if s.image != blank
+    assign has_image = true
+  endif
+-%}
+<section
+  class="hero hero--{{ s.height }} hero--{{ s.align }}{% if has_image %} hero--image scheme-dark{% else %} hero--plain{% endif %}"
+  style="--overlay: {{ s.overlay | divided_by: 100.0 }}"
+  data-hero
+>
+  <div class="hero__media" data-parallax="{{ s.parallax | divided_by: 100.0 }}">
+    {%- if has_image -%}
+      <picture>
+        {%- if s.image_mobile != blank -%}
+          <source media="(max-width: 749px)" srcset="{{ s.image_mobile | image_url: width: 750 }} 750w, {{ s.image_mobile | image_url: width: 1100 }} 1100w" sizes="100vw">
+        {%- endif -%}
+        {{ s.image | image_url: width: 2400 | image_tag:
+          widths: '750, 1100, 1500, 1800, 2400',
+          sizes: '100vw',
+          loading: 'eager',
+          fetchpriority: 'high',
+          class: 'hero__img'
+        }}
+      </picture>
+    {%- else -%}
+      <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+    {%- endif -%}
+  </div>
+
+  {%- liquid
+    assign product = s.product
+    assign show_product = false
+    if product != blank or request.design_mode
+      assign show_product = true
+    endif
+  -%}
+  <div class="hero__layout page-width{% if show_product %} hero__layout--split{% endif %}">
+  <div class="hero__content">
+    {%- if s.eyebrow != blank -%}
+      <span class="eyebrow" data-reveal>{{ s.eyebrow }}</span>
+    {%- endif -%}
+    {%- if s.heading != blank -%}
+      <h1 class="hero__title h-display" data-split>{{ s.heading }}</h1>
+    {%- endif -%}
+    {%- if s.text != blank -%}
+      <div class="hero__text rte" data-reveal style="--i: 2">{{ s.text }}</div>
+    {%- endif -%}
+    {%- if s.button_label != blank or s.button2_label != blank -%}
+      <div class="hero__ctas" data-reveal style="--i: 3">
+        {%- if s.button_label != blank -%}
+          <a href="{{ s.button_link | default: routes.all_products_collection_url }}" class="btn {% if has_image %}btn--light{% else %}btn--primary{% endif %}" data-magnetic>
+            <span>{{ s.button_label }}</span>{% render 'icon', name: 'arrow' %}
+          </a>
+        {%- endif -%}
+        {%- if s.button2_label != blank -%}
+          <a href="{{ s.button2_link | default: routes.collections_url }}" class="btn btn--ghost" data-magnetic>{{ s.button2_label }}</a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if show_product -%}
+    {%- comment -%} Floating product showcase: main photo, a second angle and a buy chip, tilting with the cursor. {%- endcomment -%}
+    <div class="hero__product" data-tilt data-reveal style="--i: 2">
+      <div class="hero__product-stage" data-tilt-inner>
+        {%- if product != blank -%}
+          <a href="{{ product.url }}" class="hero__product-main" data-cursor="{{ 'products.card.view' | t }}">
+            {%- if product.featured_media -%}
+              {{ product.featured_media.preview_image | image_url: width: 1000 | image_tag:
+                widths: '400, 600, 800, 1000',
+                sizes: '(min-width: 990px) 34vw, 80vw',
+                loading: 'eager',
+                alt: product.featured_media.alt | default: product.title | escape
+              }}
+            {%- else -%}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder' }}
+            {%- endif -%}
+          </a>
+          {%- assign second = product.media[1].preview_image -%}
+          {%- if second -%}
+            <a href="{{ product.url }}" class="hero__product-alt" tabindex="-1" aria-hidden="true">
+              {{ second | image_url: width: 500 | image_tag: loading: 'lazy', alt: '' }}
+            </a>
+          {%- endif -%}
+
+          <div class="hero__product-chip">
+            {%- if s.product_label != blank -%}<span class="hero__product-label">{{ s.product_label }}</span>{%- endif -%}
+            <a href="{{ product.url }}" class="hero__product-title">{{ product.title }}</a>
+            {% render 'price', product: product %}
+            {%- if product.available -%}
+              {%- if product.has_only_default_variant -%}
+                <form action="{{ routes.cart_add_url }}" method="post" data-product-form>
+                  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn--primary btn--small">{{ 'products.product.add_to_cart' | t }}{% render 'icon', name: 'plus' %}</button>
+                </form>
+              {%- else -%}
+                <a href="{{ product.url }}" class="btn btn--primary btn--small">{{ 'products.card.choose_options' | t }}{% render 'icon', name: 'arrow' %}</a>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          <div class="hero__product-main">{{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder' }}</div>
+          <div class="hero__product-chip">
+            <span class="hero__product-label">{{ s.product_label }}</span>
+            <span class="hero__product-title">{{ 'sections.hero.pick_product' | t }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+  </div>
+
+  {%- if s.show_scroll_hint -%}
+    <span class="scroll-hint" aria-hidden="true"><span></span></span>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "class": "section-hero",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Görsel" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobil görsel" },
+    { "type": "range", "id": "overlay", "label": "Karartma", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 30 },
+    { "type": "range", "id": "parallax", "label": "Parallax gücü", "min": 0, "max": 40, "step": 5, "unit": "%", "default": 20 },
+    {
+      "type": "select", "id": "height", "label": "Yükseklik", "default": "full",
+      "options": [ { "value": "full", "label": "Tam ekran" }, { "value": "large", "label": "Büyük" }, { "value": "medium", "label": "Orta" } ]
+    },
+    {
+      "type": "select", "id": "align", "label": "İçerik konumu", "default": "bottom-left",
+      "options": [
+        { "value": "bottom-left", "label": "Sol alt" },
+        { "value": "center", "label": "Orta" },
+        { "value": "bottom-center", "label": "Alt orta" }
+      ]
+    },
+    { "type": "text", "id": "eyebrow", "label": "Üst yazı", "default": "Sonbahar / Kış 2026" },
+    { "type": "inline_richtext", "id": "heading", "label": "Başlık", "default": "Sessiz lüksün <em>yeni</em> hali.", "info": "İtalik serif vurgu için kelimeyi <em>...</em> içine alın." },
+    { "type": "richtext", "id": "text", "label": "Metin", "default": "<p>Zamansız kesimler, dokunulası kumaşlar. Yeni koleksiyon şimdi mağazada.</p>" },
+    { "type": "text", "id": "button_label", "label": "Düğme 1", "default": "Koleksiyonu keşfet" },
+    { "type": "url", "id": "button_link", "label": "Düğme 1 bağlantısı" },
+    { "type": "text", "id": "button2_label", "label": "Düğme 2", "default": "Lookbook" },
+    { "type": "url", "id": "button2_link", "label": "Düğme 2 bağlantısı" },
+    { "type": "checkbox", "id": "show_scroll_hint", "label": "Aşağı kaydır işareti", "default": true },
+    { "type": "header", "content": "Öne çıkan ürün" },
+    { "type": "product", "id": "product", "label": "Ürün", "info": "Seçilen ürün hero'nun sağında süzülen bir kart olarak görünür." },
+    { "type": "text", "id": "product_label", "label": "Ürün etiketi", "default": "Sezonun parçası" }
+  ],
+  "presets": [ { "name": "Hero" } ]
+}
+{% endschema %}

@@ -1,0 +1,724 @@
+{{ 'hanger-rack.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'hanger-rack.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign s = section.settings
+  assign rack_collection = s.collection
+  if rack_collection == blank
+    assign rack_collection = collections.all
+  endif
+
+  assign ratio_css = '3 / 4'
+  assign ratio_h = '1.3333'
+  case s.aspect_ratio
+    when '1/1'
+      assign ratio_css = '1 / 1'
+      assign ratio_h = '1.0000'
+    when '4/5'
+      assign ratio_css = '4 / 5'
+      assign ratio_h = '1.2500'
+    when '2/3'
+      assign ratio_css = '2 / 3'
+      assign ratio_h = '1.5000'
+  endcase
+
+  assign has_blocks = false
+  if section.blocks.size > 0
+    assign has_blocks = true
+  endif
+
+  assign has_products = false
+  if rack_collection != blank and rack_collection.products_count > 0
+    assign has_products = true
+  endif
+
+  assign sale_label = 'products.product.on_sale' | t
+  if sale_label contains 'translation missing'
+    assign sale_label = 'SALE'
+  endif
+  assign sold_out_label = 'products.product.sold_out' | t
+  if sold_out_label contains 'translation missing'
+    assign sold_out_label = 'SOLD OUT'
+  endif
+
+  assign item_count = s.products_limit
+  if has_blocks
+    assign item_count = section.blocks.size
+  elsif has_products and rack_collection.products_count < item_count
+    assign item_count = rack_collection.products_count
+  elsif has_products == false
+    assign item_count = 6
+  endif
+-%}
+
+<section
+  class="hanger-rack"
+  id="HangerRack-{{ section.id }}"
+  style="--hr-bg: {{ s.bg_color }}; --hr-fg: {{ s.text_color }}; --hr-aspect: {{ ratio_css }}; --hr-ratio-h: {{ ratio_h }}; --hr-blur-max: {{ s.blur_strength }}px; --hr-hanger-opacity: {{ s.hanger_opacity | default: 45 | divided_by: 100.0 }};"
+  data-hanger-rack
+  data-product
+  data-blur-strength="{{ s.blur_strength }}"
+  data-autoplay="{{ s.autoplay }}"
+>
+  <div class="page-width">
+    <div class="hanger-rack__head">
+      <div>
+        {%- if s.heading != blank -%}
+          <h2 class="hanger-rack__title" data-split>{{ s.heading }}</h2>
+        {%- endif -%}
+        {%- if s.subheading != blank -%}
+          <p class="hanger-rack__sub">{{ s.subheading }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="hanger-rack__controls" aria-label="Rack controls">
+        {%- if s.autoplay -%}
+          <button
+            type="button"
+            class="hanger-rack__autoplay-btn"
+            aria-label="Pause"
+            data-pause-label="Pause"
+            data-play-label="Play"
+            data-rack-autoplay-btn
+          >
+            <svg data-icon-pause width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <rect x="2" y="1.5" width="3.5" height="11" rx="1"/>
+              <rect x="8.5" y="1.5" width="3.5" height="11" rx="1"/>
+            </svg>
+            <svg data-icon-play width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true" hidden>
+              <path d="M3 1.8a.6.6 0 0 1 .9-.52l8.5 5.2a.6.6 0 0 1 0 1.04l-8.5 5.2A.6.6 0 0 1 3 12.2V1.8z"/>
+            </svg>
+          </button>
+        {%- endif -%}
+
+        <button type="button" class="hanger-rack__nav-btn" aria-label="Previous item" data-rack-prev>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+
+        <span class="hanger-rack__counter" data-rack-counter>1 / {{ item_count }}</span>
+
+        <button type="button" class="hanger-rack__nav-btn" aria-label="Next item" data-rack-next>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="hanger-rack__stage-wrap"
+    tabindex="0"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="{{ s.heading | strip_html | default: 'Interactive Hanger Rack' | escape }}"
+    data-rack-stage
+  >
+    <div class="hanger-rack__rail" aria-hidden="true">
+      <span class="hanger-rack__rail-mount hanger-rack__rail-mount--left"></span>
+      <span class="hanger-rack__rail-bar"></span>
+      <span class="hanger-rack__rail-mount hanger-rack__rail-mount--right"></span>
+    </div>
+
+    <div class="hanger-rack__viewport" data-rack-viewport>
+      <div class="hanger-rack__track" data-rack-track>
+        {%- if has_blocks -%}
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign product = block.settings.product
+              if product == blank and has_products
+                assign p_idx = forloop.index0 | modulo: rack_collection.products_count
+                assign product = rack_collection.products[p_idx]
+              endif
+              assign custom_image = block.settings.image
+              assign cut_idx = forloop.index0 | modulo: 8
+              assign cutout_asset = 'rack-cutout-' | append: cut_idx | append: '.png'
+              assign is_on_sale = false
+              if product != blank and product.compare_at_price > product.price
+                assign is_on_sale = true
+              endif
+              assign price_str = '$59.00'
+              if product != blank
+                assign price_str = product.price | money
+              endif
+              assign compare_str = ''
+              if is_on_sale
+                assign compare_str = product.compare_at_price | money
+              endif
+              assign first_avail_variant = product.selected_or_first_available_variant
+              assign back_media = product.media[1]
+              assign has_back_media = false
+              if back_media != blank
+                assign has_back_media = true
+              endif
+              assign item_title = product.title | default: 'Style Vibeus Essential'
+              assign item_url = product.url | default: routes.all_products_collection_url
+              assign item_available = true
+              if product != blank
+                assign item_available = product.available
+              endif
+            -%}
+            <div
+              class="hanger-rack__item"
+              data-rack-item
+              data-index="{{ forloop.index0 }}"
+              data-title="{{ item_title | escape }}"
+              data-price="{{ price_str | escape }}"
+              data-compare-price="{{ compare_str | escape }}"
+              data-url="{{ item_url }}"
+              data-available="{{ item_available }}"
+              data-on-sale="{{ is_on_sale }}"
+              data-has-back="{{ has_back_media }}"
+              data-variant-id="{{ first_avail_variant.id }}"
+              data-sale-label="{{ sale_label | escape }}"
+              data-sold-out-label="{{ sold_out_label | escape }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- liquid
+                assign size_opt_idx = -1
+                if product != blank
+                  for opt in product.options_with_values
+                    assign opt_down = opt.name | downcase | strip
+                    if opt_down contains 'size' or opt_down contains 'beden' or opt_down contains 'ölçü' or opt_down contains 'olcu' or opt_down contains 'numara' or opt_down contains 'ebat'
+                      assign size_opt_idx = forloop.index0
+                      break
+                    endif
+                  endfor
+                  if size_opt_idx == -1
+                    for opt in product.options_with_values
+                      assign opt_down = opt.name | downcase | strip
+                      unless opt_down contains 'color' or opt_down contains 'colour' or opt_down contains 'renk'
+                        assign size_opt_idx = forloop.index0
+                        break
+                      endunless
+                    endfor
+                  endif
+                endif
+                if size_opt_idx == -1
+                  assign size_opt_idx = 0
+                endif
+              -%}
+              <script type="application/json" data-rack-variants data-size-option-index="{{ size_opt_idx }}">
+                [
+                  {%- if product != blank -%}
+                    {%- for v in product.variants -%}
+                      {
+                        "id": {{ v.id }},
+                        "title": {{ v.title | json }},
+                        "option1": {{ v.option1 | json }},
+                        "option2": {{ v.option2 | json }},
+                        "option3": {{ v.option3 | json }},
+                        "options": {{ v.options | json }},
+                        "size": {{ v.options[size_opt_idx] | json }},
+                        "available": {{ v.available | json }},
+                        "price": {{ v.price | money | json }},
+                        "compare_at_price": {% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}""{% endif %}
+                      }{%- unless forloop.last -%},{%- endunless -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+                ]
+              </script>
+
+              <div class="hanger-rack__pendulum" data-rack-pendulum>
+                {% render 'hanger-icon', style: s.hanger_style %}
+
+                <a href="{{ item_url }}" class="hanger-rack__card" data-rack-link tabindex="-1" aria-label="{{ item_title | escape }}">
+                  <div class="hanger-rack__flipper" data-rack-flipper>
+                    <div class="hanger-rack__face hanger-rack__face--front">
+                      {%- if custom_image != blank -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          {{ custom_image | image_url: width: 760 | image_tag:
+                            widths: '300, 460, 600, 760',
+                            sizes: '(min-width: 750px) 320px, 230px',
+                            loading: 'lazy',
+                            class: 'hanger-rack__img hanger-rack__img--front hanger-rack__img--cutout',
+                            alt: custom_image.alt | default: item_title | escape
+                          }}
+                        </div>
+                      {%- elsif s.use_cutout_assets -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          <img
+                            src="{{ cutout_asset | asset_url }}"
+                            width="640"
+                            height="800"
+                            loading="lazy"
+                            class="hanger-rack__img hanger-rack__img--front hanger-rack__img--cutout"
+                            alt="{{ item_title | escape }}"
+                          >
+                        </div>
+                      {%- else -%}
+                        <div class="hanger-rack__media">
+                          {%- if product != blank and product.featured_media != blank -%}
+                            {{ product.featured_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--front',
+                              alt: product.featured_media.alt | default: item_title | escape
+                            }}
+                          {%- else -%}
+                            {{ 'product-apparel-1' | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+
+                    <div class="hanger-rack__face hanger-rack__face--back" aria-hidden="true">
+                      {%- if custom_image != blank -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          {{ custom_image | image_url: width: 760 | image_tag:
+                            widths: '300, 460, 600, 760',
+                            sizes: '(min-width: 750px) 320px, 230px',
+                            loading: 'lazy',
+                            class: 'hanger-rack__img hanger-rack__img--back hanger-rack__img--back-fallback hanger-rack__img--cutout',
+                            alt: custom_image.alt | default: item_title | escape
+                          }}
+                        </div>
+                      {%- elsif s.use_cutout_assets -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          <img
+                            src="{{ cutout_asset | asset_url }}"
+                            width="640"
+                            height="800"
+                            loading="lazy"
+                            class="hanger-rack__img hanger-rack__img--back hanger-rack__img--back-fallback hanger-rack__img--cutout"
+                            alt="{{ item_title | escape }}"
+                          >
+                        </div>
+                      {%- else -%}
+                        <div class="hanger-rack__media">
+                          {%- if has_back_media -%}
+                            {{ back_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--back',
+                              alt: back_media.alt | default: item_title | escape
+                            }}
+                          {%- elsif product != blank and product.featured_media != blank -%}
+                            {{ product.featured_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--back hanger-rack__img--back-fallback',
+                              alt: product.featured_media.alt | default: item_title | escape
+                            }}
+                          {%- else -%}
+                            {{ 'product-apparel-2' | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- elsif has_products -%}
+          {%- for product in rack_collection.products limit: s.products_limit -%}
+            {%- liquid
+              assign cut_idx = forloop.index0 | modulo: 8
+              assign cutout_asset = 'rack-cutout-' | append: cut_idx | append: '.png'
+              assign is_on_sale = false
+              if product.compare_at_price > product.price
+                assign is_on_sale = true
+              endif
+              assign price_str = product.price | money
+              assign compare_str = ''
+              if is_on_sale
+                assign compare_str = product.compare_at_price | money
+              endif
+              assign first_avail_variant = product.selected_or_first_available_variant
+              assign back_media = product.media[1]
+              assign has_back_media = false
+              if back_media != blank
+                assign has_back_media = true
+              endif
+            -%}
+            <div
+              class="hanger-rack__item"
+              data-rack-item
+              data-index="{{ forloop.index0 }}"
+              data-title="{{ product.title | escape }}"
+              data-price="{{ price_str | escape }}"
+              data-compare-price="{{ compare_str | escape }}"
+              data-url="{{ product.url }}"
+              data-available="{{ product.available }}"
+              data-on-sale="{{ is_on_sale }}"
+              data-has-back="{{ has_back_media }}"
+              data-variant-id="{{ first_avail_variant.id }}"
+              data-sale-label="{{ sale_label | escape }}"
+              data-sold-out-label="{{ sold_out_label | escape }}"
+            >
+              {%- liquid
+                assign size_opt_idx = -1
+                for opt in product.options_with_values
+                  assign opt_down = opt.name | downcase | strip
+                  if opt_down contains 'size' or opt_down contains 'beden' or opt_down contains 'ölçü' or opt_down contains 'olcu' or opt_down contains 'numara' or opt_down contains 'ebat'
+                    assign size_opt_idx = forloop.index0
+                    break
+                  endif
+                endfor
+                if size_opt_idx == -1
+                  for opt in product.options_with_values
+                    assign opt_down = opt.name | downcase | strip
+                    unless opt_down contains 'color' or opt_down contains 'colour' or opt_down contains 'renk'
+                      assign size_opt_idx = forloop.index0
+                      break
+                    endunless
+                  endfor
+                endif
+                if size_opt_idx == -1
+                  assign size_opt_idx = 0
+                endif
+              -%}
+              <script type="application/json" data-rack-variants data-size-option-index="{{ size_opt_idx }}">
+                [
+                  {%- for v in product.variants -%}
+                    {
+                      "id": {{ v.id }},
+                      "title": {{ v.title | json }},
+                      "option1": {{ v.option1 | json }},
+                      "option2": {{ v.option2 | json }},
+                      "option3": {{ v.option3 | json }},
+                      "options": {{ v.options | json }},
+                      "size": {{ v.options[size_opt_idx] | json }},
+                      "available": {{ v.available | json }},
+                      "price": {{ v.price | money | json }},
+                      "compare_at_price": {% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}""{% endif %}
+                    }{%- unless forloop.last -%},{%- endunless -%}
+                  {%- endfor -%}
+                ]
+              </script>
+
+              <div class="hanger-rack__pendulum" data-rack-pendulum>
+                {% render 'hanger-icon', style: s.hanger_style %}
+
+                <a href="{{ product.url }}" class="hanger-rack__card" data-rack-link tabindex="-1" aria-label="{{ product.title | escape }}">
+                  <div class="hanger-rack__flipper" data-rack-flipper>
+                    <div class="hanger-rack__face hanger-rack__face--front">
+                      {%- if s.use_cutout_assets -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          <img
+                            src="{{ cutout_asset | asset_url }}"
+                            width="640"
+                            height="800"
+                            loading="lazy"
+                            class="hanger-rack__img hanger-rack__img--front hanger-rack__img--cutout"
+                            alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                          >
+                        </div>
+                      {%- else -%}
+                        <div class="hanger-rack__media">
+                          {%- if product.featured_media != blank -%}
+                            {{ product.featured_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--front',
+                              alt: product.featured_media.alt | default: product.title | escape
+                            }}
+                          {%- else -%}
+                            {{ 'product-apparel-1' | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+
+                    <div class="hanger-rack__face hanger-rack__face--back" aria-hidden="true">
+                      {%- if s.use_cutout_assets -%}
+                        <div class="hanger-rack__media hanger-rack__media--cutout">
+                          <img
+                            src="{{ cutout_asset | asset_url }}"
+                            width="640"
+                            height="800"
+                            loading="lazy"
+                            class="hanger-rack__img hanger-rack__img--back hanger-rack__img--back-fallback hanger-rack__img--cutout"
+                            alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                          >
+                        </div>
+                      {%- else -%}
+                        <div class="hanger-rack__media">
+                          {%- if has_back_media -%}
+                            {{ back_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--back',
+                              alt: back_media.alt | default: product.title | escape
+                            }}
+                          {%- elsif product.featured_media != blank -%}
+                            {{ product.featured_media.preview_image | image_url: width: 760 | image_tag:
+                              widths: '300, 460, 600, 760',
+                              sizes: '(min-width: 750px) 320px, 230px',
+                              loading: 'lazy',
+                              class: 'hanger-rack__img hanger-rack__img--back hanger-rack__img--back-fallback',
+                              alt: product.featured_media.alt | default: product.title | escape
+                            }}
+                          {%- else -%}
+                            {{ 'product-apparel-2' | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign placeholder_titles = 'Tailored Wool Coat,Essential Heavyweight Tee,Relaxed Linen Shirt,Pleated Wide Trousers,Merino Crewneck Knit,Structured Overshirt' | split: ',' -%}
+          {%- assign placeholder_prices = '$189.00,$45.00,$85.00,$120.00,$110.00,$135.00' | split: ',' -%}
+          {%- for i in (0..5) -%}
+            {%- assign p_num = i | modulo: 4 | plus: 1 -%}
+            {%- assign p_svg = 'product-apparel-' | append: p_num -%}
+            {%- assign p_back_num = i | plus: 1 | modulo: 4 | plus: 1 -%}
+            {%- assign p_back_svg = 'product-apparel-' | append: p_back_num -%}
+            <div
+              class="hanger-rack__item"
+              data-rack-item
+              data-index="{{ i }}"
+              data-title="{{ placeholder_titles[i] }}"
+              data-price="{{ placeholder_prices[i] }}"
+              data-compare-price=""
+              data-url="{{ routes.all_products_collection_url }}"
+              data-available="true"
+              data-on-sale="false"
+              data-has-back="true"
+              data-variant-id=""
+              data-sale-label="{{ sale_label | escape }}"
+              data-sold-out-label="{{ sold_out_label | escape }}"
+            >
+              <script type="application/json" data-rack-variants>
+                [
+                  { "id": "", "title": "S", "option1": "S", "available": true, "price": {{ placeholder_prices[i] | json }}, "compare_at_price": "" },
+                  { "id": "", "title": "M", "option1": "M", "available": true, "price": {{ placeholder_prices[i] | json }}, "compare_at_price": "" },
+                  { "id": "", "title": "L", "option1": "L", "available": true, "price": {{ placeholder_prices[i] | json }}, "compare_at_price": "" },
+                  { "id": "", "title": "XL", "option1": "XL", "available": true, "price": {{ placeholder_prices[i] | json }}, "compare_at_price": "" }
+                ]
+              </script>
+
+              <div class="hanger-rack__pendulum" data-rack-pendulum>
+                {% render 'hanger-icon', style: s.hanger_style %}
+
+                <a href="{{ routes.all_products_collection_url }}" class="hanger-rack__card" data-rack-link tabindex="-1" aria-label="{{ placeholder_titles[i] }}">
+                  <div class="hanger-rack__flipper" data-rack-flipper>
+                    <div class="hanger-rack__face hanger-rack__face--front">
+                      <div class="hanger-rack__media">
+                        {{ p_svg | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                      </div>
+                    </div>
+                    <div class="hanger-rack__face hanger-rack__face--back" aria-hidden="true">
+                      <div class="hanger-rack__media">
+                        {{ p_back_svg | placeholder_svg_tag: 'hanger-rack__placeholder' }}
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="hanger-rack__details" aria-live="polite" aria-atomic="true">
+    <div class="hanger-rack__meta">
+      <span class="hanger-rack__status" data-rack-status hidden></span>
+      <h3 class="hanger-rack__product-title" data-rack-title></h3>
+    </div>
+    <div class="hanger-rack__product-price" data-rack-price></div>
+
+    <div class="hanger-rack__browse-actions" data-rack-browse-actions>
+      <button type="button" class="hanger-rack__cta" data-rack-cta data-rack-inspect-open>
+        <span>{{ s.cta_label | default: 'SEE AVAILABILITY' }}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="hanger-rack__inspect-bar" data-rack-inspect-bar aria-hidden="true">
+      <div class="hanger-rack__inspect-controls">
+        <div class="hanger-rack__flip-group" role="group" aria-label="Garment view side">
+          <button type="button" class="hanger-rack__flip-btn is-active" data-flip-side="front" aria-pressed="true">
+            FRONT
+          </button>
+          <button type="button" class="hanger-rack__flip-btn" data-flip-side="back" aria-pressed="false">
+            BACK
+          </button>
+        </div>
+
+        <span class="hanger-rack__inspect-divider" aria-hidden="true"></span>
+
+        <div class="hanger-rack__sizes" role="radiogroup" aria-label="Select size" data-rack-sizes></div>
+      </div>
+
+      <div class="hanger-rack__inspect-actions">
+        <form action="{{ routes.cart_add_url }}" method="post" class="hanger-rack__atc-form" data-product-form data-rack-atc-form>
+          <input type="hidden" name="id" value="" data-rack-variant-id>
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="hanger-rack__atc-btn" data-rack-atc-btn>
+            <span data-rack-atc-label>ADD TO CART</span>
+          </button>
+        </form>
+
+        <a href="{{ routes.all_products_collection_url }}" class="hanger-rack__view-link" data-rack-view-link>
+          VIEW PRODUCT →
+        </a>
+
+        <button type="button" class="hanger-rack__back-btn" data-rack-inspect-close>
+          × BACK TO RACK
+        </button>
+      </div>
+    </div>
+
+    {%- if item_count > 1 -%}
+      <div class="hanger-rack__dots" data-rack-dots>
+        {%- for i in (1..item_count) -%}
+          <button
+            type="button"
+            class="hanger-rack__dot"
+            aria-label="Go to item {{ forloop.index }}"
+            data-rack-dot
+          ></button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Interactive Hanger Rack",
+  "class": "section-hanger-rack",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products limit",
+      "min": 5,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Curated <em>Rack</em>"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Move across the rail to riffle through pieces, or click to inspect front & back."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "SEE AVAILABILITY"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Garment aspect ratio",
+      "default": "3/4",
+      "options": [
+        { "value": "3/4", "label": "Portrait (3:4)" },
+        { "value": "4/5", "label": "Editorial (4:5)" },
+        { "value": "1/1", "label": "Square (1:1)" },
+        { "value": "2/3", "label": "Tall (2:3)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "blur_strength",
+      "label": "Depth blur strength",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#fbf8f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+    {
+      "type": "select",
+      "id": "hanger_style",
+      "label": "Askı tasarımı",
+      "default": "minimal_wire",
+      "options": [
+        { "value": "minimal_wire", "label": "İnce minimalist tel (Zarif & Belirsiz)" },
+        { "value": "hook_only", "label": "Yalnızca kanca (Maksimum ürün odağı)" },
+        { "value": "hidden", "label": "Askısız / Havada asılı (Görünmez)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "hanger_opacity",
+      "label": "Askı belirginliği (Opaklık)",
+      "min": 15,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 45
+    },
+    {
+      "type": "checkbox",
+      "id": "use_cutout_assets",
+      "label": "Use transparent cutout assets (rack-cutout-0..7.png)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "garment",
+      "name": "Garment",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom cutout image"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Interactive Hanger Rack"
+    }
+  ]
+}
+{% endschema %}

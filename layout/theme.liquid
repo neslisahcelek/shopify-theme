@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" class="no-js{% if settings.enable_animations %} motion{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_background }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+  {%- else -%}
+    {%- comment -%} Built-in sparkle mark, exported per size so each stays crisp. {%- endcomment -%}
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16.png' | asset_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{{ 'favicon-48.png' | asset_url }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ 'favicon-192.png' | asset_url }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ 'favicon-180.png' | asset_url }}">
+  {%- endif -%}
+
+  {%- liquid
+    assign brand = settings.seo_brand | default: shop.name
+    assign is_home = false
+    if request.page_type == 'index'
+      assign is_home = true
+    endif
+    assign meta_description = page_description
+    if is_home and settings.seo_home_description != blank
+      assign meta_description = settings.seo_home_description
+    endif
+  -%}
+  <title>
+    {%- if is_home and settings.seo_home_title != blank -%}
+      {{ settings.seo_home_title }}
+    {%- else -%}
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains brand %} &ndash; {{ brand }}{% endunless -%}
+    {%- endif -%}
+  </title>
+
+  {%- if meta_description != blank -%}
+    <meta name="description" content="{{ meta_description | strip_html | escape }}">
+  {%- endif -%}
+
+  {% render 'meta-tags', brand: brand, is_home: is_home, meta_description: meta_description %}
+  {% render 'structured-data', brand: brand %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  {% render 'css-variables' %}
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+  {{ 'motion.css' | asset_url | stylesheet_tag }}
+  {%- if settings.enable_page_transitions -%}
+    <style>@view-transition { navigation: auto; }</style>
+  {%- endif -%}
+
+  <script>
+    document.documentElement.classList.replace('no-js', 'js');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.remove('motion');
+    window.theme = {
+      routes: {
+        root: {{ routes.root_url | json }},
+        cart: {{ routes.cart_url | json }},
+        cartAdd: {{ routes.cart_add_url | json }},
+        cartChange: {{ routes.cart_change_url | json }}
+      },
+      settings: {
+        cartType: {{ settings.cart_type | json }},
+        cursor: {{ settings.enable_cursor | json }},
+        magnetic: {{ settings.enable_magnetic | json }},
+        preloader: {{ settings.enable_preloader | json }}
+      },
+      strings: {
+        addToCart: {{ 'products.product.add_to_cart' | t | json }},
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        unavailable: {{ 'products.product.unavailable' | t | json }},
+        added: {{ 'products.product.added' | t | json }},
+        error: {{ 'general.error' | t | json }}
+      }
+    };
+  </script>
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+  <script src="{{ 'motion.js' | asset_url }}" defer></script>
+
+  {{ content_for_header }}
+</head>
+
+<body class="template-{{ template.name }}{% if settings.enable_preloader %} has-preloader{% endif %}">
+  <a class="skip-link" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
+
+  {%- if settings.enable_preloader -%}
+    <div class="preloader" aria-hidden="true">
+      <div class="preloader__brand">
+        {%- assign brand_chars = shop.name | split: '' -%}
+        {%- for char in brand_chars limit: 14 -%}
+          <span style="--i: {{ forloop.index0 }}">{{ char }}</span>
+        {%- endfor -%}
+      </div>
+      <div class="preloader__bar"><i></i></div>
+    </div>
+  {%- endif -%}
+
+  {%- if settings.enable_cursor -%}
+    <div class="cursor" aria-hidden="true">
+      <div class="cursor__ring"><span class="cursor__label"></span></div>
+      <div class="cursor__dot"></div>
+    </div>
+  {%- endif -%}
+
+  {%- if settings.enable_scroll_progress -%}
+    <div class="scroll-progress" aria-hidden="true"></div>
+  {%- endif -%}
+
+  {%- if settings.enable_grain -%}
+    <div class="grain" aria-hidden="true"></div>
+  {%- endif -%}
+
+  {% sections 'header-group' %}
+
+  <main id="MainContent" class="main" role="main" tabindex="-1">
+    {%- if request.page_type == 'index' and settings.seo_home_h1 != blank -%}
+      <h1 class="visually-hidden">{{ settings.seo_home_h1 }}</h1>
+    {%- endif -%}
+    {{ content_for_layout }}
+  </main>
+
+  {% sections 'footer-group' %}
+
+  {% section 'cart-drawer' %}
+
+  <div class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

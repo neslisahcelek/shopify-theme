@@ -1,0 +1,66 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "blocks": {
+        "a1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free shipping on orders over $100 / €100",
+            "link": ""
+          }
+        },
+        "a2": {
+          "type": "announcement",
+          "settings": {
+            "text": "Shipping to the US & Europe",
+            "link": ""
+          }
+        },
+        "a3": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free returns within 30 days",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2",
+        "a3"
+      ],
+      "settings": {
+        "scroll": true,
+        "speed": 36,
+        "style": "dark"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewbox=\"0 0 342 92\" role=\"img\" aria-label=\"stylevibe\"><text x=\"0\" y=\"66\" fill=\"currentColor\" font-family=\"Manrope, system-ui, sans-serif\" font-weight=\"500\" font-size=\"72\" textlength=\"342\" lengthadjust=\"spacing\">stylevibe</text></svg>",
+        "logo_width": 140,
+        "menu": "main-menu",
+        "layout": "center",
+        "sticky": true,
+        "transparent_on_home": true
+      }
+    }
+  },
+  "order": [
+    "announcement",
+    "header"
+  ]
+}

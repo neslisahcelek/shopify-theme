@@ -1,0 +1,141 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign transparent = false
+  if section.settings.transparent_on_home and request.page_type == 'index'
+    assign transparent = true
+  endif
+-%}
+<header
+  class="header{% if transparent %} header--transparent{% endif %}{% if section.settings.sticky %} header--sticky{% endif %} header--{{ section.settings.layout }}"
+  data-header
+>
+  <div class="header__inner page-width">
+    <button class="header__burger" type="button" aria-label="{{ 'sections.header.menu' | t }}" aria-expanded="false" aria-controls="MobileMenu" data-menu-toggle>
+      <span></span><span></span>
+    </button>
+
+    <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name }}">
+      {%- if section.settings.logo_svg != blank -%}
+        {%- comment -%} Vector logo stays sharp at any size and takes the header's text colour. {%- endcomment -%}
+        <span class="header__logo-svg" style="width: {{ section.settings.logo_width }}px">{{ section.settings.logo_svg }}</span>
+      {%- elsif section.settings.logo != blank -%}
+        {%- liquid
+          assign logo_w = section.settings.logo_width
+          assign logo_w2 = logo_w | times: 2
+          assign logo_w3 = logo_w | times: 3
+          assign logo_h = logo_w | divided_by: section.settings.logo.aspect_ratio | round
+          assign logo_widths = logo_w | append: ', ' | append: logo_w2 | append: ', ' | append: logo_w3
+          assign logo_sizes = logo_w | append: 'px'
+        -%}
+        {{ section.settings.logo | image_url: width: logo_w3 | image_tag:
+          width: logo_w,
+          height: logo_h,
+          widths: logo_widths,
+          sizes: logo_sizes,
+          alt: shop.name,
+          class: 'header__logo-img',
+          loading: 'eager'
+        }}
+      {%- else -%}
+        <span class="header__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="header__nav" aria-label="{{ 'sections.header.main_nav' | t }}">
+      <ul class="header__menu">
+        {%- for link in menu.links -%}
+          <li class="header__item{% if link.links.size > 0 %} has-dropdown{% endif %}">
+            <a href="{{ link.url }}" class="header__link{% if link.active or link.child_active %} is-active{% endif %}"{% if link.links.size > 0 %} aria-haspopup="true"{% endif %}>
+              <span class="roll-mask"><span class="roll">{% render 'menu-title', title: link.title %}</span></span>
+            </a>
+            {%- if link.links.size > 0 -%}
+              <div class="dropdown">
+                <ul class="dropdown__list">
+                  {%- for child in link.links -%}
+                    <li style="--i: {{ forloop.index0 }}">
+                      <a href="{{ child.url }}" class="dropdown__link">{% render 'menu-title', title: child.title %}</a>
+                      {%- if child.links.size > 0 -%}
+                        <ul class="dropdown__sub">
+                          {%- for grandchild in child.links -%}
+                            <li><a href="{{ grandchild.url }}">{% render 'menu-title', title: grandchild.title %}</a></li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a href="{{ routes.search_url }}" class="icon-btn" aria-label="{{ 'sections.header.search' | t }}" data-search-toggle>{% render 'icon', name: 'search' %}</a>
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" class="icon-btn header__account" aria-label="{{ 'sections.header.account' | t }}">{% render 'icon', name: 'account' %}</a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="icon-btn header__cart" aria-label="{{ 'sections.header.cart' | t }}" data-cart-toggle>
+        {% render 'icon', name: 'cart' %}
+        <span class="header__cart-count{% if cart.item_count == 0 %} is-empty{% endif %}" data-cart-count>{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="search-panel" data-search-panel hidden>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-panel__form page-width">
+      <input type="hidden" name="type" value="product">
+      <label for="HeaderSearch" class="visually-hidden">{{ 'sections.header.search' | t }}</label>
+      <input id="HeaderSearch" type="search" name="q" placeholder="{{ 'sections.header.search_placeholder' | t }}" autocomplete="off" class="search-panel__input">
+      <button type="submit" class="icon-btn" aria-label="{{ 'sections.header.search' | t }}">{% render 'icon', name: 'arrow' %}</button>
+    </form>
+  </div>
+</header>
+
+<div class="mobile-menu" id="MobileMenu" data-mobile-menu>
+  <nav class="mobile-menu__inner" aria-label="{{ 'sections.header.main_nav' | t }}">
+    <ul>
+      {%- for link in menu.links -%}
+        <li style="--i: {{ forloop.index0 }}">
+          {%- if link.links.size > 0 -%}
+            <details>
+              <summary>{% render 'menu-title', title: link.title %}{% render 'icon', name: 'chevron' %}</summary>
+              <ul class="mobile-menu__sub">
+                <li><a href="{{ link.url }}">{{ 'sections.header.view_all' | t }}</a></li>
+                {%- for child in link.links -%}
+                  <li><a href="{{ child.url }}">{% render 'menu-title', title: child.title %}</a></li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- else -%}
+            <a href="{{ link.url }}">{% render 'menu-title', title: link.title %}</a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    {%- if shop.customer_accounts_enabled -%}
+      <a href="{{ routes.account_url }}" class="mobile-menu__account">{% render 'icon', name: 'account' %}{{ 'sections.header.account' | t }}</a>
+    {%- endif -%}
+  </nav>
+</div>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "html", "id": "logo_svg", "label": "SVG logo kodu", "info": "Her boyutta keskin görünür. SVG dosyasını not defteriyle açıp içeriğini buraya yapıştırın. Doluysa yukarıdaki görsel yerine bu kullanılır." },
+    { "type": "range", "id": "logo_width", "label": "Logo genişliği", "min": 50, "max": 260, "step": 5, "unit": "px", "default": 120 },
+    { "type": "link_list", "id": "menu", "label": "Menü", "default": "main-menu" },
+    {
+      "type": "select", "id": "layout", "label": "Yerleşim", "default": "center",
+      "options": [ { "value": "center", "label": "Logo ortada" }, { "value": "left", "label": "Logo solda" } ]
+    },
+    { "type": "checkbox", "id": "sticky", "label": "Yapışkan header (aşağı kaydırınca gizlenir)", "default": true },
+    { "type": "checkbox", "id": "transparent_on_home", "label": "Ana sayfada şeffaf başla", "default": true, "info": "İlk bölüm görselli bir hero ise en iyi sonucu verir." }
+  ],
+  "enabled_on": { "groups": ["header"] }
+}
+{% endschema %}
