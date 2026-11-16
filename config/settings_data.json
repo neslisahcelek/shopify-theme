@@ -21,6 +21,7 @@
     "color_gradient_3": "#cdb39a",
     "card_ratio": "portrait",
     "card_show_vendor": true,
+    "enable_intro_curtain": false,
     "seo_brand": "StyleVibe",
     "seo_home_title": "StyleVibe | Everyday Clothing & Essentials",
     "seo_home_description": "Soft cotton tees, hoodies and everyday essentials with a relaxed fit. Free shipping over $100 / €100 and free 30-day returns.",
