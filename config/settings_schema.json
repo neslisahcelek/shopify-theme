@@ -48,7 +48,11 @@
       { "type": "checkbox", "id": "enable_magnetic", "label": "Manyetik düğmeler", "default": true },
       { "type": "checkbox", "id": "enable_scroll_progress", "label": "Kaydırma ilerleme çubuğu", "default": true },
       { "type": "checkbox", "id": "enable_grain", "label": "Film greni dokusu", "default": false },
-      { "type": "checkbox", "id": "enable_preloader", "label": "Açılış animasyonu (oturum başına bir kez)", "default": false }
+      { "type": "checkbox", "id": "enable_preloader", "label": "Açılış animasyonu (oturum başına bir kez)", "default": false },
+      { "type": "header", "content": "Butik Perde Açılışı (Curtain Reveal)" },
+      { "type": "checkbox", "id": "enable_intro_curtain", "label": "Ana sayfada perde açılış animasyonunu göster", "default": true },
+      { "type": "text", "id": "intro_curtain_monogram", "label": "Perde monogramı", "default": "SV" },
+      { "type": "text", "id": "intro_curtain_subtitle", "label": "Perde alt başlığı", "default": "AUTUMN / WINTER 2026" }
     ]
   },
   {

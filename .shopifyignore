@@ -4,3 +4,6 @@ DESIGN_SYSTEM.md
 .git
 .gitignore
 node_modules
+*.zip
+.DS_Store
+Thumbs.db

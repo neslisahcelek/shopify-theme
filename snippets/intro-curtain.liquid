@@ -1,0 +1,85 @@
+{%- comment -%}
+  Style Vibeus — Prototype 1: Boutique Split / Curtain Reveal
+  -------------------------------------------------------------
+  Architectural double-door intro reveal:
+  - Palette: Dark obsidian (#0b0b0b) & warm cream (#fbf8f4)
+  - Split doors: .curtain-panel--left & .curtain-panel--right
+  - Typography: Syne display font for brand, Manrope for subtitle
+  - Progress: .curtain-progress gold/cream hairline
+  - Controls: Accessible Skip button, tap-to-open, Esc key support
+{%- endcomment -%}
+
+<script>
+  /* Instant check to prevent curtain flash on session return */
+  (function() {
+    try {
+      if (sessionStorage.getItem('sv_curtain_seen') === '1') {
+        document.documentElement.classList.add('sv-curtain-dismissed');
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<aside
+  id="sv-curtain-intro"
+  class="curtain-intro"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Style Vibeus Giriş Animasyonu"
+  tabindex="-1"
+>
+  <!-- Architectural split panels (Boutique doors) -->
+  <div class="curtain-panel curtain-panel--left" aria-hidden="true">
+    <div class="curtain-panel__texture"></div>
+    <div class="curtain-panel__edge"></div>
+  </div>
+
+  <div class="curtain-panel curtain-panel--right" aria-hidden="true">
+    <div class="curtain-panel__texture"></div>
+    <div class="curtain-panel__edge"></div>
+  </div>
+
+  <!-- Center brand & controls layer -->
+  <div class="curtain-content">
+    <!-- Minimalist luxury Skip button -->
+    <button
+      type="button"
+      id="sv-curtain-skip"
+      class="curtain-skip"
+      aria-label="Animasyonu Atla"
+    >
+      <span class="curtain-skip__text">Skip</span>
+      <span class="curtain-skip__icon" aria-hidden="true">✕</span>
+    </button>
+
+    <!-- Centerpiece display -->
+    <div class="curtain-center">
+      <div class="curtain-monogram" aria-hidden="true">
+        <span class="curtain-monogram__text">{{ settings.intro_curtain_monogram | default: 'SV' | escape }}</span>
+      </div>
+
+      <h2 class="curtain-title">
+        <span class="curtain-title__word">STYLE</span>
+        <span class="curtain-title__word">VIBEUS</span>
+      </h2>
+
+      <p class="curtain-subtitle">{{ settings.intro_curtain_subtitle | default: 'AUTUMN / WINTER 2026' | escape }}</p>
+
+      <!-- Shimmer progress line -->
+      <div
+        class="curtain-progress"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Yükleniyor"
+      >
+        <span class="curtain-progress__fill"></span>
+      </div>
+    </div>
+
+    <!-- Mobile / subtle desktop tap-to-enter hint -->
+    <div class="curtain-hint" aria-hidden="true">
+      <span class="curtain-hint__text">Giriş için dokunun</span>
+    </div>
+  </div>
+</aside>

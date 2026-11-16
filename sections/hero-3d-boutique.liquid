@@ -1,0 +1,483 @@
+{{ 'hero-3d-boutique.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'hero-3d-boutique.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign s = section.settings
+
+  assign garment_img = s.image_garment
+  assign bg_img = s.image_bg
+
+  assign product_obj = s.product
+  assign tag_label = s.tag_label
+  assign tag_price = s.tag_price
+  assign item_url = s.button_link
+
+  if product_obj != blank
+    if tag_price == blank
+      assign tag_price = product_obj.price | money
+    endif
+    if item_url == blank or item_url == '#hanger-rack'
+      assign item_url = product_obj.url
+    endif
+  endif
+
+  if tag_price == blank
+    assign tag_price = "$120"
+  endif
+  if tag_label == blank
+    assign tag_label = "AW26 SIGNATURE PIECE"
+  endif
+
+  assign intensity_factor = s.parallax_intensity | default: 5 | divided_by: 5.0
+-%}
+
+<section
+  class="hero-3d hero-3d--{{ s.height }}"
+  id="Hero3D-{{ section.id }}"
+  data-hero-3d
+  data-intensity="{{ intensity_factor }}"
+  style="--hero-3d-overlay: {{ s.overlay_opacity | divided_by: 100.0 }};"
+  aria-label="{{ s.heading | strip_html | default: 'Style Vibeus 3D Flagship Showroom' | escape }}"
+>
+  <div class="hero-3d__viewport" data-hero-3d-viewport>
+    <div class="hero-3d__stage" data-hero-3d-stage>
+
+      <!-- ==========================================
+           KATMAN 1: Arka Plan (Z: -80px)
+           Mimari Butik Salonu, Işık Hüzmeleri, Ambient Gölge
+           ========================================== -->
+      <div class="hero-3d__plane hero-3d__plane--bg" data-hero-3d-plane="bg" aria-hidden="true">
+        <div class="hero-3d__bg-media">
+          {%- if bg_img != blank -%}
+            {{ bg_img | image_url: width: 2560 | image_tag:
+              widths: '750, 1100, 1500, 1920, 2560',
+              sizes: '100vw',
+              loading: 'eager',
+              fetchpriority: 'high',
+              class: 'hero-3d__bg-img',
+              alt: 'Boutique Flagship Interior'
+            }}
+          {%- else -%}
+            <img
+              src="{{ s.bg_asset | default: 'hero-luxury-closet.jpg' | asset_url }}"
+              class="hero-3d__bg-img"
+              alt="Boutique Flagship Interior"
+              width="2560"
+              height="1440"
+              loading="eager"
+              fetchpriority="high"
+            >
+          {%- endif -%}
+        </div>
+
+        <div class="hero-3d__ambient-overlay"></div>
+
+        {%- if s.show_light_beams -%}
+          <div class="hero-3d__light-beams">
+            <span class="hero-3d__beam hero-3d__beam--1"></span>
+            <span class="hero-3d__beam hero-3d__beam--2"></span>
+            <span class="hero-3d__beam hero-3d__beam--3"></span>
+            <span class="hero-3d__spotlight"></span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- ==========================================
+           KATMAN 2: Orta Plan / Vitrin (Z: 0px)
+           Lüks Askı Rayı, Havada Asılı Kıyafet, Dinamik Gölge & Yansıma
+           ========================================== -->
+      <div class="hero-3d__plane hero-3d__plane--mid" data-hero-3d-plane="mid">
+        <div class="hero-3d__showcase" data-hero-3d-showcase>
+
+          {%- if s.show_rail_details -%}
+            <div class="hero-3d__rail-system" aria-hidden="true">
+              <span class="hero-3d__ceiling-wire hero-3d__ceiling-wire--left"></span>
+              <span class="hero-3d__ceiling-wire hero-3d__ceiling-wire--right"></span>
+              <div class="hero-3d__rail-bar">
+                <span class="hero-3d__rail-bracket hero-3d__rail-bracket--left"></span>
+                <span class="hero-3d__rail-rod"></span>
+                <span class="hero-3d__rail-bracket hero-3d__rail-bracket--right"></span>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="hero-3d__garment-cluster" data-hero-3d-garment>
+            {%- unless s.hanger_style == 'hidden' -%}
+              <div class="hero-3d__hanger hero-3d__hanger--{{ s.hanger_style | default: 'minimal_wire' }}" aria-hidden="true">
+                {%- if s.hanger_style == 'hook_only' -%}
+                  <svg class="hero-3d__hanger-svg" viewBox="0 0 160 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="80" cy="10" r="4" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M80 14 V 24 C80 29, 83.5 31, 87 31 C91 31, 94 27, 94 22 C94 16, 85 16, 80 27" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <circle cx="80" cy="34" r="2.2" fill="currentColor"/>
+                    <path d="M68 38 Q80 34 92 38" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                {%- else -%}
+                  <svg class="hero-3d__hanger-svg" viewBox="0 0 160 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Swivel Ring & Hook -->
+                    <circle cx="80" cy="10" r="4.2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M80 14.5 V 24 C80 29, 83.5 31, 87 31 C91 31, 94 27, 94 22 C94 16, 85 16, 80 27 L80 30" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <circle cx="80" cy="30.5" r="1.8" fill="currentColor"/>
+                    <!-- Shoulder wire with brass crossbar -->
+                    <path d="M80 32.5 L24 45.5 C20 46.5 19 49.5 22.5 51 L137.5 51 C141 49.5 140 46.5 136 45.5 L80 32.5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+                    <line x1="30" y1="51" x2="130" y2="51" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+                  </svg>
+                {%- endif -%}
+              </div>
+            {%- endunless -%}
+
+            <div class="hero-3d__garment-wrap">
+              {%- if garment_img != blank -%}
+                {{ garment_img | image_url: width: 1000 | image_tag:
+                  widths: '400, 600, 800, 1000',
+                  sizes: '(min-width: 990px) 480px, 80vw',
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  class: 'hero-3d__garment-img',
+                  alt: product_obj.title | default: 'Style Vibeus Signature Garment' | escape
+                }}
+              {%- else -%}
+                <img
+                  src="{{ s.garment_asset | default: 'rack-cutout-0.png' | asset_url }}"
+                  class="hero-3d__garment-img"
+                  alt="{{ product_obj.title | default: 'Style Vibeus Signature Garment' | escape }}"
+                  width="800"
+                  height="1000"
+                  loading="eager"
+                  fetchpriority="high"
+                >
+              {%- endif -%}
+
+              {%- if s.show_specular -%}
+                <div class="hero-3d__specular" aria-hidden="true" data-hero-3d-specular></div>
+              {%- endif -%}
+
+              {%- if s.show_floating_tag -%}
+                <div class="hero-3d__floating-pill" data-hero-3d-tag>
+                  <span class="hero-3d__tag-dot" aria-hidden="true"></span>
+                  <span class="hero-3d__tag-text">{{ tag_label }}</span>
+                  {%- if tag_price != blank -%}
+                    <span class="hero-3d__tag-divider" aria-hidden="true">/</span>
+                    <span class="hero-3d__tag-price">{{ tag_price }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="hero-3d__floor-shadow" aria-hidden="true" data-hero-3d-shadow></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==========================================
+           KATMAN 3: Ön Plan / Tipografi (Z: +50px)
+           "STYLE VIBEUS ATELIER", "AW26 Curated Drop", Pill CTA Butonu
+           ========================================== -->
+      <div class="hero-3d__plane hero-3d__plane--fg" data-hero-3d-plane="fg">
+        <div class="page-width hero-3d__container">
+          <div class="hero-3d__content hero-3d__content--{{ s.content_alignment }}">
+
+            {%- if s.eyebrow != blank -%}
+              <div class="hero-3d__eyebrow-badge" data-reveal>
+                <span class="hero-3d__sparkle" aria-hidden="true">✦</span>
+                <span class="hero-3d__eyebrow-text">{{ s.eyebrow }}</span>
+              </div>
+            {%- endif -%}
+
+            {%- if s.heading != blank -%}
+              <h1 class="hero-3d__heading h-display" data-split>{{ s.heading }}</h1>
+            {%- endif -%}
+
+            {%- if s.subheading != blank -%}
+              <p class="hero-3d__subheading" data-reveal style="--i: 2">{{ s.subheading }}</p>
+            {%- endif -%}
+
+            {%- if s.text != blank -%}
+              <div class="hero-3d__desc rte" data-reveal style="--i: 3">{{ s.text }}</div>
+            {%- endif -%}
+
+            <div class="hero-3d__actions" data-reveal style="--i: 4">
+              {%- if s.button_label != blank -%}
+                <a
+                  href="{{ s.button_link | default: '#hanger-rack' }}"
+                  class="btn btn--primary hero-3d__cta-primary"
+                  data-hero-3d-cta
+                  data-magnetic
+                >
+                  <span>{{ s.button_label }}</span>
+                  <svg class="icon hero-3d__cta-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if s.button2_label != blank -%}
+                <a
+                  href="{{ s.button2_link | default: routes.collections_url }}"
+                  class="btn btn--ghost hero-3d__cta-secondary"
+                  data-magnetic
+                >
+                  <span>{{ s.button2_label }}</span>
+                </a>
+              {%- endif -%}
+            </div>
+
+            {%- if s.perks != blank -%}
+              <ul class="hero-3d__perks" role="list" data-reveal style="--i: 5">
+                {%- assign perks = s.perks | split: '|' -%}
+                {%- for perk in perks -%}
+                  <li class="hero-3d__perk-item">
+                    <span class="hero-3d__perk-dot" aria-hidden="true"></span>
+                    <span>{{ perk | strip }}</span>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+          </div>
+        </div>
+
+        <!-- Scroll Indicator Cue -->
+        <a
+          href="{{ s.button_link | default: '#hanger-rack' }}"
+          class="hero-3d__scroll-cue"
+          data-hero-3d-scroll-cue
+          aria-label="{{ s.scroll_label | default: 'Koleksiyonu Keşfet' | escape }}"
+        >
+          <span class="hero-3d__scroll-mouse" aria-hidden="true">
+            <span class="hero-3d__scroll-wheel"></span>
+          </span>
+          {%- if s.scroll_label != blank -%}
+            <span class="hero-3d__scroll-text">{{ s.scroll_label }}</span>
+          {%- endif -%}
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero 3D Showroom",
+  "tag": "section",
+  "class": "hero-3d-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tipografi ve İçerik"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Koleksiyon Rozeti / Üst Başlık",
+      "default": "FLAGSHIP SHOWROOM · AW26"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Ana Başlık (Display)",
+      "default": "STYLE VIBEUS <em>ATELIER</em>"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Alt Başlık",
+      "default": "AW26 Curated Drop · Flagship Showroom"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Açıklama Metni",
+      "default": "<p>Architectural tailoring, heavyweight fabrics and signature silhouettes suspended in an immersive 3D boutique showroom.</p>"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "İçerik Hizalaması",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Sola Hizalı" },
+        { "value": "center", "label": "Ortalanmış" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Eylem Butonları (Call To Action)"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Birincil Buton Metni",
+      "default": "Koleksiyonu Keşfet →"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Birincil Buton Bağlantısı",
+      "default": "/#hanger-rack"
+    },
+    {
+      "type": "text",
+      "id": "button2_label",
+      "label": "İkincil Buton Metni",
+      "default": "Lookbook İncele"
+    },
+    {
+      "type": "url",
+      "id": "button2_link",
+      "label": "İkincil Buton Bağlantısı"
+    },
+    {
+      "type": "text",
+      "id": "scroll_label",
+      "label": "Kaydırma İpucu Metni",
+      "default": "Aşağı Kaydır"
+    },
+    {
+      "type": "header",
+      "content": "Vitrin Askı Parçası (Orta Katman Z: 0px)"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Öne Çıkarılan Ürün (Opsiyonel)"
+    },
+    {
+      "type": "text",
+      "id": "tag_label",
+      "label": "Ürün Etiketi / Rozeti",
+      "default": "AW26 SIGNATURE PIECE"
+    },
+    {
+      "type": "text",
+      "id": "tag_price",
+      "label": "Ürün Fiyat Etiketi",
+      "default": "$120"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_garment",
+      "label": "Özel Vitrin Kıyafeti Görseli (Saydam PNG)"
+    },
+    {
+      "type": "select",
+      "id": "garment_asset",
+      "label": "Varsayılan Vitrin Parçası (Asset)",
+      "default": "rack-cutout-0.png",
+      "options": [
+        { "value": "rack-cutout-0.png", "label": "0 - Oversized Vintage Jacket" },
+        { "value": "rack-cutout-1.png", "label": "1 - Minimalist Knitwear / Shirt" },
+        { "value": "rack-cutout-2.png", "label": "2 - Structured Wool Blazer" },
+        { "value": "rack-cutout-3.png", "label": "3 - Heavyweight Atelier Hoodie" },
+        { "value": "rack-cutout-4.png", "label": "4 - Relaxed Fit Cotton Shirt" },
+        { "value": "rack-cutout-5.png", "label": "5 - Tailored Overshirt" },
+        { "value": "rack-cutout-6.png", "label": "6 - Signature Drop Outerwear" },
+        { "value": "rack-cutout-7.png", "label": "7 - Everyday Minimal Tee" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hanger_style",
+      "label": "Askı Tasarımı",
+      "default": "minimal_wire",
+      "options": [
+        { "value": "minimal_wire", "label": "Lüks Pirinç / İnce Minimalist Tel" },
+        { "value": "hook_only", "label": "Yalnızca Üst Kanca" },
+        { "value": "hidden", "label": "Askısız / Havada Asılı" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rail_details",
+      "label": "Tavana Asılı Minimalist Ray Sistemini Göster",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_specular",
+      "label": "Dinamik Işık Yansıması (Specular Highlight) Göster",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_floating_tag",
+      "label": "Kıyafet Üzerinde Yüzen Fiyat/Etiket Rozetini Göster",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Atmosfer ve Arka Plan (Derin Katman Z: -80px)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_bg",
+      "label": "Özel Arka Plan Görseli"
+    },
+    {
+      "type": "select",
+      "id": "bg_asset",
+      "label": "Varsayılan Butik Arka Planı (Asset)",
+      "default": "hero-luxury-closet.jpg",
+      "options": [
+        { "value": "hero-luxury-closet.jpg", "label": "Luxury Boutique Closet Salon" },
+        { "value": "hero-wardrobe.jpg", "label": "Modern Warm Atelier Wardrobe" },
+        { "value": "wardrobe-bg.jpg", "label": "Minimalist Studio Room" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Arka Plan Karartma (Overlay)",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "show_light_beams",
+      "label": "Tavan Işık Hüzmeleri ve Spotlight Göster",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "parallax_intensity",
+      "label": "3D Parallaks Derinlik Şiddeti",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Yerleşim ve Detaylar"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Bölüm Yüksekliği",
+      "default": "full",
+      "options": [
+        { "value": "full", "label": "Tam Ekran (100vh)" },
+        { "value": "large", "label": "Geniş (90vh)" },
+        { "value": "medium", "label": "Orta (75vh)" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "perks",
+      "label": "Avantajlar Listesi (| ile ayrılmış)",
+      "default": "Free Global Shipping Over $100 | Handcrafted Finish | 30-Day Atelier Trial"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero 3D Showroom"
+    }
+  ]
+}
+{% endschema %}

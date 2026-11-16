@@ -1,0 +1,12 @@
+# Theme zip packages (local exports only)
+*.zip
+
+# Local workspace & agent rules (not part of Shopify theme schema)
+.gemini/
+AGENTS.md
+DESIGN_SYSTEM.md
+
+# Dependencies & OS metadata
+node_modules/
+.DS_Store
+Thumbs.db

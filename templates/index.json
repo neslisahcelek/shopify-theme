@@ -11,6 +11,7 @@
   "sections": {
     "slideshow": {
       "type": "slideshow",
+      "disabled": true,
       "blocks": {
         "wardrobe": {
           "type": "slide",
@@ -372,9 +373,38 @@
         "bg_y": 53,
         "overlay": 30
       }
+    },
+    "hero_3d_boutique": {
+      "type": "hero-3d-boutique",
+      "settings": {
+        "eyebrow": "FLAGSHIP SHOWROOM · AW26",
+        "heading": "STYLE VIBEUS <em>ATELIER</em>",
+        "subheading": "AW26 Curated Drop · Flagship Showroom",
+        "text": "<p>Architectural tailoring, heavyweight fabrics and signature silhouettes suspended in an immersive 3D boutique showroom.</p>",
+        "content_alignment": "left",
+        "button_label": "Koleksiyonu Keşfet →",
+        "button_link": "/#hanger-rack",
+        "button2_label": "Tüm Ürünleri Gör",
+        "button2_link": "shopify://collections/all",
+        "scroll_label": "Aşağı Kaydır",
+        "tag_label": "AW26 SIGNATURE PIECE",
+        "tag_price": "$120",
+        "garment_asset": "rack-cutout-0.png",
+        "hanger_style": "minimal_wire",
+        "show_rail_details": true,
+        "show_specular": true,
+        "show_floating_tag": true,
+        "bg_asset": "hero-luxury-closet.jpg",
+        "overlay_opacity": 30,
+        "show_light_beams": true,
+        "parallax_intensity": 5,
+        "height": "full",
+        "perks": "Free Shipping Over $100 | Free 30-Day Returns | Secure Checkout"
+      }
     }
   },
   "order": [
+    "hero_3d_boutique",
     "slideshow",
     "marquee_ticker",
     "hanger_rack",
