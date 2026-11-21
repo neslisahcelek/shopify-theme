@@ -1,7 +1,8 @@
 /* ==========================================================================
-   Style Vibeus — Interactive 3D WebGL Boutique Walkthrough
+   Style Vibeus — Interactive 3D WebGL Boutique Walkthrough (Ultra-Premium)
    --------------------------------------------------------------------------
-   - Fullscreen WebGL canvas with interactive grab/drag cursor
+   - Fullscreen WebGL canvas with grab/drag & garment pointer cursors
+   - Floating glassmorphic product inspection pill
    - Minimalist luxury HUD: "Siteye Geç ✕" & "Alışverişe Başla →"
    - Pure GPU-composited opacity exit transition
    - Accessibility & reduced-motion support
@@ -58,6 +59,10 @@ body.sv-curtain-locked {
 
 .curtain-intro.is-interactive .curtain-3d-canvas {
   cursor: grab;
+}
+
+.curtain-intro.is-interactive.is-hovering-garment .curtain-3d-canvas {
+  cursor: pointer;
 }
 
 .curtain-intro.is-interactive.is-dragging .curtain-3d-canvas {
@@ -123,7 +128,69 @@ body.sv-curtain-locked {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
   pointer-events: none;
+}
+
+/* Product Inspection Pill */
+.curtain-product-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.88);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: #fbf8f4;
+  text-decoration: none;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+  animation: curtainBarIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.curtain-product-pill[hidden] {
+  display: none;
+}
+
+.curtain-product-pill:hover {
+  transform: translateY(-2px);
+  border-color: #d4af37;
+}
+
+.curtain-product-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.7);
+  flex-shrink: 0;
+}
+
+.curtain-product-pill__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.curtain-product-pill__price {
+  font-weight: 700;
+  color: #e8d0b2;
+  padding-left: 8px;
+  border-left: 1px solid rgba(251, 248, 244, 0.2);
+}
+
+.curtain-product-pill__cta {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111111;
+  background: #fbf8f4;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-left: 4px;
 }
 
 /* Entering Progress Pill */
@@ -229,7 +296,7 @@ body.sv-curtain-locked {
 @keyframes curtainBarIn {
   0% {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   100% {
     opacity: 1;
@@ -243,7 +310,8 @@ body.sv-curtain-locked {
     transition: opacity 0.2s linear !important;
   }
   .curtain-progress__fill,
-  .curtain-explore-bar {
+  .curtain-explore-bar,
+  .curtain-product-pill {
     animation: none !important;
   }
 }
@@ -253,6 +321,12 @@ body.sv-curtain-locked {
   .curtain-skip {
     padding: 8px 14px;
     font-size: 10px;
+  }
+
+  .curtain-product-pill {
+    font-size: 11px;
+    padding: 6px 12px;
+    gap: 8px;
   }
 
   .curtain-explore-bar {
