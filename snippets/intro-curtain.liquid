@@ -1,11 +1,10 @@
 {%- comment -%}
-  Style Vibeus — 3D WebGL Boutique Walkthrough Intro
+  Style Vibeus — Interactive 3D WebGL Boutique Walkthrough
   -------------------------------------------------------------
-  - Real-time Three.js 3D architectural showroom walkthrough (~2.2s)
-  - Warm travertine & cream luxury palette matching DESIGN_SYSTEM.md
-  - Sliding glass doors, left/right illuminated racks with real products,
-    center focal pedestal & STYLE VIBEUS brand wall
-  - Session storage guard ('sv_curtain_seen'), Skip button, tap/Esc to enter
+  - Phase 1 (~2.4s): Doors slide open & camera walks into the store
+  - Phase 2 (Interactive): User can freely walk forward/back (scroll/swipe)
+    and look around left/right (drag/mouse) inside the 3D boutique
+  - Always-available "Siteye Geç ✕" & "Alışverişe Başla →" exit controls
 {%- endcomment -%}
 
 <script>
@@ -35,29 +34,45 @@
   class="curtain-intro"
   role="dialog"
   aria-modal="true"
-  aria-label="Style Vibeus 3D Mağaza Girişi"
+  aria-label="Style Vibeus 3D Sanal Mağaza"
   tabindex="-1"
   data-garments="{{ garment_urls | strip | escape }}"
 >
   <canvas id="sv-3d-walkthrough-canvas" class="curtain-3d-canvas"></canvas>
 
-  <!-- Minimal HUD overlay: Skip button & subtle tap hint -->
+  <!-- Interactive Store HUD -->
   <div class="curtain-hud">
+    <!-- Top-right instant exit button -->
     <button
       type="button"
       id="sv-curtain-skip"
       class="curtain-skip"
-      aria-label="Animasyonu Atla"
+      aria-label="3D Mağazadan Çık ve Siteye Geç"
     >
-      <span class="curtain-skip__text">Skip</span>
+      <span class="curtain-skip__text">Siteye Geç</span>
       <span class="curtain-skip__icon" aria-hidden="true">✕</span>
     </button>
 
-    <div class="curtain-hud__bottom" aria-hidden="true">
-      <div class="curtain-progress">
-        <span class="curtain-progress__fill"></span>
+    <!-- Bottom status / interactive exploration bar -->
+    <div class="curtain-hud__bottom">
+      <!-- Entering progress (shown during 0-2.4s entrance) -->
+      <div class="curtain-entering-pill" id="sv-curtain-entering">
+        <div class="curtain-progress">
+          <span class="curtain-progress__fill"></span>
+        </div>
+        <span class="curtain-hint__text">Mağazaya giriliyor...</span>
       </div>
-      <span class="curtain-hint__text">Hemen girmek için dokunun</span>
+
+      <!-- Explore bar (shown once inside the store) -->
+      <div class="curtain-explore-bar" id="sv-curtain-explore" hidden>
+        <span class="curtain-explore-bar__hint">
+          Kaydır: İlerle &nbsp;·&nbsp; Sürükle: Etrafa Bak
+        </span>
+        <button type="button" id="sv-curtain-enter-shop" class="curtain-enter-btn">
+          <span>Alışverişe Başla</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </div>
   </div>
 </aside>

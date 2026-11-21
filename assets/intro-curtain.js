@@ -1,21 +1,20 @@
 /**
- * Style Vibeus — 3D WebGL Boutique Walkthrough Intro
+ * Style Vibeus — Interactive 3D WebGL Boutique Walkthrough
  * -------------------------------------------------------------
- * - Procedural Three.js luxury travertine & cream showroom
- * - Sliding smoked-glass entrance doors + illuminated ceiling strips
- * - Left/right clothing racks with real product cutouts
- * - Center focal pedestal & STYLE VIBEUS brand wall
- * - Smooth ~2.25s camera walkthrough + seamless fade into storefront
- * - Session storage guard ('sv_curtain_seen'), Skip button, tap/Esc exit
+ * - Phase 1 (~2.35s): Glass doors slide open & camera walks into store
+ * - Phase 2 (Interactive): User stays inside and can freely walk
+ *   forward/back (wheel, touch swipe, W/S/Arrows) and look around
+ *   left/right (drag, touch pan, A/D/Arrows)
+ * - Always-available exit: "Siteye Geç ✕", "Alışverişe Başla →", Esc
+ * - Session storage guard ('sv_curtain_seen')
  */
 
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'sv_curtain_seen';
-  var WALK_DURATION_MS = 2250;
-  var FADE_OUT_MS = 420;
-  var FAST_SKIP_MS = 260;
+  var ENTRANCE_DURATION_MS = 2350;
+  var FADE_OUT_MS = 380;
 
   function hasSeenCurtain() {
     try {
@@ -31,6 +30,10 @@
         window.sessionStorage.setItem(STORAGE_KEY, '1');
       }
     } catch (e) {}
+  }
+
+  function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
   }
 
   function easeInOutCubic(t) {
@@ -50,12 +53,10 @@
     ctx.fillStyle = bgHex;
     ctx.fillRect(0, 0, c.width, c.height);
 
-    // Subtle border trim
     ctx.strokeStyle = accentHex;
     ctx.lineWidth = 3;
     ctx.strokeRect(24, 24, c.width - 48, c.height - 48);
 
-    // Main brand title
     ctx.fillStyle = textHex;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -80,6 +81,9 @@
 
     var canvas = document.getElementById('sv-3d-walkthrough-canvas');
     var skipBtn = document.getElementById('sv-curtain-skip');
+    var enterShopBtn = document.getElementById('sv-curtain-enter-shop');
+    var enteringPill = document.getElementById('sv-curtain-entering');
+    var exploreBar = document.getElementById('sv-curtain-explore');
 
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (hasSeenCurtain() || prefersReduced || typeof THREE === 'undefined' || !canvas) {
@@ -122,12 +126,11 @@
     scene.fog = new THREE.Fog(0xf6eee5, 11, 34);
 
     var isMobile = width < 768;
-    var camera = new THREE.PerspectiveCamera(isMobile ? 62 : 50, width / height, 0.1, 60);
+    var camera = new THREE.PerspectiveCamera(isMobile ? 64 : 52, width / height, 0.1, 60);
     camera.position.set(0, 1.68, 13.8);
 
     // --- Lighting ---
-    var hemiLight = new THREE.HemisphereLight(0xfffaf2, 0xd8cbb8, 0.92);
-    scene.add(hemiLight);
+    scene.add(new THREE.HemisphereLight(0xfffaf2, 0xd8cbb8, 0.92));
 
     var dirLight = new THREE.DirectionalLight(0xfff5e6, 0.75);
     dirLight.position.set(2, 8, 10);
@@ -146,31 +149,11 @@
     scene.add(focalLight);
 
     // --- Materials ---
-    var travertineMat = new THREE.MeshStandardMaterial({
-      color: 0xede4d8,
-      roughness: 0.28,
-      metalness: 0.04,
-    });
-    var wallMat = new THREE.MeshStandardMaterial({
-      color: 0xf6eee5,
-      roughness: 0.82,
-      metalness: 0.02,
-    });
-    var pillarMat = new THREE.MeshStandardMaterial({
-      color: 0xe6dccf,
-      roughness: 0.65,
-      metalness: 0.04,
-    });
-    var darkBronzeMat = new THREE.MeshStandardMaterial({
-      color: 0x161413,
-      roughness: 0.35,
-      metalness: 0.75,
-    });
-    var brassMat = new THREE.MeshStandardMaterial({
-      color: 0xd4af37,
-      roughness: 0.25,
-      metalness: 0.88,
-    });
+    var travertineMat = new THREE.MeshStandardMaterial({ color: 0xede4d8, roughness: 0.28, metalness: 0.04 });
+    var wallMat = new THREE.MeshStandardMaterial({ color: 0xf6eee5, roughness: 0.82, metalness: 0.02 });
+    var pillarMat = new THREE.MeshStandardMaterial({ color: 0xe6dccf, roughness: 0.65, metalness: 0.04 });
+    var darkBronzeMat = new THREE.MeshStandardMaterial({ color: 0x161413, roughness: 0.35, metalness: 0.75 });
+    var brassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.25, metalness: 0.88 });
     var ledMat = new THREE.MeshBasicMaterial({ color: 0xfff8ed });
     var glassMat = new THREE.MeshPhysicalMaterial({
       color: 0x1a1817,
@@ -211,7 +194,6 @@
     rightWall.position.set(5.2, 2.2, 2);
     scene.add(rightWall);
 
-    // Ceiling LED light strips
     var ledGeo = new THREE.BoxGeometry(0.08, 0.03, 22);
     var ledLeft = new THREE.Mesh(ledGeo, ledMat);
     ledLeft.position.set(-1.6, 4.38, 1.5);
@@ -221,7 +203,7 @@
     ledRight.position.set(1.6, 4.38, 1.5);
     scene.add(ledRight);
 
-    // --- 3. Entrance Architectural Portal & Sliding Glass Doors (z = 9.5) ---
+    // --- 3. Entrance Portal & Sliding Glass Doors (z = 9.5) ---
     var portalZ = 9.5;
     var pillarPortalGeo = new THREE.BoxGeometry(1.8, 4.5, 0.45);
     var portalLeft = new THREE.Mesh(pillarPortalGeo, darkBronzeMat);
@@ -236,7 +218,6 @@
     headerBeam.position.set(0, 3.95, portalZ);
     scene.add(headerBeam);
 
-    // Overhead illuminated fascia sign on exterior
     var extSignTex = createBrandSignTexture('STYLE VIBEUS', 'FLAGSHIP BOUTIQUE', '#161413', '#fbf8f4', '#d4af37');
     var extSign = new THREE.Mesh(
       new THREE.PlaneGeometry(4.2, 0.9),
@@ -245,7 +226,6 @@
     extSign.position.set(0, 3.92, portalZ + 0.27);
     scene.add(extSign);
 
-    // Sliding Glass Doors
     var doorGroupLeft = new THREE.Group();
     var doorGlassL = new THREE.Mesh(new THREE.BoxGeometry(1.72, 3.4, 0.05), glassMat);
     var doorHandleL = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.1, 12), brassMat);
@@ -266,10 +246,9 @@
     doorGroupRight.position.set(0.86, 1.7, portalZ);
     scene.add(doorGroupRight);
 
-    // --- 4. Architectural Columns along Aisle ---
+    // --- 4. Architectural Columns ---
     var colGeo = new THREE.BoxGeometry(0.55, 4.4, 0.55);
-    var colZPositions = [6.2, 1.6, -3.0];
-    colZPositions.forEach(function (zPos) {
+    [6.2, 1.6, -3.0].forEach(function (zPos) {
       var cL = new THREE.Mesh(colGeo, pillarMat);
       cL.position.set(-3.1, 2.2, zPos);
       scene.add(cL);
@@ -279,7 +258,7 @@
       scene.add(cR);
     });
 
-    // --- 5. Left & Right Boutique Clothing Racks with Real Products ---
+    // --- 5. Left & Right Boutique Clothing Racks ---
     var garmentUrls = [];
     try {
       garmentUrls = JSON.parse(curtain.getAttribute('data-garments') || '[]');
@@ -296,22 +275,18 @@
     rackZPositions.forEach(function (zPos) {
       [-1, 1].forEach(function (side) {
         var xWall = side * 4.45;
-        // Brass rail
         var rail = new THREE.Mesh(railGeo, brassMat);
         rail.position.set(xWall, 2.45, zPos);
         scene.add(rail);
 
-        // Warm top niche strip
         var nLight = new THREE.Mesh(nicheLightGeo, ledMat);
         nLight.position.set(xWall, 3.25, zPos);
         scene.add(nLight);
 
-        // Display bench underneath
         var bench = new THREE.Mesh(benchGeo, pillarMat);
         bench.position.set(xWall, 0.21, zPos);
         scene.add(bench);
 
-        // Hanging Garment Plane
         var url = garmentUrls[garmentIndex % Math.max(garmentUrls.length, 1)];
         garmentIndex++;
         if (url) {
@@ -355,7 +330,6 @@
     pedestalTrim.position.set(0, 0.78, -6.5);
     scene.add(pedestalTrim);
 
-    // Center hero garment hovering cleanly below the wall sign
     if (garmentUrls[0]) {
       texLoader.load(garmentUrls[0], function (tex) {
         if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
@@ -368,31 +342,55 @@
       });
     }
 
-    // --- Animation & Lifecycle State ---
+    // --- Interactive Exploration & State ---
     var startTime = performance.now();
     var rafId = null;
+    var isInteractive = false;
     var isFading = false;
     var isDone = false;
-    var pointerX = 0;
-    var pointerY = 0;
+
+    // Camera targets during interactive mode
+    var targetZ = 3.2;
+    var currentZ = 13.8;
+    var targetYaw = 0;
+    var currentYaw = 0;
+    var targetPitch = 0;
+    var currentPitch = 0;
+
+    var isDragging = false;
+    var lastPointerX = 0;
+    var lastPointerY = 0;
+    var keysPressed = {};
+
+    function enterInteractiveMode() {
+      if (isInteractive || isFading || isDone) return;
+      isInteractive = true;
+      targetZ = currentZ;
+      curtain.classList.add('is-interactive');
+      if (enteringPill) enteringPill.hidden = true;
+      if (exploreBar) exploreBar.hidden = false;
+    }
 
     function cleanup() {
       if (isDone) return;
       isDone = true;
       if (rafId) cancelAnimationFrame(rafId);
 
-      curtain.classList.remove('sv-curtain-fading');
+      curtain.classList.remove('sv-curtain-fading', 'is-interactive', 'is-dragging');
       curtain.classList.add('sv-curtain-done');
       curtain.setAttribute('aria-hidden', 'true');
       curtain.style.display = 'none';
       document.body.classList.remove('sv-curtain-locked');
 
       window.removeEventListener('resize', onResize);
+      canvas.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
-      curtain.removeEventListener('click', onSkip);
-      curtain.removeEventListener('touchstart', onSkip);
+      window.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('wheel', onWheel);
       document.removeEventListener('keydown', onKeyDown);
-      if (skipBtn) skipBtn.removeEventListener('click', onSkip);
+      document.removeEventListener('keyup', onKeyUp);
+      if (skipBtn) skipBtn.removeEventListener('click', onExitClick);
+      if (enterShopBtn) enterShopBtn.removeEventListener('click', onExitClick);
 
       try {
         renderer.dispose();
@@ -403,28 +401,64 @@
       } catch (err) {}
     }
 
-    function triggerFadeOut(ms) {
+    function triggerExit(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
       if (isFading || isDone) return;
       isFading = true;
       curtain.classList.add('sv-curtain-fading');
       document.body.classList.remove('sv-curtain-locked');
-      setTimeout(cleanup, ms || FADE_OUT_MS);
+      setTimeout(cleanup, FADE_OUT_MS);
     }
 
-    function onSkip(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-      triggerFadeOut(FAST_SKIP_MS);
+    function onExitClick(e) {
+      triggerExit(e);
+    }
+
+    function onPointerDown(e) {
+      if (!isInteractive || isDone) return;
+      isDragging = true;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      curtain.classList.add('is-dragging');
+    }
+
+    function onPointerMove(e) {
+      if (!isInteractive || !isDragging || isDone) return;
+      var dx = e.clientX - lastPointerX;
+      var dy = e.clientY - lastPointerY;
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+
+      // Drag left/right to look around; on touch screens also walk forward/back with vertical drag
+      targetYaw = clamp(targetYaw + dx * 0.0045, -1.18, 1.18);
+      if (e.pointerType === 'touch') {
+        targetZ = clamp(targetZ - dy * 0.028, -4.4, 7.2);
+      } else {
+        targetPitch = clamp(targetPitch + dy * 0.0025, -0.25, 0.28);
+      }
+    }
+
+    function onPointerUp() {
+      isDragging = false;
+      curtain.classList.remove('is-dragging');
+    }
+
+    function onWheel(e) {
+      if (!isInteractive || isDone) return;
+      e.preventDefault();
+      targetZ = clamp(targetZ + e.deltaY * 0.006, -4.4, 7.2);
     }
 
     function onKeyDown(e) {
       if (e.key === 'Escape' || e.keyCode === 27) {
-        triggerFadeOut(FAST_SKIP_MS);
+        triggerExit(e);
+        return;
       }
+      keysPressed[e.key] = true;
     }
 
-    function onPointerMove(e) {
-      pointerX = (e.clientX / (window.innerWidth || 1) - 0.5) * 2;
-      pointerY = (e.clientY / (window.innerHeight || 1) - 0.5) * 2;
+    function onKeyUp(e) {
+      delete keysPressed[e.key];
     }
 
     function onResize() {
@@ -432,46 +466,74 @@
       var w = window.innerWidth || 1440;
       var h = window.innerHeight || 900;
       camera.aspect = w / h;
-      camera.fov = w < 768 ? 62 : 50;
+      camera.fov = w < 768 ? 64 : 52;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
     }
 
     window.addEventListener('resize', onResize);
+    canvas.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
-    curtain.addEventListener('click', onSkip, { passive: true });
-    curtain.addEventListener('touchstart', onSkip, { passive: true });
+    window.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('wheel', onWheel, { passive: false });
     document.addEventListener('keydown', onKeyDown);
-    if (skipBtn) skipBtn.addEventListener('click', onSkip);
+    document.addEventListener('keyup', onKeyUp);
+    if (skipBtn) skipBtn.addEventListener('click', onExitClick);
+    if (enterShopBtn) enterShopBtn.addEventListener('click', onExitClick);
 
     function renderLoop(now) {
       if (isDone) return;
-      var elapsed = now - startTime;
-      var progress = Math.min(elapsed / WALK_DURATION_MS, 1);
 
-      // Doors slide open cleanly during first 42% of walkthrough
-      var doorProgress = Math.min(Math.max((progress - 0.03) / 0.38, 0), 1);
-      var doorEase = easeOutQuart(doorProgress);
-      doorGroupLeft.position.x = -0.86 - doorEase * 2.25;
-      doorGroupRight.position.x = 0.86 + doorEase * 2.25;
+      if (!isInteractive) {
+        var elapsed = now - startTime;
+        var progress = Math.min(elapsed / ENTRANCE_DURATION_MS, 1);
 
-      // Camera walks smoothly from z=13.8 through doorway down aisle to z=-2.6
-      var walkEase = easeInOutCubic(progress);
-      var camZ = 13.8 - walkEase * 16.4;
-      var stepBob = Math.sin(progress * Math.PI * 5) * 0.032 * (1 - progress * 0.4);
+        // Doors slide open cleanly
+        var doorProgress = Math.min(Math.max((progress - 0.03) / 0.42, 0), 1);
+        var doorEase = easeOutQuart(doorProgress);
+        doorGroupLeft.position.x = -0.86 - doorEase * 2.35;
+        doorGroupRight.position.x = 0.86 + doorEase * 2.35;
 
-      camera.position.set(
-        pointerX * 0.22,
-        1.68 + stepBob - pointerY * 0.08,
-        camZ
-      );
-      camera.lookAt(pointerX * 0.35, 1.65 - pointerY * 0.14, camZ - 6.5);
+        // Camera walks inside from z=13.8 to z=3.2
+        var walkEase = easeInOutCubic(progress);
+        currentZ = 13.8 - walkEase * 10.6;
+        var stepBob = Math.sin(progress * Math.PI * 5) * 0.03 * (1 - progress * 0.5);
+
+        camera.position.set(0, 1.68 + stepBob, currentZ);
+        camera.lookAt(0, 1.65, currentZ - 6.5);
+
+        if (progress >= 1) {
+          enterInteractiveMode();
+        }
+      } else {
+        // Keyboard walking / looking support
+        if (keysPressed['ArrowUp'] || keysPressed['w'] || keysPressed['W']) {
+          targetZ = clamp(targetZ - 0.12, -4.4, 7.2);
+        }
+        if (keysPressed['ArrowDown'] || keysPressed['s'] || keysPressed['S']) {
+          targetZ = clamp(targetZ + 0.12, -4.4, 7.2);
+        }
+        if (keysPressed['ArrowLeft'] || keysPressed['a'] || keysPressed['A']) {
+          targetYaw = clamp(targetYaw + 0.035, -1.18, 1.18);
+        }
+        if (keysPressed['ArrowRight'] || keysPressed['d'] || keysPressed['D']) {
+          targetYaw = clamp(targetYaw - 0.035, -1.18, 1.18);
+        }
+
+        // Silky lerp interpolation
+        currentZ += (targetZ - currentZ) * 0.085;
+        currentYaw += (targetYaw - currentYaw) * 0.09;
+        currentPitch += (targetPitch - currentPitch) * 0.09;
+
+        camera.position.set(0, 1.68, currentZ);
+        var lookDist = 6.5;
+        var lookX = -Math.sin(currentYaw) * lookDist;
+        var lookZ = currentZ - Math.cos(currentYaw) * lookDist;
+        var lookY = 1.65 - Math.sin(currentPitch) * 2.2;
+        camera.lookAt(lookX, lookY, lookZ);
+      }
 
       renderer.render(scene, camera);
-
-      if (progress >= 1 && !isFading) {
-        triggerFadeOut(FADE_OUT_MS);
-      }
 
       if (!isDone) {
         rafId = requestAnimationFrame(renderLoop);
@@ -479,11 +541,6 @@
     }
 
     rafId = requestAnimationFrame(renderLoop);
-
-    // Safety fallback timer
-    setTimeout(function () {
-      if (!isDone) triggerFadeOut(FADE_OUT_MS);
-    }, WALK_DURATION_MS + 250);
   }
 
   if (document.readyState === 'loading') {

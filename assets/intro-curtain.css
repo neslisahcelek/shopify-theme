@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Style Vibeus — 3D WebGL Boutique Walkthrough Intro
+   Style Vibeus — Interactive 3D WebGL Boutique Walkthrough
    --------------------------------------------------------------------------
-   - Fullscreen WebGL canvas with luxury HUD (Skip button & progress hairline)
-   - Warm travertine base (#f6eee5) preventing any harsh dark flash
+   - Fullscreen WebGL canvas with interactive grab/drag cursor
+   - Minimalist luxury HUD: "Siteye Geç ✕" & "Alışverişe Başla →"
    - Pure GPU-composited opacity exit transition
    - Accessibility & reduced-motion support
    ========================================================================== */
@@ -15,12 +15,12 @@ html.sv-curtain-dismissed .curtain-intro {
   pointer-events: none !important;
 }
 
-/* 2. Scroll lock during active walkthrough */
+/* 2. Scroll lock during active 3D store session */
 body.sv-curtain-locked {
   overflow: hidden !important;
 }
 
-/* 3. Main 3D Walkthrough Overlay */
+/* 3. Main 3D Overlay */
 .curtain-intro {
   position: fixed;
   inset: 0;
@@ -34,7 +34,7 @@ body.sv-curtain-locked {
   -webkit-user-select: none;
   background-color: #f6eee5;
   opacity: 1;
-  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .curtain-intro.sv-curtain-fading {
@@ -48,7 +48,7 @@ body.sv-curtain-locked {
   pointer-events: none !important;
 }
 
-/* 4. WebGL Canvas */
+/* 4. Interactive WebGL Canvas */
 .curtain-3d-canvas {
   display: block;
   width: 100%;
@@ -56,7 +56,15 @@ body.sv-curtain-locked {
   touch-action: none;
 }
 
-/* 5. Minimalist Luxury HUD */
+.curtain-intro.is-interactive .curtain-3d-canvas {
+  cursor: grab;
+}
+
+.curtain-intro.is-interactive.is-dragging .curtain-3d-canvas {
+  cursor: grabbing;
+}
+
+/* 5. Store HUD */
 .curtain-hud {
   position: absolute;
   inset: 0;
@@ -76,51 +84,65 @@ body.sv-curtain-locked {
   min-height: 44px;
   padding: 10px 18px;
   border-radius: 999px;
-  background-color: rgba(17, 17, 17, 0.72);
-  border: 1px solid rgba(251, 248, 244, 0.25);
+  background-color: rgba(17, 17, 17, 0.78);
+  border: 1px solid rgba(251, 248, 244, 0.28);
   color: #fbf8f4;
   font-family: var(--body, "Manrope", system-ui, sans-serif);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   transition: background-color 0.25s ease, transform 0.2s ease;
 }
 
 .curtain-skip:hover,
 .curtain-skip:focus-visible {
-  background-color: rgba(17, 17, 17, 0.92);
+  background-color: #111111;
   transform: translateY(-1px);
   outline: none;
 }
 
 .curtain-skip__icon {
   font-size: 12px;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 
-/* Bottom Progress & Hint */
+/* Bottom HUD Container */
 .curtain-hud__bottom {
   position: fixed;
   left: 50%;
   bottom: max(24px, env(safe-area-inset-bottom, 24px));
   transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* Entering Progress Pill */
+.curtain-entering-pill {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
 
+.curtain-entering-pill[hidden] {
+  display: none;
+}
+
 .curtain-progress {
   width: 180px;
   height: 2px;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.15);
+  background: rgba(17, 17, 17, 0.16);
   overflow: hidden;
 }
 
@@ -131,7 +153,7 @@ body.sv-curtain-locked {
   transform-origin: left center;
   background: linear-gradient(90deg, #b8944f 0%, #111111 100%);
   transform: scaleX(0);
-  animation: curtainWalkProgress 2.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  animation: curtainWalkProgress 2.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .curtain-hint__text {
@@ -140,8 +162,63 @@ body.sv-curtain-locked {
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(17, 17, 17, 0.65);
-  text-shadow: 0 1px 8px rgba(251, 248, 244, 0.8);
+  color: rgba(17, 17, 17, 0.72);
+  text-shadow: 0 1px 8px rgba(251, 248, 244, 0.85);
+}
+
+/* Interactive Explore Bar (shown once inside the boutique) */
+.curtain-explore-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 10px 8px 20px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.82);
+  border: 1px solid rgba(251, 248, 244, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+  pointer-events: auto;
+  animation: curtainBarIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.curtain-explore-bar[hidden] {
+  display: none;
+}
+
+.curtain-explore-bar__hint {
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(251, 248, 244, 0.82);
+  white-space: nowrap;
+}
+
+.curtain-enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #fbf8f4;
+  color: #111111;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.curtain-enter-btn:hover,
+.curtain-enter-btn:focus-visible {
+  background: #ffffff;
+  transform: scale(1.03);
+  outline: none;
 }
 
 @keyframes curtainWalkProgress {
@@ -149,24 +226,49 @@ body.sv-curtain-locked {
   100% { transform: scaleX(1); }
 }
 
+@keyframes curtainBarIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 6. Reduced Motion Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .curtain-intro {
     transition: opacity 0.2s linear !important;
   }
-  .curtain-progress__fill {
+  .curtain-progress__fill,
+  .curtain-explore-bar {
     animation: none !important;
-    transform: scaleX(1);
   }
 }
 
-/* 7. Mobile Adjustments */
-@media screen and (max-width: 480px) {
+/* 7. Mobile Adjustments (390px) */
+@media screen and (max-width: 600px) {
   .curtain-skip {
     padding: 8px 14px;
     font-size: 10px;
   }
-  .curtain-progress {
-    width: 140px;
+
+  .curtain-explore-bar {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 20px;
+    text-align: center;
+  }
+
+  .curtain-explore-bar__hint {
+    font-size: 10px;
+  }
+
+  .curtain-enter-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
