@@ -237,7 +237,6 @@
       return;
     }
 
-    markCurtainSeen();
     document.body.classList.add('sv-curtain-locked');
 
     var renderer;
@@ -720,9 +719,31 @@
       } catch (err) {}
     }
 
+    function saveInStorePosition() {
+      try {
+        if (window.sessionStorage) {
+          window.sessionStorage.setItem('sv_curtain_in_store', '1');
+          window.sessionStorage.setItem('sv_curtain_z', String(currentZ));
+          window.sessionStorage.setItem('sv_curtain_yaw', String(currentYaw));
+        }
+      } catch (e) {}
+    }
+
+    function clearInStorePosition() {
+      try {
+        if (window.sessionStorage) {
+          window.sessionStorage.removeItem('sv_curtain_in_store');
+          window.sessionStorage.removeItem('sv_curtain_z');
+          window.sessionStorage.removeItem('sv_curtain_yaw');
+        }
+      } catch (e) {}
+    }
+
     function triggerExit(e) {
       if (e && e.stopPropagation) e.stopPropagation();
       if (isFading || isDone) return;
+      markCurtainSeen();
+      clearInStorePosition();
       isFading = true;
       curtain.classList.add('sv-curtain-fading');
       document.body.classList.remove('sv-curtain-locked');
@@ -779,6 +800,7 @@
         var tapped = performRaycast(e.clientX, e.clientY);
         if (tapped && tapped.userData && tapped.userData.href) {
           updateProductPill(tapped);
+          saveInStorePosition();
           window.location.href = tapped.userData.href;
         }
       }
@@ -821,6 +843,34 @@
     document.addEventListener('keyup', onKeyUp);
     if (skipBtn) skipBtn.addEventListener('click', onExitClick);
     if (enterShopBtn) enterShopBtn.addEventListener('click', onExitClick);
+    if (productPill) {
+      productPill.addEventListener('click', function () {
+        saveInStorePosition();
+      });
+    }
+
+    // If returning from a 3D product click, resume directly inside the store at last position
+    try {
+      if (window.sessionStorage && window.sessionStorage.getItem('sv_curtain_in_store') === '1') {
+        var savedZ = parseFloat(window.sessionStorage.getItem('sv_curtain_z'));
+        var savedYaw = parseFloat(window.sessionStorage.getItem('sv_curtain_yaw'));
+        if (!isNaN(savedZ)) currentZ = clamp(savedZ, -4.4, 7.2);
+        if (!isNaN(savedYaw)) {
+          currentYaw = clamp(savedYaw, -1.18, 1.18);
+          targetYaw = currentYaw;
+        }
+        doorGroupLeft.position.x = -3.21;
+        doorGroupRight.position.x = 3.21;
+        enterInteractiveMode();
+      }
+    } catch (e) {}
+
+    window.addEventListener('pageshow', function (ev) {
+      if (ev && ev.persisted && !hasSeenCurtain() && !isDone) {
+        document.body.classList.add('sv-curtain-locked');
+        if (!rafId) rafId = requestAnimationFrame(renderLoop);
+      }
+    });
 
     function renderLoop(now) {
       if (isDone) return;
