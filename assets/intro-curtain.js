@@ -49,7 +49,7 @@
    * Procedural Travertine / Limestone Diffuse & Roughness Texture
    */
   function createTravertineTextures(baseColor, veinColor, repeatX, repeatY) {
-    var size = 512;
+    var size = 256;
     var c = document.createElement('canvas');
     c.width = size;
     c.height = size;
@@ -59,9 +59,9 @@
     ctx.fillRect(0, 0, size, size);
 
     // Subtle horizontal travertine mineral striations
-    for (var i = 0; i < 65; i++) {
+    for (var i = 0; i < 40; i++) {
       var y = Math.random() * size;
-      var h = 1 + Math.random() * 5;
+      var h = 1 + Math.random() * 3;
       ctx.fillStyle = veinColor;
       ctx.globalAlpha = 0.04 + Math.random() * 0.08;
       ctx.fillRect(0, y, size, h);
@@ -70,18 +70,18 @@
     // Soft organic mineral veins & travertine pores
     ctx.globalAlpha = 0.09;
     ctx.strokeStyle = veinColor;
-    for (var j = 0; j < 18; j++) {
-      ctx.lineWidth = 0.6 + Math.random() * 1.6;
+    for (var j = 0; j < 12; j++) {
+      ctx.lineWidth = 0.5 + Math.random() * 1.2;
       ctx.beginPath();
       var startY = Math.random() * size;
       ctx.moveTo(0, startY);
       ctx.bezierCurveTo(
         size * 0.33,
-        startY + (Math.random() - 0.5) * 28,
+        startY + (Math.random() - 0.5) * 16,
         size * 0.66,
-        startY + (Math.random() - 0.5) * 28,
+        startY + (Math.random() - 0.5) * 16,
         size,
-        startY + (Math.random() - 0.5) * 14
+        startY + (Math.random() - 0.5) * 10
       );
       ctx.stroke();
     }
@@ -102,15 +102,15 @@
    */
   function createContactShadowTexture() {
     var c = document.createElement('canvas');
-    c.width = 256;
-    c.height = 256;
+    c.width = 128;
+    c.height = 128;
     var ctx = c.getContext('2d');
-    var grad = ctx.createRadialGradient(128, 128, 12, 128, 128, 124);
+    var grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 62);
     grad.addColorStop(0, 'rgba(17, 15, 13, 0.36)');
     grad.addColorStop(0.55, 'rgba(17, 15, 13, 0.14)');
     grad.addColorStop(1, 'rgba(17, 15, 13, 0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillRect(0, 0, 128, 128);
 
     var tex = new THREE.CanvasTexture(c);
     tex.needsUpdate = true;
@@ -159,8 +159,8 @@
 
   function createBrandSignTexture(titleText, subText, bgHex, textHex, accentHex, noBorder) {
     var c = document.createElement('canvas');
-    c.width = 1024;
-    c.height = 384;
+    c.width = 512;
+    c.height = 192;
     var ctx = c.getContext('2d');
 
     ctx.fillStyle = bgHex;
@@ -168,20 +168,20 @@
 
     if (!noBorder) {
       ctx.strokeStyle = accentHex;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(24, 24, c.width - 48, c.height - 48);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(12, 12, c.width - 24, c.height - 24);
     }
 
     ctx.fillStyle = textHex;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '700 84px "Syne", "Helvetica Neue", Arial, sans-serif';
-    ctx.fillText(titleText, c.width / 2, c.height / 2 - (subText ? 26 : 0));
+    ctx.font = '700 42px "Syne", "Helvetica Neue", Arial, sans-serif';
+    ctx.fillText(titleText, c.width / 2, c.height / 2 - (subText ? 13 : 0));
 
     if (subText) {
       ctx.fillStyle = accentHex;
-      ctx.font = '600 24px "Manrope", "Helvetica Neue", Arial, sans-serif';
-      ctx.fillText(subText, c.width / 2, c.height / 2 + 54);
+      ctx.font = '600 12px "Manrope", "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText(subText, c.width / 2, c.height / 2 + 27);
     }
 
     var tex = new THREE.CanvasTexture(c);
@@ -256,7 +256,8 @@
 
     var width = window.innerWidth || 1440;
     var height = window.innerHeight || 900;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    var isMobile = width < 768;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.2 : 1.35));
     renderer.setSize(width, height, false);
     if (THREE.ACESFilmicToneMapping) {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -272,25 +273,18 @@
       scene.environment = envMap;
     }
 
-    var isMobile = width < 768;
     var camera = new THREE.PerspectiveCamera(isMobile ? 64 : 50, width / height, 0.1, 60);
     camera.position.set(0, 1.68, 13.8);
 
-    // --- Lighting ---
-    scene.add(new THREE.HemisphereLight(0xfffaf2, 0xcabaa5, 0.85));
+    // --- Optimized Lighting (3 lights total instead of 6 for 2x faster PBR shading) ---
+    scene.add(new THREE.HemisphereLight(0xfffaf2, 0xcabaa5, 1.05));
 
-    var dirLight = new THREE.DirectionalLight(0xfff5e6, 0.8);
+    var dirLight = new THREE.DirectionalLight(0xfff5e6, 0.92);
     dirLight.position.set(2.5, 8.5, 10);
     scene.add(dirLight);
 
-    [5.0, 0.0, -4.5].forEach(function (zL) {
-      var pt = new THREE.PointLight(0xffe9c8, 1.15, 13);
-      pt.position.set(0, 3.85, zL);
-      scene.add(pt);
-    });
-
-    var focalLight = new THREE.PointLight(0xfff2dc, 1.75, 12);
-    focalLight.position.set(0, 3.6, -6.4);
+    var focalLight = new THREE.PointLight(0xfff0d6, 1.65, 18);
+    focalLight.position.set(0, 3.7, -2.5);
     scene.add(focalLight);
 
     // --- Procedural Luxury Materials ---
@@ -334,13 +328,13 @@
     });
     var ledMat = new THREE.MeshBasicMaterial({ color: 0xfff8ed });
     var haloMat = new THREE.MeshBasicMaterial({ color: 0xffebd0 });
-    var glassMat = new THREE.MeshPhysicalMaterial({
+    var glassMat = new THREE.MeshStandardMaterial({
       color: 0x1a1817,
       transparent: true,
       opacity: 0.34,
-      roughness: 0.06,
-      metalness: 0.18,
-      envMapIntensity: 1.4,
+      roughness: 0.08,
+      metalness: 0.22,
+      envMapIntensity: 1.35,
     });
     var shadowMat = new THREE.MeshBasicMaterial({
       map: shadowTex,
@@ -447,11 +441,11 @@
     doorGroupRight.position.set(0.86, 1.7, portalZ);
     scene.add(doorGroupRight);
 
-    // --- 4. Travertine Columns with Contact Shadows & Brass Base Caps ---
-    var colGeo = new THREE.BoxGeometry(0.56, 4.4, 0.56);
-    var colCapGeo = new THREE.BoxGeometry(0.6, 0.06, 0.6);
-    [6.2, 1.6, -3.0].forEach(function (zPos) {
-      [-3.1, 3.1].forEach(function (xPos) {
+    // --- 4. Engaged Travertine Wall Pilasters (positioned strictly between alcoves so zero products are blocked) ---
+    var colGeo = new THREE.BoxGeometry(0.48, 4.4, 0.48);
+    var colCapGeo = new THREE.BoxGeometry(0.54, 0.06, 0.54);
+    [6.65, 2.15, -2.35, -6.85].forEach(function (zPos) {
+      [-4.88, 4.88].forEach(function (xPos) {
         var col = new THREE.Mesh(colGeo, pillarMat);
         col.position.set(xPos, 2.2, zPos);
         scene.add(col);
@@ -460,7 +454,7 @@
         cap.position.set(xPos, 0.03, zPos);
         scene.add(cap);
 
-        addContactShadow(xPos, zPos, 1.25, 1.25);
+        addContactShadow(xPos, zPos, 1.05, 1.05);
       });
     });
 
@@ -485,7 +479,7 @@
     rackZPositions.forEach(function (zPos) {
       [-1, 1].forEach(function (side) {
         var wallX = side * 5.14;
-        var rackX = side * 4.45;
+        var rackX = side * 4.35;
 
         // Recessed Dark-Bronze Framed Alcove
         var backPanel = new THREE.Mesh(alcoveBackGeo, nicheBackMat);
@@ -514,26 +508,27 @@
 
         // Travertine Display Bench + Contact Shadow
         var bench = new THREE.Mesh(benchGeo, pillarMat);
-        bench.position.set(rackX + side * 0.12, 0.2, zPos);
+        bench.position.set(rackX + side * 0.14, 0.2, zPos);
         scene.add(bench);
-        addContactShadow(rackX + side * 0.12, zPos, 1.25, 3.1);
+        addContactShadow(rackX + side * 0.14, zPos, 1.25, 3.1);
 
-        // Hang 2 Curated Garments per Alcove with 3D Brass Hangers
+        // Hang 2 Curated Garments per Alcove angled clearly toward the aisle
         [-0.78, 0.78].forEach(function (zSlot) {
           var item = garmentItems[garmentCursor % Math.max(garmentItems.length, 1)];
           garmentCursor++;
           if (!item || !item.url) return;
 
           var gz = zPos + zSlot;
-          var gx = rackX - side * 0.06;
+          var gx = rackX - side * 0.08;
+          var gAngle = side > 0 ? -Math.PI / 2 + 0.28 : Math.PI / 2 - 0.28;
 
           // 3D Brass Hanger connecting garment to rail
           var hanger = createHangerMesh(brassMat);
           hanger.position.set(gx, 2.48, gz);
-          hanger.rotation.y = side > 0 ? -Math.PI / 2 + 0.14 : Math.PI / 2 - 0.14;
+          hanger.rotation.y = gAngle;
           scene.add(hanger);
 
-          (function (gItem, posX, posZ, sSide) {
+          (function (gItem, posX, posZ, rotY) {
             texLoader.load(gItem.url, function (tex) {
               if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
               var gMat = new THREE.MeshBasicMaterial({
@@ -542,9 +537,9 @@
                 alphaTest: 0.08,
                 side: THREE.DoubleSide,
               });
-              var gMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.32, 1.62), gMat);
+              var gMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.34, 1.64), gMat);
               gMesh.position.set(posX, 1.56, posZ);
-              gMesh.rotation.y = sSide > 0 ? -Math.PI / 2 + 0.14 : Math.PI / 2 - 0.14;
+              gMesh.rotation.y = rotY;
               gMesh.userData = {
                 title: gItem.title,
                 price: gItem.price,
@@ -555,7 +550,7 @@
               scene.add(gMesh);
               interactableMeshes.push(gMesh);
             });
-          })(item, gx, gz, side);
+          })(item, gx, gz, gAngle);
         });
       });
     });
@@ -612,7 +607,7 @@
     }
 
     // --- 7. Atmospheric Floating Golden Dust Motes ---
-    var particleCount = 90;
+    var particleCount = 45;
     var pPositions = new Float32Array(particleCount * 3);
     for (var p = 0; p < particleCount; p++) {
       pPositions[p * 3] = (Math.random() - 0.5) * 8.5;
@@ -632,7 +627,8 @@
     scene.add(dustMotes);
 
     // --- Interactive Exploration & Raycaster State ---
-    var startTime = performance.now();
+    var startTime = null;
+    var lastRaycastTime = 0;
     var rafId = null;
     var isInteractive = false;
     var isFading = false;
@@ -780,6 +776,9 @@
           targetPitch = clamp(targetPitch + dy * 0.0025, -0.25, 0.28);
         }
       } else if (e.pointerType !== 'touch') {
+        var nowMs = performance.now();
+        if (nowMs - lastRaycastTime < 55) return;
+        lastRaycastTime = nowMs;
         var hit = performRaycast(e.clientX, e.clientY);
         if (hit !== hoveredMesh) {
           if (hoveredMesh) hoveredMesh.userData.targetScale = 1;
@@ -831,6 +830,7 @@
       camera.aspect = w / h;
       camera.fov = w < 768 ? 64 : 50;
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, w < 768 ? 1.2 : 1.35));
       renderer.setSize(w, h, false);
     }
 
@@ -872,8 +872,15 @@
       }
     });
 
+    // Pre-compile WebGL shaders before starting timer to eliminate first-frame stutter
+    try {
+      renderer.compile(scene, camera);
+      renderer.render(scene, camera);
+    } catch (e) {}
+
     function renderLoop(now) {
       if (isDone) return;
+      if (startTime === null) startTime = now;
 
       // Gentle ambient drift of golden dust motes
       dustMotes.rotation.y = now * 0.00004;
