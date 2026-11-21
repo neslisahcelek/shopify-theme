@@ -601,8 +601,8 @@
         scene.add(bench);
         addContactShadow(rackX + side * 0.14, zPos, 1.25, 3.1);
 
-        // Hang 2 Curated Garments per Alcove angled clearly toward the aisle
-        [-0.78, 0.78].forEach(function (zSlot) {
+        // Hang 1 Centered Curated Garment per Alcove angled clearly toward the aisle
+        [0].forEach(function (zSlot) {
           var item = garmentItems[garmentCursor % Math.max(garmentItems.length, 1)];
           garmentCursor++;
           if (!item || !item.url) return;

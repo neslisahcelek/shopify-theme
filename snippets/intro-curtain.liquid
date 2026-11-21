@@ -21,7 +21,7 @@
   {%- assign store_products = collections.all.products -%}
   {%- if store_products.size > 0 -%}
     [
-    {%- for prod in store_products limit: 6 -%}
+    {%- for prod in store_products limit: 8 -%}
       {%- assign idx = forloop.index0 -%}
       {%- case idx -%}
         {%- when 0 -%}{%- assign cutout_asset = 'rack-cutout-0.png' | asset_url -%}
@@ -29,6 +29,8 @@
         {%- when 2 -%}{%- assign cutout_asset = 'rack-cutout-2.png' | asset_url -%}
         {%- when 3 -%}{%- assign cutout_asset = 'rack-cutout-3.png' | asset_url -%}
         {%- when 4 -%}{%- assign cutout_asset = 'rack-cutout-4.png' | asset_url -%}
+        {%- when 5 -%}{%- assign cutout_asset = 'rack-cutout-5.png' | asset_url -%}
+        {%- when 6 -%}{%- assign cutout_asset = 'rack-cutout-6.png' | asset_url -%}
         {%- else -%}{%- assign cutout_asset = 'rack-cutout-7.png' | asset_url -%}
       {%- endcase -%}
       {
