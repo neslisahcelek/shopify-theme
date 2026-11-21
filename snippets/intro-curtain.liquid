@@ -1,11 +1,9 @@
 {%- comment -%}
   Style Vibeus — Interactive 3D WebGL Boutique Walkthrough (Ultra-Premium)
   -------------------------------------------------------------
-  - Phase 1 (~2.35s): Glass doors slide open & camera walks into store
-  - Phase 2 (Interactive): User can freely walk forward/back (scroll/swipe)
-    and look around left/right (drag/mouse) inside the 3D boutique
-  - Raycaster product hover/tap inspection pill
-  - Always-available "Siteye Geç ✕" & "Alışverişe Başla →" exit controls
+  - Pulls real products from collections.all for authentic titles, prices & product detail URLs
+  - Pairs with transparent rack-cutout-*.png assets for clean 3D hanger presentation
+  - Clicking/tapping any 3D garment navigates directly to its product detail page
 {%- endcomment -%}
 
 <script>
@@ -20,14 +18,37 @@
 </script>
 
 {%- capture garment_items -%}
-[
-  { "url": {{ 'rack-cutout-2.png' | asset_url | json }}, "title": "Butterfly Knit Sweater", "price": "$120", "href": {{ routes.all_products_collection_url | json }} },
-  { "url": {{ 'rack-cutout-4.png' | asset_url | json }}, "title": "Atelier Heavyweight Jacket", "price": "$185", "href": {{ routes.all_products_collection_url | json }} },
-  { "url": {{ 'rack-cutout-1.png' | asset_url | json }}, "title": "Graphic Essential Hoodie", "price": "$110", "href": {{ routes.all_products_collection_url | json }} },
-  { "url": {{ 'rack-cutout-3.png' | asset_url | json }}, "title": "Boxy Street Hoodie", "price": "$95", "href": {{ routes.all_products_collection_url | json }} },
-  { "url": {{ 'rack-cutout-0.png' | asset_url | json }}, "title": "Distressed Denim Shorts", "price": "$88", "href": {{ routes.all_products_collection_url | json }} },
-  { "url": {{ 'rack-cutout-7.png' | asset_url | json }}, "title": "Everyday Minimal Tee", "price": "$55", "href": {{ routes.all_products_collection_url | json }} }
-]
+  {%- assign store_products = collections.all.products -%}
+  {%- if store_products.size > 0 -%}
+    [
+    {%- for prod in store_products limit: 6 -%}
+      {%- assign idx = forloop.index0 -%}
+      {%- case idx -%}
+        {%- when 0 -%}{%- assign cutout_asset = 'rack-cutout-0.png' | asset_url -%}
+        {%- when 1 -%}{%- assign cutout_asset = 'rack-cutout-1.png' | asset_url -%}
+        {%- when 2 -%}{%- assign cutout_asset = 'rack-cutout-2.png' | asset_url -%}
+        {%- when 3 -%}{%- assign cutout_asset = 'rack-cutout-3.png' | asset_url -%}
+        {%- when 4 -%}{%- assign cutout_asset = 'rack-cutout-4.png' | asset_url -%}
+        {%- else -%}{%- assign cutout_asset = 'rack-cutout-7.png' | asset_url -%}
+      {%- endcase -%}
+      {
+        "url": {{ cutout_asset | json }},
+        "title": {{ prod.title | json }},
+        "price": {{ prod.price | money | json }},
+        "href": {{ prod.url | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+    ]
+  {%- else -%}
+    [
+      { "url": {{ 'rack-cutout-2.png' | asset_url | json }}, "title": "Butterfly Knit Sweater", "price": "$120", "href": {{ routes.all_products_collection_url | json }} },
+      { "url": {{ 'rack-cutout-4.png' | asset_url | json }}, "title": "Atelier Heavyweight Jacket", "price": "$185", "href": {{ routes.all_products_collection_url | json }} },
+      { "url": {{ 'rack-cutout-1.png' | asset_url | json }}, "title": "Graphic Essential Hoodie", "price": "$110", "href": {{ routes.all_products_collection_url | json }} },
+      { "url": {{ 'rack-cutout-3.png' | asset_url | json }}, "title": "Boxy Street Hoodie", "price": "$95", "href": {{ routes.all_products_collection_url | json }} },
+      { "url": {{ 'rack-cutout-0.png' | asset_url | json }}, "title": "Distressed Denim Shorts", "price": "$88", "href": {{ routes.all_products_collection_url | json }} },
+      { "url": {{ 'rack-cutout-7.png' | asset_url | json }}, "title": "Everyday Minimal Tee", "price": "$55", "href": {{ routes.all_products_collection_url | json }} }
+    ]
+  {%- endif -%}
 {%- endcapture -%}
 
 <aside
@@ -56,7 +77,7 @@
 
     <!-- Bottom status / product inspection / exploration bar -->
     <div class="curtain-hud__bottom">
-      <!-- Floating Product Inspection Pill (shown when hovering/tapping a garment) -->
+      <!-- Floating Product Inspection Pill -->
       <a
         href="{{ routes.all_products_collection_url }}"
         id="sv-curtain-product-pill"
@@ -64,9 +85,9 @@
         hidden
       >
         <span class="curtain-product-pill__dot" aria-hidden="true"></span>
-        <span class="curtain-product-pill__title" data-pill-title>Butterfly Knit Sweater</span>
-        <span class="curtain-product-pill__price" data-pill-price>$120</span>
-        <span class="curtain-product-pill__cta">İncele →</span>
+        <span class="curtain-product-pill__title" data-pill-title></span>
+        <span class="curtain-product-pill__price" data-pill-price></span>
+        <span class="curtain-product-pill__cta">Detaya Git →</span>
       </a>
 
       <!-- Entering progress (shown during 0-2.35s entrance) -->
@@ -80,7 +101,7 @@
       <!-- Explore bar (shown once inside the store) -->
       <div class="curtain-explore-bar" id="sv-curtain-explore" hidden>
         <span class="curtain-explore-bar__hint">
-          Kaydır: İlerle &nbsp;·&nbsp; Sürükle: Etrafa Bak &nbsp;·&nbsp; Ürüne Dokun
+          Kaydır: İlerle &nbsp;·&nbsp; Sürükle: Etrafa Bak &nbsp;·&nbsp; Ürüne Tıkla
         </span>
         <button type="button" id="sv-curtain-enter-shop" class="curtain-enter-btn">
           <span>Alışverişe Başla</span>

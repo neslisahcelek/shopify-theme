@@ -774,17 +774,13 @@
       isDragging = false;
       curtain.classList.remove('is-dragging');
 
-      // Tap / Click (minimal drag) checks for garment selection
+      // Direct click / tap on a 3D garment navigates straight to its product detail page
       if (isInteractive && dragTotalDist < 8 && e && typeof e.clientX === 'number') {
         var tapped = performRaycast(e.clientX, e.clientY);
-        if (hoveredMesh && hoveredMesh !== tapped) {
-          hoveredMesh.userData.targetScale = 1;
+        if (tapped && tapped.userData && tapped.userData.href) {
+          updateProductPill(tapped);
+          window.location.href = tapped.userData.href;
         }
-        hoveredMesh = tapped;
-        if (hoveredMesh) {
-          hoveredMesh.userData.targetScale = 1.06;
-        }
-        updateProductPill(hoveredMesh);
       }
     }
 
