@@ -341,29 +341,29 @@
 
     var backSignTex = createBrandSignTexture('STYLE VIBEUS', 'AUTUMN / WINTER 2026', '#f6eee5', '#111111', '#b8944f');
     var backSign = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.8, 1.75),
+      new THREE.PlaneGeometry(4.8, 1.55),
       new THREE.MeshBasicMaterial({ map: backSignTex })
     );
-    backSign.position.set(0, 2.35, -9.15);
+    backSign.position.set(0, 3.05, -9.15);
     scene.add(backSign);
 
-    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.85, 1.5), pillarMat);
-    pedestal.position.set(0, 0.425, -6.5);
+    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.78, 1.5), pillarMat);
+    pedestal.position.set(0, 0.39, -6.5);
     scene.add(pedestal);
 
     var pedestalTrim = new THREE.Mesh(new THREE.BoxGeometry(1.54, 0.04, 1.54), brassMat);
-    pedestalTrim.position.set(0, 0.84, -6.5);
+    pedestalTrim.position.set(0, 0.78, -6.5);
     scene.add(pedestalTrim);
 
-    // Center hero garment hovering above pedestal
+    // Center hero garment hovering cleanly below the wall sign
     if (garmentUrls[0]) {
       texLoader.load(garmentUrls[0], function (tex) {
         if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
         var heroGarment = new THREE.Mesh(
-          new THREE.PlaneGeometry(1.45, 1.75),
+          new THREE.PlaneGeometry(1.35, 1.6),
           new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.08 })
         );
-        heroGarment.position.set(0, 1.82, -6.5);
+        heroGarment.position.set(0, 1.55, -6.5);
         scene.add(heroGarment);
       });
     }
