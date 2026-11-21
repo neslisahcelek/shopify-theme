@@ -117,46 +117,6 @@
     return tex;
   }
 
-  /**
-   * Studio/Boutique Environment Map using PMREMGenerator for real metallic/floor reflections
-   */
-  function createBoutiqueEnvMap(renderer) {
-    if (!THREE.PMREMGenerator) return null;
-    try {
-      var pmrem = new THREE.PMREMGenerator(renderer);
-      pmrem.compileEquirectangularShader();
-
-      var envScene = new THREE.Scene();
-      envScene.background = new THREE.Color(0xece2d4);
-
-      // Warm overhead studio softboxes
-      var boxGeo = new THREE.PlaneGeometry(8, 22);
-      var lightBoxMat = new THREE.MeshBasicMaterial({ color: 0xfffaf0, side: THREE.DoubleSide });
-      var topBox1 = new THREE.Mesh(boxGeo, lightBoxMat);
-      topBox1.rotation.x = Math.PI / 2;
-      topBox1.position.set(-2.5, 6, 0);
-      envScene.add(topBox1);
-
-      var topBox2 = new THREE.Mesh(boxGeo, lightBoxMat);
-      topBox2.rotation.x = Math.PI / 2;
-      topBox2.position.set(2.5, 6, 0);
-      envScene.add(topBox2);
-
-      // Dark architectural floor & contrast strips
-      var darkMat = new THREE.MeshBasicMaterial({ color: 0x2b2520, side: THREE.DoubleSide });
-      var envFloor = new THREE.Mesh(new THREE.PlaneGeometry(24, 24), darkMat);
-      envFloor.rotation.x = -Math.PI / 2;
-      envFloor.position.y = -4;
-      envScene.add(envFloor);
-
-      var rt = pmrem.fromScene(envScene, 0.04);
-      pmrem.dispose();
-      return rt.texture;
-    } catch (e) {
-      return null;
-    }
-  }
-
   function createBrandSignTexture(titleText, subText, bgHex, textHex, accentHex, noBorder) {
     var c = document.createElement('canvas');
     c.width = 512;
@@ -268,22 +228,17 @@
     scene.background = new THREE.Color(0xf5ede3);
     scene.fog = new THREE.Fog(0xf5ede3, 12, 34);
 
-    var envMap = createBoutiqueEnvMap(renderer);
-    if (envMap) {
-      scene.environment = envMap;
-    }
-
     var camera = new THREE.PerspectiveCamera(isMobile ? 64 : 50, width / height, 0.1, 60);
     camera.position.set(0, 1.68, 13.8);
 
-    // --- Optimized Lighting (3 lights total instead of 6 for 2x faster PBR shading) ---
-    scene.add(new THREE.HemisphereLight(0xfffaf2, 0xcabaa5, 1.05));
+    // --- Optimized Lighting (Zero PMREM IBL overhead, fast direct lighting) ---
+    scene.add(new THREE.HemisphereLight(0xfffaf2, 0xcabaa5, 1.18));
 
-    var dirLight = new THREE.DirectionalLight(0xfff5e6, 0.92);
+    var dirLight = new THREE.DirectionalLight(0xfff5e6, 1.05);
     dirLight.position.set(2.5, 8.5, 10);
     scene.add(dirLight);
 
-    var focalLight = new THREE.PointLight(0xfff0d6, 1.65, 18);
+    var focalLight = new THREE.PointLight(0xfff0d6, 1.5, 18);
     focalLight.position.set(0, 3.7, -2.5);
     scene.add(focalLight);
 
@@ -294,9 +249,8 @@
 
     var floorMat = new THREE.MeshStandardMaterial({
       map: floorTex,
-      roughness: 0.18,
-      metalness: 0.06,
-      envMapIntensity: 1.15,
+      roughness: 0.22,
+      metalness: 0.05,
     });
     var wallMat = new THREE.MeshStandardMaterial({
       color: 0xf6eee5,
@@ -312,29 +266,24 @@
       map: columnTex,
       roughness: 0.45,
       metalness: 0.05,
-      envMapIntensity: 0.8,
     });
     var darkBronzeMat = new THREE.MeshStandardMaterial({
       color: 0x171514,
       roughness: 0.32,
-      metalness: 0.82,
-      envMapIntensity: 1.2,
+      metalness: 0.75,
     });
     var brassMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
-      roughness: 0.2,
-      metalness: 0.92,
-      envMapIntensity: 1.4,
+      roughness: 0.24,
+      metalness: 0.82,
     });
     var ledMat = new THREE.MeshBasicMaterial({ color: 0xfff8ed });
     var haloMat = new THREE.MeshBasicMaterial({ color: 0xffebd0 });
-    var glassMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1817,
+    var glassMat = new THREE.MeshBasicMaterial({
+      color: 0x181615,
       transparent: true,
-      opacity: 0.34,
-      roughness: 0.08,
-      metalness: 0.22,
-      envMapIntensity: 1.35,
+      opacity: 0.3,
+      depthWrite: false,
     });
     var shadowMat = new THREE.MeshBasicMaterial({
       map: shadowTex,
@@ -465,7 +414,56 @@
     } catch (e) {}
 
     var interactableMeshes = [];
-    var texLoader = new THREE.TextureLoader();
+    var sharedGarmentGeo = new THREE.PlaneGeometry(1.34, 1.64);
+    var dummyCanvas = document.createElement('canvas');
+    dummyCanvas.width = 2;
+    dummyCanvas.height = 2;
+    var placeholderTex = new THREE.CanvasTexture(dummyCanvas);
+    placeholderTex.generateMipmaps = false;
+
+    var garmentMatCache = {};
+    var pendingTexQueue = [];
+
+    function getSharedGarmentMaterial(url) {
+      if (garmentMatCache[url]) return garmentMatCache[url];
+
+      var mat = new THREE.MeshBasicMaterial({
+        map: placeholderTex,
+        transparent: true,
+        opacity: 0,
+        alphaTest: 0.06,
+        side: THREE.DoubleSide,
+      });
+      garmentMatCache[url] = mat;
+
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.decoding = 'async';
+      img.onload = function () {
+        var finishDecode = function () {
+          var c = document.createElement('canvas');
+          c.width = 256;
+          c.height = 320;
+          var ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, 256, 320);
+          var tex = new THREE.CanvasTexture(c);
+          tex.generateMipmaps = false;
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+          tex.needsUpdate = true;
+          pendingTexQueue.push({ mat: mat, tex: tex });
+        };
+        if (typeof img.decode === 'function') {
+          img.decode().then(finishDecode).catch(finishDecode);
+        } else {
+          finishDecode();
+        }
+      };
+      img.src = url;
+      return mat;
+    }
+
     var rackZPositions = [4.4, -0.1, -4.6];
     var railGeo = new THREE.CylinderGeometry(0.022, 0.022, 3.1, 12);
     railGeo.rotateX(Math.PI / 2);
@@ -528,29 +526,19 @@
           hanger.rotation.y = gAngle;
           scene.add(hanger);
 
-          (function (gItem, posX, posZ, rotY) {
-            texLoader.load(gItem.url, function (tex) {
-              if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
-              var gMat = new THREE.MeshBasicMaterial({
-                map: tex,
-                transparent: true,
-                alphaTest: 0.08,
-                side: THREE.DoubleSide,
-              });
-              var gMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.34, 1.64), gMat);
-              gMesh.position.set(posX, 1.56, posZ);
-              gMesh.rotation.y = rotY;
-              gMesh.userData = {
-                title: gItem.title,
-                price: gItem.price,
-                href: gItem.href,
-                baseScale: 1,
-                targetScale: 1,
-              };
-              scene.add(gMesh);
-              interactableMeshes.push(gMesh);
-            });
-          })(item, gx, gz, gAngle);
+          var gMat = getSharedGarmentMaterial(item.url);
+          var gMesh = new THREE.Mesh(sharedGarmentGeo, gMat);
+          gMesh.position.set(gx, 1.56, gz);
+          gMesh.rotation.y = gAngle;
+          gMesh.userData = {
+            title: item.title,
+            price: item.price,
+            href: item.href,
+            baseScale: 1,
+            targetScale: 1,
+          };
+          scene.add(gMesh);
+          interactableMeshes.push(gMesh);
         });
       });
     });
@@ -587,23 +575,18 @@
       centerHanger.position.set(0, 2.36, -6.5);
       scene.add(centerHanger);
 
-      texLoader.load(garmentItems[0].url, function (tex) {
-        if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
-        var heroGarment = new THREE.Mesh(
-          new THREE.PlaneGeometry(1.35, 1.6),
-          new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.08 })
-        );
-        heroGarment.position.set(0, 1.55, -6.5);
-        heroGarment.userData = {
-          title: garmentItems[0].title,
-          price: garmentItems[0].price,
-          href: garmentItems[0].href,
-          baseScale: 1,
-          targetScale: 1,
-        };
-        scene.add(heroGarment);
-        interactableMeshes.push(heroGarment);
-      });
+      var heroMat = getSharedGarmentMaterial(garmentItems[0].url);
+      var heroGarment = new THREE.Mesh(sharedGarmentGeo, heroMat);
+      heroGarment.position.set(0, 1.55, -6.5);
+      heroGarment.userData = {
+        title: garmentItems[0].title,
+        price: garmentItems[0].price,
+        href: garmentItems[0].href,
+        baseScale: 1,
+        targetScale: 1,
+      };
+      scene.add(heroGarment);
+      interactableMeshes.push(heroGarment);
     }
 
     // --- 7. Atmospheric Floating Golden Dust Motes ---
@@ -878,32 +861,59 @@
       renderer.render(scene, camera);
     } catch (e) {}
 
+    var warmupFrames = 0;
+    var lastFrameTime = null;
+    var animElapsed = 0;
+
     function renderLoop(now) {
       if (isDone) return;
-      if (startTime === null) startTime = now;
+
+      // Let 3 initial frames flush layout & shader pipeline before sliding doors
+      if (!isInteractive && warmupFrames < 3) {
+        warmupFrames++;
+        while (pendingTexQueue.length > 0) {
+          var preItem = pendingTexQueue.shift();
+          preItem.mat.map = preItem.tex;
+          preItem.mat.opacity = 1;
+          preItem.mat.needsUpdate = true;
+        }
+        renderer.render(scene, camera);
+        rafId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      if (lastFrameTime === null) lastFrameTime = now;
+      var dt = Math.min(Math.max(now - lastFrameTime, 0), 22);
+      lastFrameTime = now;
 
       // Gentle ambient drift of golden dust motes
       dustMotes.rotation.y = now * 0.00004;
 
-      // Smooth scale animation on hovered garments
-      for (var m = 0; m < interactableMeshes.length; m++) {
-        var mesh = interactableMeshes[m];
-        var sc = mesh.scale.x + (mesh.userData.targetScale - mesh.scale.x) * 0.14;
-        mesh.scale.set(sc, sc, 1);
-      }
-
       if (!isInteractive) {
-        var elapsed = now - startTime;
-        var progress = Math.min(elapsed / ENTRANCE_DURATION_MS, 1);
+        animElapsed += dt;
+        var progress = Math.min(animElapsed / ENTRANCE_DURATION_MS, 1);
 
-        var doorProgress = Math.min(Math.max((progress - 0.03) / 0.42, 0), 1);
+        var doorProgress = Math.min(Math.max((progress - 0.02) / 0.42, 0), 1);
         var doorEase = easeOutQuart(doorProgress);
         doorGroupLeft.position.x = -0.86 - doorEase * 2.35;
         doorGroupRight.position.x = 0.86 + doorEase * 2.35;
 
+        if (doorProgress >= 1 && doorGroupLeft.visible) {
+          doorGroupLeft.visible = false;
+          doorGroupRight.visible = false;
+        }
+
+        // Only upload late-arriving garment textures after doors finish opening
+        if (doorProgress >= 0.96 && pendingTexQueue.length > 0) {
+          var qItem = pendingTexQueue.shift();
+          qItem.mat.map = qItem.tex;
+          qItem.mat.opacity = 1;
+          qItem.mat.needsUpdate = true;
+        }
+
         var walkEase = easeInOutCubic(progress);
         currentZ = 13.8 - walkEase * 10.6;
-        var stepBob = Math.sin(progress * Math.PI * 5) * 0.03 * (1 - progress * 0.5);
+        var stepBob = Math.sin(progress * Math.PI * 5) * 0.026 * (1 - progress * 0.5);
 
         camera.position.set(0, 1.68 + stepBob, currentZ);
         camera.lookAt(0, 1.65, currentZ - 6.5);
@@ -912,6 +922,19 @@
           enterInteractiveMode();
         }
       } else {
+        if (pendingTexQueue.length > 0) {
+          var iqItem = pendingTexQueue.shift();
+          iqItem.mat.map = iqItem.tex;
+          iqItem.mat.opacity = 1;
+          iqItem.mat.needsUpdate = true;
+        }
+
+        for (var m = 0; m < interactableMeshes.length; m++) {
+          var mesh = interactableMeshes[m];
+          var sc = mesh.scale.x + (mesh.userData.targetScale - mesh.scale.x) * 0.14;
+          mesh.scale.set(sc, sc, 1);
+        }
+
         if (keysPressed['ArrowUp'] || keysPressed['w'] || keysPressed['W']) {
           targetZ = clamp(targetZ - 0.12, -4.4, 7.2);
         }
