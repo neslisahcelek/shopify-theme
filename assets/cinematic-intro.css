@@ -153,13 +153,17 @@ body.sv-cinematic-locked {
 
 .cinematic-garment__shadow {
   position: absolute;
-  bottom: -6px;
-  left: 15%;
-  width: 70%;
-  height: 14px;
+  bottom: -12px;
+  left: 18%;
+  width: 64%;
+  height: 10px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(24, 18, 12, 0.38) 0%, transparent 72%);
+  background: radial-gradient(ellipse at center, rgba(24, 18, 12, 0.22) 0%, transparent 72%);
   pointer-events: none;
+}
+
+.cinematic-garment--slot-2 .cinematic-garment__shadow {
+  display: none;
 }
 
 .cinematic-garment:hover,
@@ -177,7 +181,7 @@ body.sv-cinematic-locked {
 /* Exact Perspective Placement Matching Empty Rails & Pedestal */
 .cinematic-garment--slot-0 {
   left: 10%;
-  top: 40.5%;
+  top: 41.2%;
   width: 11.2%;
   transform: translate(-50%, 0) perspective(900px) rotateY(24deg) skewY(2deg);
 }
@@ -187,7 +191,7 @@ body.sv-cinematic-locked {
 
 .cinematic-garment--slot-1 {
   left: 26.2%;
-  top: 44.5%;
+  top: 43%;
   width: 6.8%;
   transform: translate(-50%, 0) perspective(900px) rotateY(28deg) skewY(2deg);
 }
@@ -207,7 +211,7 @@ body.sv-cinematic-locked {
 
 .cinematic-garment--slot-3 {
   left: 71.2%;
-  top: 52%;
+  top: 54.5%;
   width: 7.4%;
   transform: translate(-50%, 0) perspective(900px) rotateY(-18deg);
 }
@@ -511,10 +515,14 @@ body.sv-cinematic-locked {
     transform: none;
   }
 
+  .cinematic-intro__bottom {
+    bottom: max(64px, env(safe-area-inset-bottom, 64px));
+  }
+
   .cinematic-explore-bar {
     flex-direction: column;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 6px;
+    padding: 10px 14px;
     border-radius: 20px;
     text-align: center;
   }
