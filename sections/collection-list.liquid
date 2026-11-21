@@ -16,7 +16,7 @@
           <li class="collection-index__item" {{ block.shopify_attributes }} data-reveal style="--i: {{ forloop.index0 }}">
             <a href="{{ c.url | default: '#' }}" class="collection-index__link">
               <span class="collection-index__num">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
-              <span class="collection-index__title">{{ block.settings.title | default: c.title | default: 'Koleksiyon' }}</span>
+              <span class="collection-index__title">{{ block.settings.title | default: c.title | default: 'Collection' }}</span>
               <span class="collection-index__count">{%- if c -%}{{ c.products_count }}{%- endif -%}</span>
               {%- assign img = block.settings.image | default: c.featured_image -%}
               {%- if img -%}
@@ -47,7 +47,7 @@
               {%- endif -%}
             </div>
             <div class="collection-tile__info">
-              <h3>{{ block.settings.title | default: c.title | default: 'Koleksiyon' }}</h3>
+              <h3>{{ block.settings.title | default: c.title | default: 'Collection' }}</h3>
               <span class="collection-tile__arrow">{% render 'icon', name: 'arrow' %}</span>
             </div>
           </a>

@@ -56,7 +56,7 @@
   class="curtain-intro"
   role="dialog"
   aria-modal="true"
-  aria-label="Style Vibeus 3D Sanal Mağaza"
+  aria-label="Style Vibeus 3D Virtual Boutique"
   tabindex="-1"
   data-garments="{{ garment_items | strip | escape }}"
 >
@@ -69,9 +69,9 @@
       type="button"
       id="sv-curtain-skip"
       class="curtain-skip"
-      aria-label="3D Mağazadan Çık ve Siteye Geç"
+      aria-label="Exit 3D Store and Enter Site"
     >
-      <span class="curtain-skip__text">Siteye Geç</span>
+      <span class="curtain-skip__text">Enter Store</span>
       <span class="curtain-skip__icon" aria-hidden="true">✕</span>
     </button>
 
@@ -87,7 +87,7 @@
         <span class="curtain-product-pill__dot" aria-hidden="true"></span>
         <span class="curtain-product-pill__title" data-pill-title></span>
         <span class="curtain-product-pill__price" data-pill-price></span>
-        <span class="curtain-product-pill__cta">Detaya Git →</span>
+        <span class="curtain-product-pill__cta">View Product →</span>
       </a>
 
       <!-- Entering progress (shown during 0-2.35s entrance) -->
@@ -95,16 +95,16 @@
         <div class="curtain-progress">
           <span class="curtain-progress__fill"></span>
         </div>
-        <span class="curtain-hint__text">Mağazaya giriliyor...</span>
+        <span class="curtain-hint__text">Entering boutique...</span>
       </div>
 
       <!-- Explore bar (shown once inside the store) -->
       <div class="curtain-explore-bar" id="sv-curtain-explore" hidden>
         <span class="curtain-explore-bar__hint">
-          Kaydır: İlerle &nbsp;·&nbsp; Sürükle: Etrafa Bak &nbsp;·&nbsp; Ürüne Tıkla
+          Scroll: Walk &nbsp;·&nbsp; Drag: Look Around &nbsp;·&nbsp; Click Product
         </span>
         <button type="button" id="sv-curtain-enter-shop" class="curtain-enter-btn">
-          <span>Alışverişe Başla</span>
+          <span>Shop Now</span>
           <span aria-hidden="true">→</span>
         </button>
       </div>
