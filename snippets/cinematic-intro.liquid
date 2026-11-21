@@ -1,9 +1,11 @@
 {%- comment -%}
-  Style Vibeus — Cinematic Flagship Video Intro
-  -------------------------------------------------------------
-  - Fullscreen 100vw x 100dvh video entrance (auto or manual ENTER mode)
-  - Supports custom desktop/mobile video URLs & poster override in Theme Settings
-  - Instant sessionStorage bypass, Low Power Mode autoplay fallback & reduced-motion support
+  Style Vibeus — Hybrid Cinematic Entrance + Interactive Real-Product Showroom
+  ---------------------------------------------------------------------------
+  - Stage 1 (0 -> 2.5s): Photorealistic 60fps flagship entrance video
+  - Stage 2 (Interactive): Seamless transition into empty-rail interior render
+    populated with real Shopify products (collections.all.products)
+  - Clicking any product opens /products/...; Back button returns to showroom
+  - Only explicit exit ("Enter Store X" / "Shop Now ->" / Esc) marks seen
 {%- endcomment -%}
 
 <script>
@@ -25,22 +27,21 @@
     assign poster_url = 'cinematic-intro-poster.jpg' | asset_url
   endif
 
-  if settings.cinematic_intro_video_url != blank
-    assign video_url = settings.cinematic_intro_video_url | strip
+  assign custom_video_url = settings.cinematic_intro_video_url | strip
+  if custom_video_url != blank
+    assign video_url = custom_video_url
   else
     assign video_url = 'cinematic-intro.mp4' | asset_url
   endif
 
-  assign mobile_video_url = ''
-  if settings.cinematic_intro_mobile_video_url != blank
-    assign mobile_video_url = settings.cinematic_intro_mobile_video_url | strip
-  endif
-
   assign video_type = 'video/mp4'
-  assign video_url_lower = video_url | downcase
-  if video_url_lower contains '.webm'
+  assign video_url_down = video_url | downcase
+  if video_url_down contains '.webm'
     assign video_type = 'video/webm'
   endif
+
+  assign mobile_video_url = settings.cinematic_intro_mobile_video_url | strip
+  assign store_products = collections.all.products
 -%}
 
 <aside
@@ -48,10 +49,11 @@
   class="cinematic-intro"
   role="dialog"
   aria-modal="true"
-  aria-label="Style Vibeus Flagship Entrance"
-  data-mode="{{ intro_mode | escape }}"
+  aria-label="Style Vibeus Flagship Showroom"
   tabindex="-1"
+  data-mode="{{ intro_mode }}"
 >
+  <!-- Stage 1: Photorealistic 60fps Entrance Video -->
   <video
     id="sv-cinematic-video"
     class="cinematic-intro__video"
@@ -59,29 +61,109 @@
     muted
     preload="auto"
     poster="{{ poster_url }}"
-    data-mobile-src="{{ mobile_video_url | escape }}"
-    aria-hidden="true"
+    {%- if mobile_video_url != blank %} data-mobile-src="{{ mobile_video_url | escape }}"{% endif -%}
   >
-    <source src="{{ video_url | escape }}" type="{{ video_type }}">
+    <source src="{{ video_url }}" type="{{ video_type }}">
   </video>
+
+  <!-- Stage 2: Interactive Photorealistic Showroom with Real Shopify Products -->
+  <div id="sv-cinematic-showroom" class="cinematic-showroom" aria-hidden="true">
+    <div class="cinematic-showroom__viewport" id="sv-showroom-viewport">
+      <div class="cinematic-showroom__stage" id="sv-showroom-stage">
+        <img
+          src="{{ 'cinematic-intro-interior.jpg' | asset_url }}"
+          alt="Style Vibeus Flagship Interior"
+          width="1600"
+          height="900"
+          loading="eager"
+          class="cinematic-showroom__bg"
+        >
+
+        <div class="cinematic-showroom__products" id="sv-showroom-products">
+          {%- for slot_idx in (0..4) -%}
+            {%- liquid
+              if store_products.size > 0
+                assign prod_idx = slot_idx | modulo: store_products.size
+                assign prod = store_products[prod_idx]
+                assign item_title = prod.title
+                assign item_price = prod.price | money
+                assign item_href = prod.url
+              else
+                case slot_idx
+                  when 0
+                    assign item_title = 'Distressed Denim Shorts'
+                    assign item_price = '$88'
+                  when 1
+                    assign item_title = 'Graphic Essential Hoodie'
+                    assign item_price = '$110'
+                  when 2
+                    assign item_title = 'Butterfly Knit Sweater'
+                    assign item_price = '$120'
+                  when 3
+                    assign item_title = 'Boxy Street Hoodie'
+                    assign item_price = '$95'
+                  else
+                    assign item_title = 'Atelier Heavyweight Jacket'
+                    assign item_price = '$185'
+                endcase
+                assign item_href = routes.all_products_collection_url
+              endif
+
+              case slot_idx
+                when 0
+                  assign cutout_img = 'rack-cutout-1.png' | asset_url
+                when 1
+                  assign cutout_img = 'rack-cutout-3.png' | asset_url
+                when 2
+                  assign cutout_img = 'rack-cutout-2.png' | asset_url
+                when 3
+                  assign cutout_img = 'rack-cutout-0.png' | asset_url
+                else
+                  assign cutout_img = 'rack-cutout-4.png' | asset_url
+              endcase
+            -%}
+            <a
+              href="{{ item_href }}"
+              class="cinematic-garment cinematic-garment--slot-{{ slot_idx }}"
+              data-garment-link
+              data-title="{{ item_title | escape }}"
+              data-price="{{ item_price | escape }}"
+              aria-label="{{ item_title | escape }} — {{ item_price | escape }}"
+            >
+              {%- unless slot_idx == 2 or slot_idx == 3 -%}
+                <span class="cinematic-garment__hook" aria-hidden="true"></span>
+              {%- endunless -%}
+              <img
+                src="{{ cutout_img }}"
+                alt="{{ item_title | escape }}"
+                width="360"
+                height="450"
+                loading="eager"
+                class="cinematic-garment__img"
+              >
+              <span class="cinematic-garment__shadow" aria-hidden="true"></span>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="cinematic-intro__scrim" aria-hidden="true"></div>
 
+  <!-- Minimalist English HUD -->
   <div class="cinematic-intro__hud">
     <button
       type="button"
       id="sv-cinematic-skip"
       class="cinematic-intro__skip"
-      aria-label="Skip Intro"
+      aria-label="Enter Store"
     >
-      <span class="cinematic-intro__skip-label">Skip</span>
+      <span class="cinematic-intro__skip-text">Enter Store</span>
       <span class="cinematic-intro__skip-icon" aria-hidden="true">✕</span>
     </button>
 
-    <div
-      class="cinematic-intro__center"
-      {% unless intro_mode == 'enter' %}hidden{% endunless %}
-    >
+    <div class="cinematic-intro__center">
       <button
         type="button"
         id="sv-cinematic-enter"
@@ -89,16 +171,42 @@
         aria-label="Enter Style Vibeus Flagship"
         {% unless intro_mode == 'enter' %}hidden{% endunless %}
       >
-        <span class="cinematic-intro__enter-label">ENTER</span>
+        <span>ENTER</span>
       </button>
     </div>
 
     <div class="cinematic-intro__bottom">
-      <p class="cinematic-intro__brand">STYLE VIBEUS &middot; FLAGSHIP</p>
-      <div class="cinematic-intro__progress" aria-hidden="true">
-        <span id="sv-cinematic-progress-fill" class="cinematic-intro__progress-fill"></span>
+      <!-- Hovered/focused product card -->
+      <a
+        href="{{ routes.all_products_collection_url }}"
+        id="sv-cinematic-product-pill"
+        class="cinematic-product-pill"
+        hidden
+      >
+        <span class="cinematic-product-pill__dot" aria-hidden="true"></span>
+        <span class="cinematic-product-pill__title" data-pill-title></span>
+        <span class="cinematic-product-pill__price" data-pill-price></span>
+        <span class="cinematic-product-pill__cta">View Product →</span>
+      </a>
+
+      <!-- Entrance video progress -->
+      <div class="cinematic-intro__progress-wrap" id="sv-cinematic-progress-wrap">
+        <div class="cinematic-intro__bar" aria-hidden="true">
+          <span class="cinematic-intro__bar-fill" id="sv-cinematic-bar-fill"></span>
+        </div>
+        <p class="cinematic-intro__caption">STYLE VIBEUS &middot; ENTERING FLAGSHIP</p>
       </div>
-      <p id="sv-cinematic-caption" class="cinematic-intro__caption">Entering Flagship...</p>
+
+      <!-- Interactive showroom exploration bar -->
+      <div class="cinematic-explore-bar" id="sv-cinematic-explore" hidden>
+        <span class="cinematic-explore-bar__hint">
+          Move to Explore &nbsp;&middot;&nbsp; Click Any Piece
+        </span>
+        <button type="button" id="sv-cinematic-shop-now" class="cinematic-explore-bar__btn">
+          <span>Shop Now</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </div>
   </div>
 </aside>

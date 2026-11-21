@@ -1,13 +1,12 @@
 /* ==========================================================================
-   Style Vibeus — Cinematic Flagship Video Intro
+   Style Vibeus — Hybrid Cinematic Entrance + Interactive Showroom
    --------------------------------------------------------------------------
-   - Fullscreen 100vw x 100dvh obsidian stage (#0b0b0b) with cover video
-   - Pure GPU-composited opacity & transform animations only
-   - Zero backdrop-filter blur over live <video>
-   - Accessible reduced-motion instant bypass & 390px mobile responsiveness
+   - GPU-composited opacity & transform only
+   - Zero backdrop-filter: blur over live <video>
+   - Exact 16:9 perspective stage matching empty-rail interior render
+   - Responsive mobile horizontal pan without aspect distortion
    ========================================================================== */
 
-/* 1. Instant FOUC suppression when previously dismissed in session */
 html.sv-cinematic-dismissed #sv-cinematic-intro,
 html.sv-cinematic-dismissed .cinematic-intro {
   display: none !important;
@@ -15,12 +14,10 @@ html.sv-cinematic-dismissed .cinematic-intro {
   pointer-events: none !important;
 }
 
-/* 2. Body scroll lock while intro is active */
 body.sv-cinematic-locked {
   overflow: hidden !important;
 }
 
-/* 3. Fullscreen Intro Overlay */
 .cinematic-intro {
   position: fixed;
   inset: 0;
@@ -29,17 +26,12 @@ body.sv-cinematic-locked {
   height: 100dvh;
   z-index: 999999;
   overflow: hidden;
-  overscroll-behavior: contain;
   background-color: #0b0b0b;
-  color: #fbf8f4;
   opacity: 1;
+  pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
   transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cinematic-intro:focus {
-  outline: none;
 }
 
 .cinematic-intro.sv-cinematic-fading {
@@ -53,50 +45,214 @@ body.sv-cinematic-locked {
   pointer-events: none !important;
 }
 
-/* 4. Full-Bleed Background Video */
+/* Stage 1: Entrance Video */
 .cinematic-intro__video {
   position: absolute;
   inset: 0;
-  display: block;
   width: 100%;
   height: 100%;
-  max-width: none;
   object-fit: cover;
   object-position: center;
-  background-color: #0b0b0b;
+  display: block;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
-/* Contrast scrim (pure CSS gradient, no backdrop-filter blur) */
-.cinematic-intro__scrim {
+.cinematic-intro.is-showroom .cinematic-intro__video {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Stage 2: Interactive Photorealistic Showroom */
+.cinematic-showroom {
   position: absolute;
   inset: 0;
   z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #eae0d4;
+}
+
+.cinematic-intro.is-showroom .cinematic-showroom {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.cinematic-showroom__viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cinematic-showroom__stage {
+  position: relative;
+  /* Cover full viewport cleanly while keeping exact 16:9 garment coordinates */
+  width: max(100vw, 177.78vh);
+  width: max(100vw, 177.78dvh);
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0) scale(1.06);
+  transition: transform 0.14s ease-out;
+  will-change: transform;
+}
+
+.cinematic-showroom__bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.cinematic-showroom__products {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* Real Product Hotspots Mounted onto Rails & Pedestal */
+.cinematic-garment {
+  position: absolute;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  transform-origin: top center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+}
+
+.cinematic-garment__hook {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border: 2px solid #c9a75c;
+  border-bottom-color: transparent;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+.cinematic-garment__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* Warm boutique color grading + realistic soft shadow */
+  filter: sepia(0.08) saturate(0.95) brightness(0.96)
+          drop-shadow(0 14px 18px rgba(32, 24, 16, 0.34));
+  transition: filter 0.3s ease;
+}
+
+.cinematic-garment__shadow {
+  position: absolute;
+  bottom: -6px;
+  left: 15%;
+  width: 70%;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(24, 18, 12, 0.38) 0%, transparent 72%);
+  pointer-events: none;
+}
+
+.cinematic-garment:hover,
+.cinematic-garment:focus-visible {
+  z-index: 6;
+  outline: none;
+}
+
+.cinematic-garment:hover .cinematic-garment__img,
+.cinematic-garment:focus-visible .cinematic-garment__img {
+  filter: sepia(0.04) saturate(1.02) brightness(1.04)
+          drop-shadow(0 18px 26px rgba(20, 15, 10, 0.48));
+}
+
+/* Exact Perspective Placement Matching Empty Rails & Pedestal */
+.cinematic-garment--slot-0 {
+  left: 10%;
+  top: 40.5%;
+  width: 11.2%;
+  transform: translate(-50%, 0) perspective(900px) rotateY(24deg) skewY(2deg);
+}
+.cinematic-garment--slot-0:hover {
+  transform: translate(-50%, -4px) perspective(900px) rotateY(16deg) scale(1.07);
+}
+
+.cinematic-garment--slot-1 {
+  left: 26.2%;
+  top: 44.5%;
+  width: 6.8%;
+  transform: translate(-50%, 0) perspective(900px) rotateY(28deg) skewY(2deg);
+}
+.cinematic-garment--slot-1:hover {
+  transform: translate(-50%, -4px) perspective(900px) rotateY(18deg) scale(1.1);
+}
+
+.cinematic-garment--slot-2 {
+  left: 50%;
+  top: 50.5%;
+  width: 8.6%;
+  transform: translate(-50%, 0);
+}
+.cinematic-garment--slot-2:hover {
+  transform: translate(-50%, -5px) scale(1.08);
+}
+
+.cinematic-garment--slot-3 {
+  left: 71.2%;
+  top: 52%;
+  width: 7.4%;
+  transform: translate(-50%, 0) perspective(900px) rotateY(-18deg);
+}
+.cinematic-garment--slot-3:hover {
+  transform: translate(-50%, -4px) perspective(900px) rotateY(-10deg) scale(1.09);
+}
+
+.cinematic-garment--slot-4 {
+  left: 89.5%;
+  top: 40.5%;
+  width: 11.2%;
+  transform: translate(-50%, 0) perspective(900px) rotateY(-24deg) skewY(-2deg);
+}
+.cinematic-garment--slot-4:hover {
+  transform: translate(-50%, -4px) perspective(900px) rotateY(-16deg) scale(1.07);
+}
+
+/* Subtle Scrim */
+.cinematic-intro__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(11, 11, 11, 0.46) 0%,
-    rgba(11, 11, 11, 0) 24%,
-    rgba(11, 11, 11, 0) 68%,
-    rgba(11, 11, 11, 0.72) 100%
+    rgba(11, 11, 11, 0.28) 0%,
+    rgba(11, 11, 11, 0) 22%,
+    rgba(11, 11, 11, 0) 76%,
+    rgba(11, 11, 11, 0.44) 100%
   );
 }
 
-/* 5. HUD Layer */
+/* HUD Layer */
 .cinematic-intro__hud {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   pointer-events: none;
 }
 
-/* Top-Right Minimalist Skip Button */
 .cinematic-intro__skip {
-  position: absolute;
+  position: fixed;
   top: max(20px, env(safe-area-inset-top, 20px));
   right: max(20px, env(safe-area-inset-right, 20px));
-  z-index: 4;
+  z-index: 20;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -105,70 +261,39 @@ body.sv-cinematic-locked {
   min-height: 44px;
   padding: 10px 18px;
   border-radius: 999px;
-  border: 1px solid rgba(251, 248, 244, 0.32);
-  background-color: rgba(11, 11, 11, 0.78);
+  background-color: rgba(17, 17, 17, 0.86);
+  border: 1px solid rgba(251, 248, 244, 0.28);
   color: #fbf8f4;
   font-family: var(--body, "Manrope", system-ui, sans-serif);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
-  transition:
-    background-color 0.22s ease,
-    border-color 0.22s ease,
-    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  transition: background-color 0.22s ease, transform 0.2s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .cinematic-intro__skip:hover {
-    background-color: #111111;
-    border-color: rgba(251, 248, 244, 0.72);
-    transform: translate3d(0, -1px, 0);
-  }
-}
-
-.cinematic-intro__skip:active {
-  transform: scale3d(0.97, 0.97, 1);
-}
-
+.cinematic-intro__skip:hover,
 .cinematic-intro__skip:focus-visible {
-  outline: 2px solid #fbf8f4;
-  outline-offset: 3px;
+  background-color: #111111;
+  transform: translateY(-1px);
+  outline: 2px solid rgba(232, 208, 178, 0.85);
+  outline-offset: 2px;
 }
 
 .cinematic-intro__skip-icon {
   font-size: 12px;
-  line-height: 1;
   opacity: 0.85;
 }
 
-/* Optional Center ENTER Button (visible only in enter mode) */
 .cinematic-intro__center {
   position: absolute;
   inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  pointer-events: none;
-  opacity: 1;
-  transform: scale3d(1, 1, 1);
-  transition:
-    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cinematic-intro__center[hidden],
-.cinematic-intro[data-mode="auto"] .cinematic-intro__center,
-.cinematic-intro__enter[hidden] {
-  display: none !important;
-}
-
-.cinematic-intro.is-playing .cinematic-intro__center {
-  opacity: 0;
-  transform: scale3d(0.96, 0.96, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
 }
 
@@ -176,87 +301,73 @@ body.sv-cinematic-locked {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 168px;
+  min-width: 148px;
   min-height: 52px;
-  padding: 14px 40px;
+  padding: 14px 38px;
   border-radius: 999px;
-  border: 1px solid rgba(251, 248, 244, 0.78);
-  background-color: rgba(11, 11, 11, 0.72);
+  background-color: rgba(17, 17, 17, 0.84);
+  border: 1px solid rgba(232, 208, 178, 0.65);
   color: #fbf8f4;
-  font-family: var(--body, "Manrope", system-ui, sans-serif);
-  font-size: 12px;
+  font-family: var(--display, "Syne", system-ui, sans-serif);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.36);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .cinematic-intro__enter:hover {
-    background-color: #fbf8f4;
-    border-color: #fbf8f4;
-    color: #0b0b0b;
-    transform: scale3d(1.03, 1.03, 1);
-  }
+.cinematic-intro__enter[hidden] {
+  display: none;
 }
 
-.cinematic-intro__enter:active {
-  transform: scale3d(0.97, 0.97, 1);
-}
-
-.cinematic-intro__enter:focus-visible {
-  outline: 2px solid #fbf8f4;
-  outline-offset: 4px;
-}
-
-/* Bottom Brand Micro-Caption & Hairline Progress Bar */
+/* Bottom HUD */
 .cinematic-intro__bottom {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  bottom: max(28px, env(safe-area-inset-bottom, 28px));
-  transform: translate3d(-50%, 0, 0);
-  width: min(360px, calc(100vw - 40px));
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  text-align: center;
   pointer-events: none;
 }
 
-.cinematic-intro__brand {
-  margin: 0;
-  font-family: var(--display, "Syne", system-ui, sans-serif);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: #fbf8f4;
-  line-height: 1.2;
+.cinematic-intro__progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.cinematic-intro__progress {
-  width: min(200px, 60vw);
-  height: 1px;
+.cinematic-intro__progress-wrap[hidden] {
+  display: none;
+}
+
+.cinematic-intro__bar {
+  width: min(200px, 54vw);
+  height: 2px;
   border-radius: 999px;
-  background-color: rgba(251, 248, 244, 0.24);
+  background: rgba(251, 248, 244, 0.24);
   overflow: hidden;
 }
 
-.cinematic-intro__progress-fill {
+.cinematic-intro__bar-fill {
   display: block;
   width: 100%;
   height: 100%;
   transform-origin: left center;
+  background: linear-gradient(90deg, #d4af37 0%, #fbf8f4 100%);
   transform: scaleX(0);
-  background: linear-gradient(90deg, rgba(233, 216, 200, 0.85) 0%, #fbf8f4 100%);
-  will-change: transform;
+}
+
+.cinematic-intro.is-playing .cinematic-intro__bar-fill {
+  animation: svCinematicProgress 2.5s linear forwards;
 }
 
 .cinematic-intro__caption {
@@ -264,64 +375,156 @@ body.sv-cinematic-locked {
   font-family: var(--body, "Manrope", system-ui, sans-serif);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(251, 248, 244, 0.78);
-  line-height: 1.2;
+  color: rgba(251, 248, 244, 0.88);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
 }
 
-/* 6. Reduced Motion Instant Bypass */
+/* Product Inspection Pill */
+.cinematic-product-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #fbf8f4;
+  text-decoration: none;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+  pointer-events: auto;
+  transition: transform 0.2s ease;
+}
+
+.cinematic-product-pill[hidden] {
+  display: none;
+}
+
+.cinematic-product-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d4af37;
+  flex-shrink: 0;
+}
+
+.cinematic-product-pill__title {
+  font-weight: 600;
+}
+
+.cinematic-product-pill__price {
+  font-weight: 700;
+  color: #e8d0b2;
+  padding-left: 8px;
+  border-left: 1px solid rgba(251, 248, 244, 0.2);
+}
+
+.cinematic-product-pill__cta {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111111;
+  background: #fbf8f4;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* Explore Bar */
+.cinematic-explore-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 10px 8px 20px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.88);
+  border: 1px solid rgba(251, 248, 244, 0.22);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+}
+
+.cinematic-explore-bar[hidden] {
+  display: none;
+}
+
+.cinematic-explore-bar__hint {
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(251, 248, 244, 0.86);
+  white-space: nowrap;
+}
+
+.cinematic-explore-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #fbf8f4;
+  color: #111111;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.cinematic-explore-bar__btn:hover {
+  background: #ffffff;
+  transform: scale(1.03);
+}
+
+@keyframes svCinematicProgress {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  #sv-cinematic-intro,
-  .cinematic-intro {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transition: none !important;
+  .cinematic-intro,
+  .cinematic-intro__video,
+  .cinematic-showroom,
+  .cinematic-showroom__stage {
+    transition: opacity 0.2s linear !important;
   }
-
-  .cinematic-intro__skip,
-  .cinematic-intro__enter,
-  .cinematic-intro__center {
-    transition: none !important;
-    transform: none !important;
+  .cinematic-intro.is-playing .cinematic-intro__bar-fill {
+    animation: none !important;
+    transform: scaleX(1);
   }
 }
 
-/* 7. Mobile Responsive Styling (390px) */
+/* Mobile Responsive Horizontal Pan */
 @media screen and (max-width: 767px) {
-  .cinematic-intro__skip {
-    top: max(16px, env(safe-area-inset-top, 16px));
-    right: max(16px, env(safe-area-inset-right, 16px));
-    padding: 10px 16px;
-    font-size: 10.5px;
-    letter-spacing: 0.14em;
+  .cinematic-showroom__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .cinematic-intro__enter {
-    min-width: 152px;
-    min-height: 48px;
-    padding: 12px 32px;
-    font-size: 11px;
-    letter-spacing: 0.22em;
+  .cinematic-showroom__stage {
+    transform: none;
   }
 
-  .cinematic-intro__bottom {
-    bottom: max(22px, env(safe-area-inset-bottom, 22px));
+  .cinematic-explore-bar {
+    flex-direction: column;
     gap: 8px;
+    padding: 12px 16px;
+    border-radius: 20px;
+    text-align: center;
   }
 
-  .cinematic-intro__brand {
+  .cinematic-explore-bar__hint {
     font-size: 10px;
-    letter-spacing: 0.2em;
   }
 
-  .cinematic-intro__progress {
-    width: min(168px, 52vw);
-  }
-
-  .cinematic-intro__caption {
-    font-size: 9.5px;
-    letter-spacing: 0.16em;
+  .cinematic-explore-bar__btn {
+    width: 100%;
+    justify-content: center;
   }
 }

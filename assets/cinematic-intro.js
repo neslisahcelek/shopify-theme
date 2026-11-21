@@ -1,24 +1,24 @@
 /**
- * Style Vibeus — Cinematic Flagship Video Intro Controller
- * --------------------------------------------------------------------------
- * - Respects sessionStorage (`sv_cinematic_seen`) & `prefers-reduced-motion`
- * - Swaps mobile vertical video source (`data-mobile-src`) on viewports < 768px
- * - Supports `auto` mode (with 650ms Low Power Mode fallback & 4200ms safety timeout)
- *   and `enter` mode (paused on poster until ENTER click, fades out on ended)
- * - Unlocks scroll & applies GPU-composited opacity fade before display: none
+ * Style Vibeus — Hybrid Cinematic Entrance + Interactive Showroom
+ * ---------------------------------------------------------------------------
+ * - Stage 1 (0 -> 2.5s): Plays photorealistic entrance video
+ * - Stage 2 (Interactive): Seamless transition into real-product showroom
+ * - Hover/tap any real Shopify product -> opens /products/...
+ * - Back button from product returns straight into the showroom
+ * - Explicit exit ("Enter Store X" / "Shop Now ->" / Esc) marks seen
  */
 
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'sv_cinematic_seen';
-  var FADE_OUT_MS = 450;
-  var AUTO_SAFETY_TIMEOUT_MS = 4200;
-  var AUTOPLAY_BLOCKED_DELAY_MS = 650;
+  var SEEN_KEY = 'sv_cinematic_seen';
+  var IN_STORE_KEY = 'sv_cinematic_in_store';
+  var FADE_OUT_MS = 460;
+  var AUTO_SAFETY_MS = 3200;
 
   function hasSeenIntro() {
     try {
-      return window.sessionStorage && window.sessionStorage.getItem(STORAGE_KEY) === '1';
+      return window.sessionStorage && window.sessionStorage.getItem(SEEN_KEY) === '1';
     } catch (e) {
       return false;
     }
@@ -27,35 +27,25 @@
   function markIntroSeen() {
     try {
       if (window.sessionStorage) {
-        window.sessionStorage.setItem(STORAGE_KEY, '1');
+        window.sessionStorage.setItem(SEEN_KEY, '1');
+        window.sessionStorage.removeItem(IN_STORE_KEY);
       }
     } catch (e) {}
   }
 
-  function prefersReducedMotion() {
-    return Boolean(
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    );
-  }
-
-  function clamp(val, min, max) {
-    return Math.max(min, Math.min(max, val));
-  }
-
-  function inferMimeType(url) {
-    return url.toLowerCase().indexOf('.webm') !== -1 ? 'video/webm' : 'video/mp4';
-  }
-
-  function releaseVideoResources(video) {
-    if (!video) return;
+  function isReturningInStore() {
     try {
-      video.pause();
-      var sources = video.querySelectorAll('source');
-      for (var i = 0; i < sources.length; i++) {
-        sources[i].removeAttribute('src');
+      return window.sessionStorage && window.sessionStorage.getItem(IN_STORE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markInStore() {
+    try {
+      if (window.sessionStorage) {
+        window.sessionStorage.setItem(IN_STORE_KEY, '1');
       }
-      video.removeAttribute('src');
-      video.load();
     } catch (e) {}
   }
 
@@ -64,289 +54,243 @@
     if (!intro) return;
 
     var video = document.getElementById('sv-cinematic-video');
+    var showroom = document.getElementById('sv-cinematic-showroom');
+    var viewport = document.getElementById('sv-showroom-viewport');
+    var stage = document.getElementById('sv-showroom-stage');
     var skipBtn = document.getElementById('sv-cinematic-skip');
     var enterBtn = document.getElementById('sv-cinematic-enter');
-    var enterWrap = intro.querySelector('.cinematic-intro__center');
-    var progressFill = document.getElementById('sv-cinematic-progress-fill');
+    var shopNowBtn = document.getElementById('sv-cinematic-shop-now');
+    var progressWrap = document.getElementById('sv-cinematic-progress-wrap');
+    var exploreBar = document.getElementById('sv-cinematic-explore');
+    var productPill = document.getElementById('sv-cinematic-product-pill');
+    var pillTitle = productPill && productPill.querySelector('[data-pill-title]');
+    var pillPrice = productPill && productPill.querySelector('[data-pill-price]');
 
-    // Immediate bypass on repeat session visits or reduced motion
-    if (hasSeenIntro() || prefersReducedMotion() || !video) {
+    var mode = intro.getAttribute('data-mode') || 'auto';
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (hasSeenIntro() || prefersReduced) {
       document.documentElement.classList.add('sv-cinematic-dismissed');
       intro.classList.add('sv-cinematic-done');
       intro.setAttribute('aria-hidden', 'true');
+      intro.style.display = 'none';
       document.body.classList.remove('sv-cinematic-locked');
-      releaseVideoResources(video);
+      if (video) {
+        try {
+          video.pause();
+          video.removeAttribute('src');
+        } catch (e) {}
+      }
       return;
     }
 
-    var mode = (intro.getAttribute('data-mode') || 'auto').toLowerCase() === 'enter' ? 'enter' : 'auto';
-    var isFading = false;
-    var isDone = false;
-    var hasStartedEnter = false;
-    var autoplayBlockedHandled = false;
-    var safetyTimer = null;
-    var blockedTimer = null;
-    var cleanupTimer = null;
-    var progressRaf = null;
-    var fallbackStartTime = null;
-    var inertedNodes = [];
-    var previousActiveElement = document.activeElement;
-
-    // Lock scroll and mark sibling landmarks inert while modal dialog is active
     document.body.classList.add('sv-cinematic-locked');
-    var bodyChildren = document.body ? document.body.children : [];
-    for (var i = 0; i < bodyChildren.length; i++) {
-      var child = bodyChildren[i];
-      if (
-        child !== intro &&
-        child.tagName !== 'SCRIPT' &&
-        child.tagName !== 'STYLE' &&
-        !child.hasAttribute('inert')
-      ) {
-        child.setAttribute('inert', '');
-        inertedNodes.push(child);
+
+    var inertNodes = [];
+    var prevFocus = document.activeElement;
+    Array.prototype.forEach.call(document.body.children, function (child) {
+      if (child !== intro && child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && !child.inert) {
+        child.inert = true;
+        inertNodes.push(child);
       }
-    }
+    });
 
-    try {
-      intro.focus({ preventScroll: true });
-    } catch (e) {}
+    var isShowroom = false;
+    var isExiting = false;
+    var isDone = false;
+    var safetyTimer = null;
+    var cleanupTimer = null;
 
-    // Swap mobile vertical video source on viewports < 768px before playback
-    var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1024;
-    var mobileSrc = (video.getAttribute('data-mobile-src') || '').trim();
-    var sourceEl = video.querySelector('source');
-
-    if (viewportWidth < 768 && mobileSrc) {
-      if (sourceEl) {
-        if (sourceEl.getAttribute('src') !== mobileSrc) {
+    // Optional mobile video override
+    if (video) {
+      var mobileSrc = video.getAttribute('data-mobile-src');
+      if (mobileSrc && (window.innerWidth || 1024) < 768) {
+        var sourceEl = video.querySelector('source');
+        if (sourceEl) {
           sourceEl.setAttribute('src', mobileSrc);
-          sourceEl.setAttribute('type', inferMimeType(mobileSrc));
-          video.load();
+          if (mobileSrc.toLowerCase().indexOf('.webm') !== -1) {
+            sourceEl.setAttribute('type', 'video/webm');
+          }
+          try {
+            video.load();
+          } catch (e) {}
         }
-      } else {
-        video.setAttribute('src', mobileSrc);
-        video.load();
       }
     }
 
-    function setProgress(ratio) {
-      if (!progressFill) return;
-      progressFill.style.transform = 'scaleX(' + clamp(ratio, 0, 1).toFixed(4) + ')';
-    }
-
-    function stopProgressLoop() {
-      if (progressRaf) {
-        cancelAnimationFrame(progressRaf);
-        progressRaf = null;
+    function centerMobileViewport() {
+      if (!viewport) return;
+      if (viewport.scrollWidth > viewport.clientWidth) {
+        viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
       }
     }
 
-    function tickProgress(now) {
-      if (isFading || isDone) return;
-      if (video.duration && isFinite(video.duration) && video.duration > 0) {
-        setProgress(video.currentTime / video.duration);
-      } else if (mode === 'auto') {
-        if (fallbackStartTime === null) fallbackStartTime = now;
-        setProgress((now - fallbackStartTime) / AUTO_SAFETY_TIMEOUT_MS);
-      }
-      progressRaf = requestAnimationFrame(tickProgress);
-    }
+    function enterShowroom() {
+      if (isShowroom || isExiting || isDone) return;
+      isShowroom = true;
+      clearTimeout(safetyTimer);
 
-    function startProgressLoop() {
-      stopProgressLoop();
-      fallbackStartTime = null;
-      progressRaf = requestAnimationFrame(tickProgress);
-    }
-
-    function clearTimers() {
-      if (safetyTimer) {
-        clearTimeout(safetyTimer);
-        safetyTimer = null;
-      }
-      if (blockedTimer) {
-        clearTimeout(blockedTimer);
-        blockedTimer = null;
-      }
-      if (cleanupTimer) {
-        clearTimeout(cleanupTimer);
-        cleanupTimer = null;
-      }
-    }
-
-    function restoreInertAndFocus() {
-      for (var j = 0; j < inertedNodes.length; j++) {
-        inertedNodes[j].removeAttribute('inert');
-      }
-      inertedNodes = [];
-
-      if (
-        previousActiveElement &&
-        previousActiveElement !== document.body &&
-        typeof previousActiveElement.focus === 'function' &&
-        document.contains(previousActiveElement)
-      ) {
+      if (video) {
         try {
-          previousActiveElement.focus({ preventScroll: true });
+          video.pause();
         } catch (e) {}
       }
+
+      if (enterBtn) enterBtn.hidden = true;
+      if (progressWrap) progressWrap.hidden = true;
+      if (exploreBar) exploreBar.hidden = false;
+      if (showroom) showroom.setAttribute('aria-hidden', 'false');
+
+      intro.classList.add('is-showroom');
+      requestAnimationFrame(centerMobileViewport);
     }
 
-    function cleanup() {
+    function finishExit() {
       if (isDone) return;
       isDone = true;
-      clearTimers();
-      stopProgressLoop();
+      clearTimeout(safetyTimer);
+      clearTimeout(cleanupTimer);
 
-      intro.classList.remove('sv-cinematic-fading', 'is-playing', 'is-autoplay-blocked');
+      intro.classList.remove('sv-cinematic-fading', 'is-playing', 'is-showroom');
       intro.classList.add('sv-cinematic-done');
+
+      if (document.activeElement && intro.contains(document.activeElement)) {
+        try {
+          document.activeElement.blur();
+        } catch (e) {}
+      }
+
       intro.setAttribute('aria-hidden', 'true');
-      document.documentElement.classList.add('sv-cinematic-dismissed');
+      intro.style.display = 'none';
       document.body.classList.remove('sv-cinematic-locked');
 
-      restoreInertAndFocus();
-      releaseVideoResources(video);
+      inertNodes.forEach(function (node) {
+        node.inert = false;
+      });
+      if (prevFocus && typeof prevFocus.focus === 'function') {
+        try {
+          prevFocus.focus({ preventScroll: true });
+        } catch (e) {}
+      }
+
+      if (video) {
+        try {
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+        } catch (e) {}
+      }
 
       document.removeEventListener('keydown', onKeyDown);
-      intro.removeEventListener('click', onBlockedTap);
-      intro.removeEventListener('transitionend', onFadeEnd);
-      if (skipBtn) skipBtn.removeEventListener('click', onSkipClick);
+      window.removeEventListener('pointermove', onPointerMove);
+      if (skipBtn) skipBtn.removeEventListener('click', onExitClick);
+      if (shopNowBtn) shopNowBtn.removeEventListener('click', onExitClick);
       if (enterBtn) enterBtn.removeEventListener('click', onEnterClick);
-      video.removeEventListener('ended', onVideoEnded);
-      video.removeEventListener('error', onMediaError);
-      if (sourceEl) sourceEl.removeEventListener('error', onMediaError);
-
-      try {
-        window.dispatchEvent(new CustomEvent('sv:cinematic:dismissed', { bubbles: true }));
-      } catch (e) {}
     }
 
-    function onFadeEnd(e) {
-      if (e && e.target === intro && e.propertyName === 'opacity' && isFading) {
-        cleanup();
-      }
-    }
-
-    function triggerExit() {
-      if (isFading || isDone) return;
-      isFading = true;
-      clearTimers();
-      stopProgressLoop();
-      setProgress(1);
+    function triggerExit(e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      if (isExiting || isDone) return;
+      isExiting = true;
       markIntroSeen();
+      clearTimeout(safetyTimer);
 
-      document.body.classList.remove('sv-cinematic-locked');
       intro.classList.add('sv-cinematic-fading');
-
-      // Wait for opacity transitionend with deterministic failsafe timeout
-      cleanupTimer = setTimeout(cleanup, FADE_OUT_MS + 60);
+      document.body.classList.remove('sv-cinematic-locked');
+      cleanupTimer = setTimeout(finishExit, FADE_OUT_MS);
     }
 
-    function handleAutoplayBlocked() {
-      if (autoplayBlockedHandled || isFading || isDone) return;
-      autoplayBlockedHandled = true;
-      clearTimers();
-      stopProgressLoop();
-
-      intro.classList.add('is-autoplay-blocked');
-      intro.addEventListener('click', onBlockedTap);
-      blockedTimer = setTimeout(triggerExit, AUTOPLAY_BLOCKED_DELAY_MS);
-    }
-
-    function onBlockedTap() {
-      triggerExit();
-    }
-
-    function onSkipClick(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-      triggerExit();
-    }
-
-    function onVideoEnded() {
-      triggerExit();
-    }
-
-    function onMediaError() {
-      if (mode === 'auto' || hasStartedEnter) {
-        handleAutoplayBlocked();
-      }
+    function onExitClick(e) {
+      triggerExit(e);
     }
 
     function onKeyDown(e) {
-      if (e.key === 'Escape' || e.key === 'Esc') {
-        e.preventDefault();
-        triggerExit();
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        triggerExit(e);
       }
     }
 
-    function attemptPlayback() {
-      video.muted = true;
-      video.defaultMuted = true;
-      video.playsInline = true;
+    function startPlayback() {
+      if (!video) {
+        enterShowroom();
+        return;
+      }
+      intro.classList.add('is-playing');
+      safetyTimer = setTimeout(enterShowroom, AUTO_SAFETY_MS);
 
       try {
         var playPromise = video.play();
-        if (playPromise && typeof playPromise.then === 'function') {
-          playPromise
-            .then(function () {
-              if (isFading || isDone) return;
-              intro.classList.add('is-playing');
-              startProgressLoop();
-            })
-            .catch(function () {
-              handleAutoplayBlocked();
-            });
-        } else {
-          intro.classList.add('is-playing');
-          startProgressLoop();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(function () {
+            // Autoplay blocked (e.g. Low Power Mode): enter interactive showroom gracefully
+            clearTimeout(safetyTimer);
+            setTimeout(enterShowroom, 350);
+          });
         }
       } catch (err) {
-        handleAutoplayBlocked();
+        enterShowroom();
       }
     }
 
     function onEnterClick(e) {
-      if (e && e.stopPropagation) e.stopPropagation();
-      if (hasStartedEnter || isFading || isDone) return;
-      hasStartedEnter = true;
-
-      if (video.error) {
-        handleAutoplayBlocked();
-        return;
-      }
-
-      attemptPlayback();
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      if (enterBtn) enterBtn.hidden = true;
+      startPlayback();
     }
 
-    // Bind event listeners
-    document.addEventListener('keydown', onKeyDown);
-    intro.addEventListener('transitionend', onFadeEnd);
-    if (skipBtn) skipBtn.addEventListener('click', onSkipClick);
-    if (enterBtn) enterBtn.addEventListener('click', onEnterClick);
-    video.addEventListener('ended', onVideoEnded);
-    video.addEventListener('error', onMediaError);
-    if (sourceEl) sourceEl.addEventListener('error', onMediaError);
+    function onPointerMove(e) {
+      if (!isShowroom || !stage || isExiting || isDone) return;
+      if ((window.innerWidth || 1024) < 768) return;
+      var nx = (e.clientX / (window.innerWidth || 1440) - 0.5) * 2;
+      var ny = (e.clientY / (window.innerHeight || 900) - 0.5) * 2;
+      stage.style.setProperty('--pan-x', (-nx * 26).toFixed(1) + 'px');
+      stage.style.setProperty('--pan-y', (-ny * 10).toFixed(1) + 'px');
+    }
 
-    // Initialize mode behavior
-    if (mode === 'enter') {
-      if (enterWrap) enterWrap.hidden = false;
-      if (enterBtn) enterBtn.hidden = false;
-      try {
-        video.pause();
-        if (video.readyState >= 1) {
-          video.currentTime = 0;
-        }
-      } catch (e) {}
-      setProgress(0);
+    // Bind product hotspots
+    var garmentLinks = intro.querySelectorAll('[data-garment-link]');
+    Array.prototype.forEach.call(garmentLinks, function (link) {
+      var showPill = function () {
+        if (!productPill) return;
+        if (pillTitle) pillTitle.textContent = link.getAttribute('data-title') || '';
+        if (pillPrice) pillPrice.textContent = link.getAttribute('data-price') || '';
+        productPill.setAttribute('href', link.getAttribute('href') || '#');
+        productPill.hidden = false;
+      };
+      link.addEventListener('mouseenter', showPill);
+      link.addEventListener('focus', showPill);
+      link.addEventListener('click', function () {
+        markInStore();
+      });
+    });
+
+    if (productPill) {
+      productPill.addEventListener('click', function () {
+        markInStore();
+      });
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    if (skipBtn) skipBtn.addEventListener('click', onExitClick);
+    if (shopNowBtn) shopNowBtn.addEventListener('click', onExitClick);
+
+    if (video) {
+      video.addEventListener('ended', enterShowroom, { once: true });
+      video.addEventListener('error', enterShowroom, { once: true });
+    }
+
+    // Returning from product detail? Open straight inside showroom
+    if (isReturningInStore()) {
+      enterShowroom();
+      return;
+    }
+
+    if (mode === 'enter' && enterBtn) {
+      enterBtn.hidden = false;
+      enterBtn.addEventListener('click', onEnterClick);
     } else {
-      if (enterWrap) enterWrap.hidden = true;
-      if (enterBtn) enterBtn.hidden = true;
-      safetyTimer = setTimeout(triggerExit, AUTO_SAFETY_TIMEOUT_MS);
-      if (video.error) {
-        handleAutoplayBlocked();
-      } else {
-        attemptPlayback();
-      }
+      startPlayback();
     }
   }
 
