@@ -1,0 +1,104 @@
+{%- comment -%}
+  Style Vibeus — Cinematic Flagship Video Intro
+  -------------------------------------------------------------
+  - Fullscreen 100vw x 100dvh video entrance (auto or manual ENTER mode)
+  - Supports custom desktop/mobile video URLs & poster override in Theme Settings
+  - Instant sessionStorage bypass, Low Power Mode autoplay fallback & reduced-motion support
+{%- endcomment -%}
+
+<script>
+  (function () {
+    try {
+      if (sessionStorage.getItem('sv_cinematic_seen') === '1') {
+        document.documentElement.classList.add('sv-cinematic-dismissed');
+      }
+    } catch (e) {}
+  })();
+</script>
+
+{%- liquid
+  assign intro_mode = settings.cinematic_intro_mode | default: 'auto'
+
+  if settings.cinematic_intro_poster != blank
+    assign poster_url = settings.cinematic_intro_poster | image_url: width: 1600
+  else
+    assign poster_url = 'cinematic-intro-poster.jpg' | asset_url
+  endif
+
+  if settings.cinematic_intro_video_url != blank
+    assign video_url = settings.cinematic_intro_video_url | strip
+  else
+    assign video_url = 'cinematic-intro.mp4' | asset_url
+  endif
+
+  assign mobile_video_url = ''
+  if settings.cinematic_intro_mobile_video_url != blank
+    assign mobile_video_url = settings.cinematic_intro_mobile_video_url | strip
+  endif
+
+  assign video_type = 'video/mp4'
+  assign video_url_lower = video_url | downcase
+  if video_url_lower contains '.webm'
+    assign video_type = 'video/webm'
+  endif
+-%}
+
+<aside
+  id="sv-cinematic-intro"
+  class="cinematic-intro"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Style Vibeus Flagship Entrance"
+  data-mode="{{ intro_mode | escape }}"
+  tabindex="-1"
+>
+  <video
+    id="sv-cinematic-video"
+    class="cinematic-intro__video"
+    playsinline
+    muted
+    preload="auto"
+    poster="{{ poster_url }}"
+    data-mobile-src="{{ mobile_video_url | escape }}"
+    aria-hidden="true"
+  >
+    <source src="{{ video_url | escape }}" type="{{ video_type }}">
+  </video>
+
+  <div class="cinematic-intro__scrim" aria-hidden="true"></div>
+
+  <div class="cinematic-intro__hud">
+    <button
+      type="button"
+      id="sv-cinematic-skip"
+      class="cinematic-intro__skip"
+      aria-label="Skip Intro"
+    >
+      <span class="cinematic-intro__skip-label">Skip</span>
+      <span class="cinematic-intro__skip-icon" aria-hidden="true">✕</span>
+    </button>
+
+    <div
+      class="cinematic-intro__center"
+      {% unless intro_mode == 'enter' %}hidden{% endunless %}
+    >
+      <button
+        type="button"
+        id="sv-cinematic-enter"
+        class="cinematic-intro__enter"
+        aria-label="Enter Style Vibeus Flagship"
+        {% unless intro_mode == 'enter' %}hidden{% endunless %}
+      >
+        <span class="cinematic-intro__enter-label">ENTER</span>
+      </button>
+    </div>
+
+    <div class="cinematic-intro__bottom">
+      <p class="cinematic-intro__brand">STYLE VIBEUS &middot; FLAGSHIP</p>
+      <div class="cinematic-intro__progress" aria-hidden="true">
+        <span id="sv-cinematic-progress-fill" class="cinematic-intro__progress-fill"></span>
+      </div>
+      <p id="sv-cinematic-caption" class="cinematic-intro__caption">Entering Flagship...</p>
+    </div>
+  </div>
+</aside>

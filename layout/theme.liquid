@@ -54,17 +54,16 @@
   {% render 'css-variables' %}
   {{ 'base.css' | asset_url | stylesheet_tag }}
   {{ 'motion.css' | asset_url | stylesheet_tag }}
-  {%- if request.page_type == 'index' and settings.enable_intro_curtain != false -%}
-    {{ 'intro-curtain.css' | asset_url | stylesheet_tag }}
+  {%- if request.page_type == 'index' and settings.enable_cinematic_intro != false -%}
+    {{ 'cinematic-intro.css' | asset_url | stylesheet_tag }}
     <script>
       try {
-        if (sessionStorage.getItem('sv_curtain_seen') === '1') {
-          document.documentElement.classList.add('sv-curtain-dismissed');
+        if (sessionStorage.getItem('sv_cinematic_seen') === '1') {
+          document.documentElement.classList.add('sv-cinematic-dismissed');
         }
       } catch (e) {}
     </script>
-    <script src="{{ 'three.min.js' | asset_url }}" defer></script>
-    <script src="{{ 'intro-curtain.js' | asset_url }}" defer></script>
+    <script src="{{ 'cinematic-intro.js' | asset_url }}" defer></script>
   {%- endif -%}
   {%- if settings.enable_page_transitions -%}
     <style>@view-transition { navigation: auto; }</style>
@@ -104,8 +103,8 @@
 <body class="template-{{ template.name }}{% if settings.enable_preloader %} has-preloader{% endif %}">
   <a class="skip-link" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
 
-  {%- if request.page_type == 'index' and settings.enable_intro_curtain != false -%}
-    {% render 'intro-curtain' %}
+  {%- if request.page_type == 'index' and settings.enable_cinematic_intro != false -%}
+    {% render 'cinematic-intro' %}
   {%- endif -%}
 
   {%- if settings.enable_preloader -%}

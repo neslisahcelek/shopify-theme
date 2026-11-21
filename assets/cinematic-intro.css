@@ -1,0 +1,327 @@
+/* ==========================================================================
+   Style Vibeus — Cinematic Flagship Video Intro
+   --------------------------------------------------------------------------
+   - Fullscreen 100vw x 100dvh obsidian stage (#0b0b0b) with cover video
+   - Pure GPU-composited opacity & transform animations only
+   - Zero backdrop-filter blur over live <video>
+   - Accessible reduced-motion instant bypass & 390px mobile responsiveness
+   ========================================================================== */
+
+/* 1. Instant FOUC suppression when previously dismissed in session */
+html.sv-cinematic-dismissed #sv-cinematic-intro,
+html.sv-cinematic-dismissed .cinematic-intro {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 2. Body scroll lock while intro is active */
+body.sv-cinematic-locked {
+  overflow: hidden !important;
+}
+
+/* 3. Fullscreen Intro Overlay */
+.cinematic-intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 999999;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: #0b0b0b;
+  color: #fbf8f4;
+  opacity: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cinematic-intro:focus {
+  outline: none;
+}
+
+.cinematic-intro.sv-cinematic-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cinematic-intro.sv-cinematic-done {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* 4. Full-Bleed Background Video */
+.cinematic-intro__video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  background-color: #0b0b0b;
+  pointer-events: none;
+}
+
+/* Contrast scrim (pure CSS gradient, no backdrop-filter blur) */
+.cinematic-intro__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 11, 11, 0.46) 0%,
+    rgba(11, 11, 11, 0) 24%,
+    rgba(11, 11, 11, 0) 68%,
+    rgba(11, 11, 11, 0.72) 100%
+  );
+}
+
+/* 5. HUD Layer */
+.cinematic-intro__hud {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Top-Right Minimalist Skip Button */
+.cinematic-intro__skip {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top, 20px));
+  right: max(20px, env(safe-area-inset-right, 20px));
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 248, 244, 0.32);
+  background-color: rgba(11, 11, 11, 0.78);
+  color: #fbf8f4;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cinematic-intro__skip:hover {
+    background-color: #111111;
+    border-color: rgba(251, 248, 244, 0.72);
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.cinematic-intro__skip:active {
+  transform: scale3d(0.97, 0.97, 1);
+}
+
+.cinematic-intro__skip:focus-visible {
+  outline: 2px solid #fbf8f4;
+  outline-offset: 3px;
+}
+
+.cinematic-intro__skip-icon {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+/* Optional Center ENTER Button (visible only in enter mode) */
+.cinematic-intro__center {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+  transition:
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cinematic-intro__center[hidden],
+.cinematic-intro[data-mode="auto"] .cinematic-intro__center,
+.cinematic-intro__enter[hidden] {
+  display: none !important;
+}
+
+.cinematic-intro.is-playing .cinematic-intro__center {
+  opacity: 0;
+  transform: scale3d(0.96, 0.96, 1);
+  pointer-events: none;
+}
+
+.cinematic-intro__enter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 168px;
+  min-height: 52px;
+  padding: 14px 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 248, 244, 0.78);
+  background-color: rgba(11, 11, 11, 0.72);
+  color: #fbf8f4;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cinematic-intro__enter:hover {
+    background-color: #fbf8f4;
+    border-color: #fbf8f4;
+    color: #0b0b0b;
+    transform: scale3d(1.03, 1.03, 1);
+  }
+}
+
+.cinematic-intro__enter:active {
+  transform: scale3d(0.97, 0.97, 1);
+}
+
+.cinematic-intro__enter:focus-visible {
+  outline: 2px solid #fbf8f4;
+  outline-offset: 4px;
+}
+
+/* Bottom Brand Micro-Caption & Hairline Progress Bar */
+.cinematic-intro__bottom {
+  position: absolute;
+  left: 50%;
+  bottom: max(28px, env(safe-area-inset-bottom, 28px));
+  transform: translate3d(-50%, 0, 0);
+  width: min(360px, calc(100vw - 40px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cinematic-intro__brand {
+  margin: 0;
+  font-family: var(--display, "Syne", system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fbf8f4;
+  line-height: 1.2;
+}
+
+.cinematic-intro__progress {
+  width: min(200px, 60vw);
+  height: 1px;
+  border-radius: 999px;
+  background-color: rgba(251, 248, 244, 0.24);
+  overflow: hidden;
+}
+
+.cinematic-intro__progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, rgba(233, 216, 200, 0.85) 0%, #fbf8f4 100%);
+  will-change: transform;
+}
+
+.cinematic-intro__caption {
+  margin: 0;
+  font-family: var(--body, "Manrope", system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 248, 244, 0.78);
+  line-height: 1.2;
+}
+
+/* 6. Reduced Motion Instant Bypass */
+@media (prefers-reduced-motion: reduce) {
+  #sv-cinematic-intro,
+  .cinematic-intro {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: none !important;
+  }
+
+  .cinematic-intro__skip,
+  .cinematic-intro__enter,
+  .cinematic-intro__center {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* 7. Mobile Responsive Styling (390px) */
+@media screen and (max-width: 767px) {
+  .cinematic-intro__skip {
+    top: max(16px, env(safe-area-inset-top, 16px));
+    right: max(16px, env(safe-area-inset-right, 16px));
+    padding: 10px 16px;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+  }
+
+  .cinematic-intro__enter {
+    min-width: 152px;
+    min-height: 48px;
+    padding: 12px 32px;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+  }
+
+  .cinematic-intro__bottom {
+    bottom: max(22px, env(safe-area-inset-bottom, 22px));
+    gap: 8px;
+  }
+
+  .cinematic-intro__brand {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+  }
+
+  .cinematic-intro__progress {
+    width: min(168px, 52vw);
+  }
+
+  .cinematic-intro__caption {
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+  }
+}

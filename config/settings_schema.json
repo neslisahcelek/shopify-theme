@@ -52,7 +52,22 @@
       { "type": "header", "content": "Butik Perde Açılışı (Curtain Reveal)" },
       { "type": "checkbox", "id": "enable_intro_curtain", "label": "Ana sayfada perde açılış animasyonunu göster", "default": true },
       { "type": "text", "id": "intro_curtain_monogram", "label": "Perde monogramı", "default": "SV" },
-      { "type": "text", "id": "intro_curtain_subtitle", "label": "Perde alt başlığı", "default": "AUTUMN / WINTER 2026" }
+      { "type": "text", "id": "intro_curtain_subtitle", "label": "Perde alt başlığı", "default": "AUTUMN / WINTER 2026" },
+      { "type": "header", "content": "Sinematik Mağaza Girişi (Video Intro)" },
+      { "type": "checkbox", "id": "enable_cinematic_intro", "label": "Ana sayfada sinematik video girişini aç", "default": true },
+      {
+        "type": "select",
+        "id": "cinematic_intro_mode",
+        "label": "Giriş modu",
+        "default": "auto",
+        "options": [
+          { "value": "auto", "label": "Otomatik Oynat" },
+          { "value": "enter", "label": "ENTER Butonlu" }
+        ]
+      },
+      { "type": "image_picker", "id": "cinematic_intro_poster", "label": "Video kapak görseli (Poster)", "info": "İsteğe bağlı. Boş bırakılırsa temadaki varsayılan poster kullanılır." },
+      { "type": "text", "id": "cinematic_intro_video_url", "label": "Özel video URL (.mp4 / .webm)", "placeholder": "https://cdn.shopify.com/.../intro.mp4", "info": "İsteğe bağlı masaüstü video bağlantısı. Boş bırakılırsa temadaki varsayılan video kullanılır." },
+      { "type": "text", "id": "cinematic_intro_mobile_video_url", "label": "Mobil dikey video URL (.mp4 / .webm)", "placeholder": "https://cdn.shopify.com/.../intro-mobile.mp4", "info": "İsteğe bağlı (< 768px ekranlar için). Boş bırakılırsa ana video oynatılır." }
     ]
   },
   {
