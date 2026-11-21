@@ -649,9 +649,9 @@
     backWall.position.set(0, 2.3, -9.2);
     scene.add(backWall);
 
-    // Warm halo backlight behind monolith sign
+    // Warm halo backlight behind monolith sign (raised slightly above 3-garment arch)
     var haloPlane = new THREE.Mesh(new THREE.PlaneGeometry(5.15, 1.8), haloMat);
-    haloPlane.position.set(0, 3.05, -9.16);
+    haloPlane.position.set(0, 3.25, -9.16);
     scene.add(haloPlane);
 
     var backSignTex = createBrandSignTexture('STYLE VIBEUS', 'AUTUMN / WINTER 2026', '#f2e8dc', '#111111', '#b8944f', true);
@@ -659,44 +659,45 @@
       new THREE.BoxGeometry(4.8, 1.5, 0.12),
       new THREE.MeshStandardMaterial({ map: backSignTex, roughness: 0.55, metalness: 0.04 })
     );
-    backSign.position.set(0, 3.05, -9.06);
+    backSign.position.set(0, 3.25, -9.06);
     scene.add(backSign);
 
-    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.78, 1.5), pillarMat);
-    pedestal.position.set(0, 0.39, -6.5);
+    // Wide 3-Garment Center Showcase Pedestal (z = -6.5)
+    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.72, 1.35), pillarMat);
+    pedestal.position.set(0, 0.36, -6.5);
     scene.add(pedestal);
-    addContactShadow(0, -6.5, 2.35, 2.2);
+    addContactShadow(0, -6.5, 5.4, 2.1);
 
-    var pedestalTrim = new THREE.Mesh(new THREE.BoxGeometry(1.69, 0.04, 1.54), brassMat);
-    pedestalTrim.position.set(0, 0.78, -6.5);
+    var pedestalTrim = new THREE.Mesh(new THREE.BoxGeometry(4.64, 0.04, 1.39), brassMat);
+    pedestalTrim.position.set(0, 0.72, -6.5);
     scene.add(pedestalTrim);
 
-    // Freestanding Brushed-Brass Display Stand mounted physically onto pedestal top
-    var standPostGeo = new THREE.CylinderGeometry(0.018, 0.018, 1.74, 10);
+    // Freestanding Wide Brushed-Brass Display Stand mounted physically onto pedestal top
+    var standPostGeo = new THREE.CylinderGeometry(0.018, 0.018, 1.76, 10);
     var standBaseCollarGeo = new THREE.CylinderGeometry(0.042, 0.048, 0.05, 12);
-    [-0.72, 0.72].forEach(function (px) {
+    [-2.12, 2.12].forEach(function (px) {
       var post = new THREE.Mesh(standPostGeo, brassMat);
-      post.position.set(px, 1.65, -6.5);
+      post.position.set(px, 1.62, -6.5);
       scene.add(post);
 
       var collar = new THREE.Mesh(standBaseCollarGeo, darkBronzeMat);
-      collar.position.set(px, 0.805, -6.5);
+      collar.position.set(px, 0.745, -6.5);
       scene.add(collar);
     });
 
-    var topBarGeo = new THREE.CylinderGeometry(0.02, 0.02, 1.48, 10);
+    var topBarGeo = new THREE.CylinderGeometry(0.02, 0.02, 4.28, 10);
     topBarGeo.rotateZ(Math.PI / 2);
     var topBar = new THREE.Mesh(topBarGeo, brassMat);
-    topBar.position.set(0, 2.52, -6.5);
+    topBar.position.set(0, 2.5, -6.5);
     scene.add(topBar);
 
-    // Subtle Volumetric Ceiling Spotlight Cone shining onto the center display
+    // Subtle Volumetric Ceiling Spotlight Cone shining onto the 3-garment center display
     var spotCone = new THREE.Mesh(
-      new THREE.ConeGeometry(1.35, 3.6, 20, 1, true),
+      new THREE.ConeGeometry(2.6, 3.6, 24, 1, true),
       new THREE.MeshBasicMaterial({
         color: 0xfff3de,
         transparent: true,
-        opacity: 0.045,
+        opacity: 0.04,
         depthWrite: false,
         side: THREE.DoubleSide,
       })
@@ -704,32 +705,110 @@
     spotCone.position.set(0, 2.58, -6.5);
     scene.add(spotCone);
 
-    if (garmentItems[0]) {
-      var centerHanger = isBottomGarment(garmentItems[0])
-        ? createClipHangerMesh(brassMat, darkBronzeMat)
-        : createHangerMesh(brassMat);
-      centerHanger.position.set(0, 2.48, -6.5);
-      scene.add(centerHanger);
+    if (garmentItems.length > 0) {
+      var centerSlots = [
+        { x: -1.42, idx: 1 },
+        { x: 0, idx: 0 },
+        { x: 1.42, idx: 2 },
+      ];
+      centerSlots.forEach(function (slot) {
+        var cItem = garmentItems[slot.idx % garmentItems.length];
+        if (!cItem || !cItem.url) return;
 
-      // Subtle shadow on top of the pedestal under the featured piece
-      var pedShadow = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.85), shadowMat);
-      pedShadow.rotation.x = -Math.PI / 2;
-      pedShadow.position.set(0, 0.805, -6.5);
-      scene.add(pedShadow);
+        var centerHanger = isBottomGarment(cItem)
+          ? createClipHangerMesh(brassMat, darkBronzeMat)
+          : createHangerMesh(brassMat);
+        centerHanger.position.set(slot.x, 2.46, -6.5);
+        scene.add(centerHanger);
 
-      var heroPair = getSharedGarmentMaterial(garmentItems[0].url);
-      var heroGarment = new THREE.Mesh(sharedGarmentGeo, heroPair.mat);
-      heroGarment.position.set(0, 1.6, -6.5);
-      heroGarment.userData = {
-        title: garmentItems[0].title,
-        price: garmentItems[0].price,
-        href: garmentItems[0].href,
-        baseScale: 1,
-        targetScale: 1,
-      };
-      scene.add(heroGarment);
-      interactableMeshes.push(heroGarment);
+        var pedShadow = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 0.75), shadowMat);
+        pedShadow.rotation.x = -Math.PI / 2;
+        pedShadow.position.set(slot.x, 0.745, -6.5);
+        scene.add(pedShadow);
+
+        var heroPair = getSharedGarmentMaterial(cItem.url);
+        var heroGarment = new THREE.Mesh(sharedGarmentGeo, heroPair.mat);
+        heroGarment.position.set(slot.x, 1.58, -6.5);
+        heroGarment.userData = {
+          title: cItem.title,
+          price: cItem.price,
+          href: cItem.href,
+          baseScale: 1,
+          targetScale: 1,
+        };
+        scene.add(heroGarment);
+        interactableMeshes.push(heroGarment);
+      });
     }
+
+    // --- 6B. 2 Angled Front-Side Boutique Island Stands (z = -2.1, x = +-2.45) ---
+    var islandConfigs = [
+      { side: -1, idx: 3 },
+      { side: 1, idx: 4 },
+    ];
+    var islandPostGeo = new THREE.CylinderGeometry(0.015, 0.015, 1.7, 8);
+    var islandBarGeo = new THREE.CylinderGeometry(0.017, 0.017, 1.12, 8);
+    islandBarGeo.rotateZ(Math.PI / 2);
+
+    islandConfigs.forEach(function (cfg) {
+      var island = new THREE.Group();
+      island.position.set(cfg.side * 2.45, 0, -2.1);
+      island.rotation.y = cfg.side > 0 ? -0.62 : 0.62;
+
+      var iPlinth = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.56, 0.78), pillarMat);
+      iPlinth.position.set(0, 0.28, 0);
+      island.add(iPlinth);
+
+      var iTrim = new THREE.Mesh(new THREE.BoxGeometry(1.36, 0.035, 0.82), brassMat);
+      iTrim.position.set(0, 0.56, 0);
+      island.add(iTrim);
+
+      var iShadow = new THREE.Mesh(new THREE.PlaneGeometry(1.85, 1.3), shadowMat);
+      iShadow.rotation.x = -Math.PI / 2;
+      iShadow.position.set(0, 0.004, 0);
+      island.add(iShadow);
+
+      [-0.54, 0.54].forEach(function (ix) {
+        var iPost = new THREE.Mesh(islandPostGeo, brassMat);
+        iPost.position.set(ix, 1.43, 0);
+        island.add(iPost);
+
+        var iCollar = new THREE.Mesh(standBaseCollarGeo, darkBronzeMat);
+        iCollar.position.set(ix, 0.585, 0);
+        island.add(iCollar);
+      });
+
+      var iBar = new THREE.Mesh(islandBarGeo, brassMat);
+      iBar.position.set(0, 2.28, 0);
+      island.add(iBar);
+
+      if (garmentItems.length > 0) {
+        var iItem = garmentItems[cfg.idx % garmentItems.length];
+        if (iItem && iItem.url) {
+          var iHanger = isBottomGarment(iItem)
+            ? createClipHangerMesh(brassMat, darkBronzeMat)
+            : createHangerMesh(brassMat);
+          iHanger.position.set(0, 2.24, 0);
+          island.add(iHanger);
+
+          var iPair = getSharedGarmentMaterial(iItem.url);
+          var iGarment = new THREE.Mesh(sharedGarmentGeo, iPair.mat);
+          iGarment.position.set(0, 1.42, 0);
+          iGarment.scale.set(0.9, 0.9, 1);
+          iGarment.userData = {
+            title: iItem.title,
+            price: iItem.price,
+            href: iItem.href,
+            baseScale: 0.9,
+            targetScale: 0.9,
+          };
+          island.add(iGarment);
+          interactableMeshes.push(iGarment);
+        }
+      }
+
+      scene.add(island);
+    });
 
     // --- 7. Atmospheric Floating Golden Dust Motes ---
     var particleCount = 45;
@@ -906,9 +985,9 @@
         lastRaycastTime = nowMs;
         var hit = performRaycast(e.clientX, e.clientY);
         if (hit !== hoveredMesh) {
-          if (hoveredMesh) hoveredMesh.userData.targetScale = 1;
+          if (hoveredMesh) hoveredMesh.userData.targetScale = hoveredMesh.userData.baseScale || 1;
           hoveredMesh = hit;
-          if (hoveredMesh) hoveredMesh.userData.targetScale = 1.06;
+          if (hoveredMesh) hoveredMesh.userData.targetScale = (hoveredMesh.userData.baseScale || 1) * 1.06;
           updateProductPill(hoveredMesh);
         }
       }
