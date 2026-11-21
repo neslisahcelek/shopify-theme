@@ -151,28 +151,78 @@
   }
 
   /**
-   * 3D Minimalist Brushed-Brass Hanger Geometry (Hook + Shoulders)
+   * 3D Minimalist Brushed-Brass Shoulder Hanger Geometry (Tops)
    */
   function createHangerMesh(brassMat) {
     var group = new THREE.Group();
-    var barGeo = new THREE.CylinderGeometry(0.011, 0.011, 0.56, 8);
-    barGeo.rotateZ(Math.PI / 2);
-    var bar = new THREE.Mesh(barGeo, brassMat);
-    bar.position.y = -0.14;
-    group.add(bar);
+    var armGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.31, 8);
 
-    var stemGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.16, 8);
+    var leftArm = new THREE.Mesh(armGeo, brassMat);
+    leftArm.position.set(-0.14, -0.13, 0);
+    leftArm.rotation.z = Math.PI / 2 - 0.32;
+    group.add(leftArm);
+
+    var rightArm = new THREE.Mesh(armGeo, brassMat);
+    rightArm.position.set(0.14, -0.13, 0);
+    rightArm.rotation.z = -(Math.PI / 2 - 0.32);
+    group.add(rightArm);
+
+    var stemGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.11, 8);
     var stem = new THREE.Mesh(stemGeo, brassMat);
-    stem.position.y = -0.06;
+    stem.position.y = -0.04;
     group.add(stem);
 
     var hookGeo = new THREE.TorusGeometry(0.032, 0.008, 8, 16, Math.PI * 1.25);
     var hook = new THREE.Mesh(hookGeo, brassMat);
-    hook.position.set(0, 0.03, 0);
+    hook.position.set(0, 0.035, 0);
     hook.rotation.z = -0.35;
     group.add(hook);
 
     return group;
+  }
+
+  /**
+   * 3D Minimalist Brushed-Brass Clip Hanger Geometry (Shorts / Pants)
+   */
+  function createClipHangerMesh(brassMat, darkBronzeMat) {
+    var group = new THREE.Group();
+    var barGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.54, 8);
+    barGeo.rotateZ(Math.PI / 2);
+    var bar = new THREE.Mesh(barGeo, brassMat);
+    bar.position.y = -0.12;
+    group.add(bar);
+
+    var clipGeo = new THREE.BoxGeometry(0.032, 0.075, 0.026);
+    [-0.19, 0.19].forEach(function (cx) {
+      var clip = new THREE.Mesh(clipGeo, darkBronzeMat || brassMat);
+      clip.position.set(cx, -0.16, 0);
+      group.add(clip);
+    });
+
+    var stemGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.13, 8);
+    var stem = new THREE.Mesh(stemGeo, brassMat);
+    stem.position.y = -0.055;
+    group.add(stem);
+
+    var hookGeo = new THREE.TorusGeometry(0.032, 0.008, 8, 16, Math.PI * 1.25);
+    var hook = new THREE.Mesh(hookGeo, brassMat);
+    hook.position.set(0, 0.035, 0);
+    hook.rotation.z = -0.35;
+    group.add(hook);
+
+    return group;
+  }
+
+  function isBottomGarment(item) {
+    if (!item) return false;
+    var u = (item.url || '').toLowerCase();
+    var t = (item.title || '').toLowerCase();
+    return (
+      u.indexOf('rack-cutout-0') !== -1 ||
+      u.indexOf('rack-cutout-5') !== -1 ||
+      u.indexOf('rack-cutout-6') !== -1 ||
+      /short|pant|trouser|jean|cargo|bottom|skirt/.test(t)
+    );
   }
 
   function initWalkthrough() {
@@ -427,14 +477,25 @@
     function getSharedGarmentMaterial(url) {
       if (garmentMatCache[url]) return garmentMatCache[url];
 
-      var mat = new THREE.MeshBasicMaterial({
+      var mat = new THREE.MeshLambertMaterial({
+        map: placeholderTex,
+        color: 0xfbf7f0,
+        emissive: 0x1a1510,
+        emissiveIntensity: 0.16,
+        transparent: true,
+        opacity: 0,
+        alphaTest: 0.12,
+        side: THREE.DoubleSide,
+      });
+      var gShadowMat = new THREE.MeshBasicMaterial({
         map: placeholderTex,
         transparent: true,
         opacity: 0,
-        alphaTest: 0.06,
+        depthWrite: false,
         side: THREE.DoubleSide,
       });
-      garmentMatCache[url] = mat;
+      var pair = { mat: mat, shadowMat: gShadowMat };
+      garmentMatCache[url] = pair;
 
       var img = new Image();
       img.crossOrigin = 'anonymous';
@@ -452,7 +513,37 @@
           tex.magFilter = THREE.LinearFilter;
           if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
           tex.needsUpdate = true;
-          pendingTexQueue.push({ mat: mat, tex: tex });
+
+          // Compact 64x80 blurred silhouette shadow for wall depth
+          var sTemp = document.createElement('canvas');
+          sTemp.width = 64;
+          sTemp.height = 80;
+          var stCtx = sTemp.getContext('2d');
+          stCtx.drawImage(img, 0, 0, 64, 80);
+          stCtx.globalCompositeOperation = 'source-in';
+          stCtx.fillStyle = 'rgba(28, 22, 16, 0.38)';
+          stCtx.fillRect(0, 0, 64, 80);
+
+          var sBlur = document.createElement('canvas');
+          sBlur.width = 64;
+          sBlur.height = 80;
+          var sbCtx = sBlur.getContext('2d');
+          try {
+            sbCtx.filter = 'blur(4px)';
+          } catch (e) {}
+          sbCtx.drawImage(sTemp, 0, 0);
+          var gShadowTex = new THREE.CanvasTexture(sBlur);
+          gShadowTex.generateMipmaps = false;
+          gShadowTex.minFilter = THREE.LinearFilter;
+          gShadowTex.magFilter = THREE.LinearFilter;
+          gShadowTex.needsUpdate = true;
+
+          pendingTexQueue.push({
+            mat: mat,
+            tex: tex,
+            shadowMat: gShadowMat,
+            shadowTex: gShadowTex,
+          });
         };
         if (typeof img.decode === 'function') {
           img.decode().then(finishDecode).catch(finishDecode);
@@ -461,7 +552,7 @@
         }
       };
       img.src = url;
-      return mat;
+      return pair;
     }
 
     var rackZPositions = [4.4, -0.1, -4.6];
@@ -520,14 +611,24 @@
           var gx = rackX - side * 0.08;
           var gAngle = side > 0 ? -Math.PI / 2 + 0.28 : Math.PI / 2 - 0.28;
 
-          // 3D Brass Hanger connecting garment to rail
-          var hanger = createHangerMesh(brassMat);
+          // Proper 3D Brass Hanger (clip hanger for bottoms, shoulder hanger for tops)
+          var hanger = isBottomGarment(item)
+            ? createClipHangerMesh(brassMat, darkBronzeMat)
+            : createHangerMesh(brassMat);
           hanger.position.set(gx, 2.48, gz);
           hanger.rotation.y = gAngle;
           scene.add(hanger);
 
-          var gMat = getSharedGarmentMaterial(item.url);
-          var gMesh = new THREE.Mesh(sharedGarmentGeo, gMat);
+          var pair = getSharedGarmentMaterial(item.url);
+
+          // Soft silhouette wall shadow behind garment
+          var wallShadow = new THREE.Mesh(sharedGarmentGeo, pair.shadowMat);
+          wallShadow.position.set(gx + side * 0.24, 1.48, gz);
+          wallShadow.rotation.y = gAngle;
+          wallShadow.scale.set(1.04, 1.04, 1);
+          scene.add(wallShadow);
+
+          var gMesh = new THREE.Mesh(sharedGarmentGeo, pair.mat);
           gMesh.position.set(gx, 1.56, gz);
           gMesh.rotation.y = gAngle;
           gMesh.userData = {
@@ -561,23 +662,64 @@
     backSign.position.set(0, 3.05, -9.06);
     scene.add(backSign);
 
-    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.78, 1.5), pillarMat);
+    var pedestal = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.78, 1.5), pillarMat);
     pedestal.position.set(0, 0.39, -6.5);
     scene.add(pedestal);
-    addContactShadow(0, -6.5, 2.2, 2.2);
+    addContactShadow(0, -6.5, 2.35, 2.2);
 
-    var pedestalTrim = new THREE.Mesh(new THREE.BoxGeometry(1.54, 0.04, 1.54), brassMat);
+    var pedestalTrim = new THREE.Mesh(new THREE.BoxGeometry(1.69, 0.04, 1.54), brassMat);
     pedestalTrim.position.set(0, 0.78, -6.5);
     scene.add(pedestalTrim);
 
+    // Freestanding Brushed-Brass Display Stand mounted physically onto pedestal top
+    var standPostGeo = new THREE.CylinderGeometry(0.018, 0.018, 1.74, 10);
+    var standBaseCollarGeo = new THREE.CylinderGeometry(0.042, 0.048, 0.05, 12);
+    [-0.72, 0.72].forEach(function (px) {
+      var post = new THREE.Mesh(standPostGeo, brassMat);
+      post.position.set(px, 1.65, -6.5);
+      scene.add(post);
+
+      var collar = new THREE.Mesh(standBaseCollarGeo, darkBronzeMat);
+      collar.position.set(px, 0.805, -6.5);
+      scene.add(collar);
+    });
+
+    var topBarGeo = new THREE.CylinderGeometry(0.02, 0.02, 1.48, 10);
+    topBarGeo.rotateZ(Math.PI / 2);
+    var topBar = new THREE.Mesh(topBarGeo, brassMat);
+    topBar.position.set(0, 2.52, -6.5);
+    scene.add(topBar);
+
+    // Subtle Volumetric Ceiling Spotlight Cone shining onto the center display
+    var spotCone = new THREE.Mesh(
+      new THREE.ConeGeometry(1.35, 3.6, 20, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: 0xfff3de,
+        transparent: true,
+        opacity: 0.045,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      })
+    );
+    spotCone.position.set(0, 2.58, -6.5);
+    scene.add(spotCone);
+
     if (garmentItems[0]) {
-      var centerHanger = createHangerMesh(brassMat);
-      centerHanger.position.set(0, 2.36, -6.5);
+      var centerHanger = isBottomGarment(garmentItems[0])
+        ? createClipHangerMesh(brassMat, darkBronzeMat)
+        : createHangerMesh(brassMat);
+      centerHanger.position.set(0, 2.48, -6.5);
       scene.add(centerHanger);
 
-      var heroMat = getSharedGarmentMaterial(garmentItems[0].url);
-      var heroGarment = new THREE.Mesh(sharedGarmentGeo, heroMat);
-      heroGarment.position.set(0, 1.55, -6.5);
+      // Subtle shadow on top of the pedestal under the featured piece
+      var pedShadow = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.85), shadowMat);
+      pedShadow.rotation.x = -Math.PI / 2;
+      pedShadow.position.set(0, 0.805, -6.5);
+      scene.add(pedShadow);
+
+      var heroPair = getSharedGarmentMaterial(garmentItems[0].url);
+      var heroGarment = new THREE.Mesh(sharedGarmentGeo, heroPair.mat);
+      heroGarment.position.set(0, 1.6, -6.5);
       heroGarment.userData = {
         title: garmentItems[0].title,
         price: garmentItems[0].price,
@@ -844,6 +986,8 @@
         }
         doorGroupLeft.position.x = -3.21;
         doorGroupRight.position.x = 3.21;
+        doorGroupLeft.visible = false;
+        doorGroupRight.visible = false;
         enterInteractiveMode();
       }
     } catch (e) {}
@@ -854,6 +998,18 @@
         if (!rafId) rafId = requestAnimationFrame(renderLoop);
       }
     });
+
+    function applyQueuedTex(qItem) {
+      if (!qItem) return;
+      qItem.mat.map = qItem.tex;
+      qItem.mat.opacity = 1;
+      qItem.mat.needsUpdate = true;
+      if (qItem.shadowMat && qItem.shadowTex) {
+        qItem.shadowMat.map = qItem.shadowTex;
+        qItem.shadowMat.opacity = 0.82;
+        qItem.shadowMat.needsUpdate = true;
+      }
+    }
 
     // Pre-compile WebGL shaders before starting timer to eliminate first-frame stutter
     try {
@@ -872,10 +1028,7 @@
       if (!isInteractive && warmupFrames < 3) {
         warmupFrames++;
         while (pendingTexQueue.length > 0) {
-          var preItem = pendingTexQueue.shift();
-          preItem.mat.map = preItem.tex;
-          preItem.mat.opacity = 1;
-          preItem.mat.needsUpdate = true;
+          applyQueuedTex(pendingTexQueue.shift());
         }
         renderer.render(scene, camera);
         rafId = requestAnimationFrame(renderLoop);
@@ -905,10 +1058,7 @@
 
         // Only upload late-arriving garment textures after doors finish opening
         if (doorProgress >= 0.96 && pendingTexQueue.length > 0) {
-          var qItem = pendingTexQueue.shift();
-          qItem.mat.map = qItem.tex;
-          qItem.mat.opacity = 1;
-          qItem.mat.needsUpdate = true;
+          applyQueuedTex(pendingTexQueue.shift());
         }
 
         var walkEase = easeInOutCubic(progress);
@@ -923,10 +1073,7 @@
         }
       } else {
         if (pendingTexQueue.length > 0) {
-          var iqItem = pendingTexQueue.shift();
-          iqItem.mat.map = iqItem.tex;
-          iqItem.mat.opacity = 1;
-          iqItem.mat.needsUpdate = true;
+          applyQueuedTex(pendingTexQueue.shift());
         }
 
         for (var m = 0; m < interactableMeshes.length; m++) {
