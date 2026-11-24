@@ -34,6 +34,25 @@ html {
   }
 }
 
+/* Sıcak keten & yulaf zemin güvencesi (Shopify scheme fallback) */
+.ak-header,
+.ak-hero,
+.ak-section.color-scheme-1 {
+  background-color: var(--ak-cream);
+  color: var(--ak-espresso);
+}
+
+.ak-trust.color-scheme-2,
+.ak-section.color-scheme-2 {
+  background-color: var(--ak-oat);
+  color: var(--ak-espresso);
+}
+
+.announcement-bar-section .color-scheme-4 {
+  background-color: var(--ak-espresso);
+  color: var(--ak-cream);
+}
+
 .ak-container {
   max-width: var(--page-width, 1240px);
   margin: 0 auto;
@@ -105,12 +124,14 @@ html {
 }
 
 .ak-btn--primary {
-  background-color: rgb(var(--color-button));
-  color: rgb(var(--color-button-text));
+  background-color: var(--ak-terracotta);
+  color: #ffffff;
   box-shadow: 0 10px 24px -10px rgba(196, 125, 99, 0.55);
 }
 
 .ak-btn--primary:hover {
+  background-color: var(--ak-terracotta-dark);
+  color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 14px 28px -10px rgba(196, 125, 99, 0.7);
 }
@@ -938,18 +959,22 @@ html {
   text-decoration: none;
 }
 
-.ak-header__cart-count {
+.ak-header__cart .ak-header__cart-count {
   position: absolute;
-  top: -0.3rem;
-  right: -0.3rem;
-  min-width: 1.9rem;
-  height: 1.9rem;
-  padding: 0 0.4rem;
+  top: -0.4rem;
+  right: -0.4rem;
+  bottom: auto;
+  left: auto;
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0;
   border-radius: 999px;
   background: var(--ak-terracotta);
   color: #ffffff;
   font-size: 1.1rem;
   font-weight: 700;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
