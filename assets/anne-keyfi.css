@@ -37,19 +37,29 @@ html {
 /* Sıcak keten & yulaf zemin güvencesi (Shopify scheme fallback) */
 .ak-header,
 .ak-hero,
+.ak-section,
 .ak-section.color-scheme-1 {
   background-color: var(--ak-cream);
   color: var(--ak-espresso);
 }
 
+.ak-trust,
+#ak-hotspots,
+#ak-buybox,
+#ak-faq,
 .ak-trust.color-scheme-2,
 .ak-section.color-scheme-2 {
   background-color: var(--ak-oat);
   color: var(--ak-espresso);
 }
 
+.announcement-bar-section .utility-bar,
 .announcement-bar-section .color-scheme-4 {
   background-color: var(--ak-espresso);
+  color: var(--ak-cream);
+}
+
+.announcement-bar-section .announcement-bar__message {
   color: var(--ak-cream);
 }
 
@@ -1005,14 +1015,19 @@ html {
    ========================================================================== */
 .ak-hero__price-pill {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 0.4rem 0.9rem;
   padding: 0.7rem 1.5rem;
   border-radius: var(--ak-radius-pill);
   background: var(--ak-oat);
   color: var(--ak-espresso);
   font-size: 1.45rem;
   margin-bottom: 1.8rem;
+}
+
+.ak-hero__price-pill > * {
+  white-space: nowrap;
 }
 
 .ak-hero__price-pill strong {
