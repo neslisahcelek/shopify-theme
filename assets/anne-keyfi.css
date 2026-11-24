@@ -1,0 +1,826 @@
+/* ==========================================================================
+   Anne Keyfi — Sıcak Editoryal Tek Ürün Tasarım Sistemi (Craft + Sense)
+   ========================================================================== */
+
+:root {
+  --ak-cream: #f7f4f0;
+  --ak-oat: #eae3da;
+  --ak-sand: #dfd5c8;
+  --ak-espresso: #2e2a27;
+  --ak-stone: #6e655f;
+  --ak-terracotta: #c47d63;
+  --ak-terracotta-dark: #ae684f;
+  --ak-sage: #7d8c75;
+  --ak-border: rgba(46, 42, 39, 0.1);
+  --ak-shadow-soft: 0 14px 36px -14px rgba(46, 42, 39, 0.12);
+  --ak-radius-card: 20px;
+  --ak-radius-pill: 999px;
+  --ak-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+.ak-container {
+  max-width: var(--page-width, 1240px);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .ak-container {
+    padding: 0 4rem;
+  }
+}
+
+.ak-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: var(--ak-radius-pill);
+  background: rgba(196, 125, 99, 0.13);
+  color: var(--ak-terracotta-dark);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+}
+
+.ak-eyebrow--sage {
+  background: rgba(125, 140, 117, 0.16);
+  color: #4f5e47;
+}
+
+.ak-heading {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.16;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.4rem;
+  color: rgb(var(--color-foreground));
+}
+
+.ak-heading em {
+  font-style: italic;
+  color: var(--ak-terracotta-dark);
+}
+
+.ak-lead {
+  font-size: 1.65rem;
+  line-height: 1.65;
+  color: rgba(var(--color-foreground), 0.78);
+  margin: 0 0 2.4rem;
+}
+
+.ak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.35rem 2.6rem;
+  border-radius: var(--ak-radius-pill);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.25s var(--ak-ease), background-color 0.25s var(--ak-ease), box-shadow 0.25s var(--ak-ease), color 0.25s var(--ak-ease);
+}
+
+.ak-btn--primary {
+  background-color: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  box-shadow: 0 10px 24px -10px rgba(196, 125, 99, 0.55);
+}
+
+.ak-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -10px rgba(196, 125, 99, 0.7);
+}
+
+.ak-btn--secondary {
+  background-color: transparent;
+  color: rgb(var(--color-foreground));
+  border-color: rgba(var(--color-foreground), 0.22);
+}
+
+.ak-btn--secondary:hover {
+  background-color: rgba(var(--color-foreground), 0.05);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   1. Hero Section
+   ========================================================================== */
+.ak-hero {
+  padding: 3.6rem 0 5.4rem;
+}
+
+.ak-hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.2rem;
+  align-items: center;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-hero {
+    padding: 5.4rem 0 7rem;
+  }
+  .ak-hero__grid {
+    grid-template-columns: 1.05fr 1fr;
+    gap: 5.6rem;
+  }
+}
+
+.ak-hero__title {
+  font-size: clamp(3.2rem, 4.4vw, 5rem);
+}
+
+.ak-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  align-items: center;
+  margin-bottom: 2.6rem;
+}
+
+.ak-hero__highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--ak-border);
+}
+
+.ak-hero__highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  font-size: 1.35rem;
+  line-height: 1.45;
+  color: rgba(var(--color-foreground), 0.85);
+}
+
+.ak-hero__highlight-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--ak-terracotta);
+  margin-top: 0.55rem;
+  flex-shrink: 0;
+}
+
+.ak-hero__media-wrap {
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--ak-oat);
+  box-shadow: var(--ak-shadow-soft);
+  aspect-ratio: 4 / 4.2;
+}
+
+.ak-hero__media-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-hero__floating-badge {
+  position: absolute;
+  left: 2rem;
+  right: 2rem;
+  bottom: 2rem;
+  padding: 1.4rem 1.8rem;
+  border-radius: 16px;
+  background: rgba(247, 244, 240, 0.94);
+  color: var(--ak-espresso);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  box-shadow: 0 12px 30px rgba(46, 42, 39, 0.14);
+}
+
+.ak-hero__floating-badge strong {
+  display: block;
+  font-size: 1.45rem;
+}
+
+.ak-hero__floating-badge span {
+  font-size: 1.25rem;
+  color: var(--ak-stone);
+}
+
+/* ==========================================================================
+   2. Trust Strip
+   ========================================================================== */
+.ak-trust {
+  padding: 2.8rem 0;
+  border-top: 1px solid var(--ak-border);
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.ak-trust__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .ak-trust__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+}
+
+.ak-trust__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
+}
+
+.ak-trust__icon {
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 14px;
+  background: rgba(196, 125, 99, 0.14);
+  color: var(--ak-terracotta-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ak-trust__title {
+  margin: 0 0 0.3rem;
+  font-size: 1.55rem;
+  font-weight: 600;
+}
+
+.ak-trust__text {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: rgba(var(--color-foreground), 0.72);
+}
+
+/* ==========================================================================
+   3. Usage Positions (Sitting, Recline, Postpartum)
+   ========================================================================== */
+.ak-section {
+  padding: 5.6rem 0;
+}
+
+@media screen and (min-width: 750px) {
+  .ak-section {
+    padding: 7.4rem 0;
+  }
+}
+
+.ak-section-head {
+  text-align: center;
+  max-width: 68rem;
+  margin: 0 auto 4rem;
+}
+
+.ak-section-head .ak-heading {
+  font-size: clamp(2.6rem, 3.2vw, 3.8rem);
+}
+
+.ak-positions__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.4rem;
+}
+
+@media screen and (min-width: 900px) {
+  .ak-positions__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.8rem;
+  }
+}
+
+.ak-card {
+  background: var(--ak-cream);
+  border-radius: var(--ak-radius-card);
+  border: 1px solid var(--ak-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s var(--ak-ease), box-shadow 0.3s var(--ak-ease);
+}
+
+.ak-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ak-shadow-soft);
+}
+
+.ak-card__media {
+  aspect-ratio: 4 / 3;
+  background: var(--ak-oat);
+  overflow: hidden;
+  position: relative;
+}
+
+.ak-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-card__tag {
+  position: absolute;
+  top: 1.4rem;
+  left: 1.4rem;
+  padding: 0.45rem 1.2rem;
+  border-radius: var(--ak-radius-pill);
+  background: rgba(247, 244, 240, 0.94);
+  color: var(--ak-espresso);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.ak-card__body {
+  padding: 2.2rem 2.4rem 2.6rem;
+}
+
+.ak-card__title {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-heading-family);
+  font-size: 2rem;
+}
+
+.ak-card__text {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.6;
+  color: rgba(var(--color-foreground), 0.78);
+}
+
+/* ==========================================================================
+   4. Anatomy & Comparison Table
+   ========================================================================== */
+.ak-compare__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.6rem;
+  align-items: center;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-compare__grid {
+    grid-template-columns: 1fr 1.08fr;
+    gap: 5rem;
+  }
+}
+
+.ak-anatomy-box {
+  background: var(--ak-cream);
+  border: 1px solid var(--ak-border);
+  border-radius: 24px;
+  padding: 2.8rem;
+  box-shadow: var(--ak-shadow-soft);
+}
+
+.ak-specs-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.ak-spec-pill {
+  background: var(--ak-oat);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+}
+
+.ak-spec-pill span {
+  display: block;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ak-stone);
+}
+
+.ak-spec-pill strong {
+  font-size: 1.5rem;
+  color: var(--ak-espresso);
+}
+
+.ak-compare-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--ak-cream);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--ak-border);
+  box-shadow: var(--ak-shadow-soft);
+}
+
+.ak-compare-table th,
+.ak-compare-table td {
+  padding: 1.5rem 1.6rem;
+  text-align: left;
+  font-size: 1.4rem;
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.ak-compare-table thead th {
+  background: var(--ak-oat);
+  font-weight: 600;
+  font-size: 1.45rem;
+}
+
+.ak-compare-table thead th.is-brand {
+  background: var(--ak-espresso);
+  color: var(--ak-cream);
+}
+
+.ak-compare-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ak-compare-table td.is-brand {
+  background: rgba(196, 125, 99, 0.08);
+  font-weight: 500;
+}
+
+.ak-check-yes {
+  color: #4f6f46;
+  font-weight: 700;
+}
+
+.ak-check-no {
+  color: #a65c52;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   5. Featured Single Product Buy-Box & Color Swatches
+   ========================================================================== */
+.ak-buybox__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.4rem;
+  align-items: start;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-buybox__grid {
+    grid-template-columns: 1.05fr 1fr;
+    gap: 5.2rem;
+  }
+}
+
+.ak-gallery__main {
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--ak-oat);
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--ak-border);
+}
+
+.ak-gallery__main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-gallery__thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.ak-gallery__thumb {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ak-oat);
+  aspect-ratio: 1 / 1;
+  transition: border-color 0.2s var(--ak-ease), transform 0.2s var(--ak-ease);
+}
+
+.ak-gallery__thumb.is-active {
+  border-color: var(--ak-terracotta);
+}
+
+.ak-gallery__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-rating-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.35rem;
+  margin-bottom: 1rem;
+  color: var(--ak-stone);
+}
+
+.ak-stars {
+  color: #d49043;
+  letter-spacing: 0.1em;
+}
+
+.ak-buybox__title {
+  font-family: var(--font-heading-family);
+  font-size: clamp(2.6rem, 3vw, 3.4rem);
+  margin: 0 0 1rem;
+}
+
+.ak-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.8rem 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.ak-price-current {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--ak-espresso);
+  white-space: nowrap;
+}
+
+.ak-price-compare {
+  font-size: 1.7rem;
+  text-decoration: line-through;
+  color: var(--ak-stone);
+  white-space: nowrap;
+}
+
+.ak-price-badge {
+  padding: 0.35rem 1rem;
+  border-radius: var(--ak-radius-pill);
+  background: var(--ak-terracotta);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ak-swatches {
+  margin-bottom: 2.2rem;
+}
+
+.ak-swatches__label {
+  font-size: 1.4rem;
+  margin-bottom: 0.9rem;
+  display: block;
+}
+
+.ak-swatches__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+}
+
+.ak-swatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 1.3rem 0.65rem 0.75rem;
+  border-radius: var(--ak-radius-pill);
+  border: 1.5px solid var(--ak-border);
+  background: #ffffff;
+  color: var(--ak-espresso);
+  font-size: 1.35rem;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ak-ease), box-shadow 0.2s var(--ak-ease), transform 0.2s var(--ak-ease);
+}
+
+.ak-swatch-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ak-swatch-btn.is-active {
+  border-color: var(--ak-espresso);
+  box-shadow: 0 0 0 2px rgba(46, 42, 39, 0.14);
+  font-weight: 600;
+}
+
+.ak-swatch-dot {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
+}
+
+.ak-qty-submit {
+  display: flex;
+  gap: 1.2rem;
+  align-items: stretch;
+  margin-bottom: 1.4rem;
+}
+
+.ak-qty-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(46, 42, 39, 0.22);
+  border-radius: var(--ak-radius-pill);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.ak-qty-box button {
+  width: 4rem;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--ak-espresso);
+}
+
+.ak-qty-box input {
+  width: 4rem;
+  text-align: center;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--ak-espresso);
+}
+
+.ak-submit-btn {
+  flex: 1;
+  min-height: 5rem;
+}
+
+.ak-buybox__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  font-size: 1.3rem;
+  color: var(--ak-stone);
+  margin: 1.6rem 0 2.4rem;
+}
+
+/* ==========================================================================
+   6. Accordions (Sense-style Product Details & FAQ)
+   ========================================================================== */
+.ak-accordion {
+  border-top: 1px solid var(--ak-border);
+}
+
+.ak-accordion__item {
+  border-bottom: 1px solid var(--ak-border);
+}
+
+.ak-accordion__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 1.7rem 0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+}
+
+.ak-accordion__icon {
+  font-size: 2rem;
+  line-height: 1;
+  transition: transform 0.25s var(--ak-ease);
+}
+
+.ak-accordion__item[open] .ak-accordion__icon {
+  transform: rotate(45deg);
+}
+
+.ak-accordion__content {
+  padding: 0 0 1.8rem;
+  font-size: 1.45rem;
+  line-height: 1.65;
+  color: rgba(var(--color-foreground), 0.78);
+}
+
+/* ==========================================================================
+   7. Testimonials
+   ========================================================================== */
+.ak-reviews__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.2rem;
+}
+
+@media screen and (min-width: 900px) {
+  .ak-reviews__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ak-review-card {
+  background: var(--ak-cream);
+  border: 1px solid var(--ak-border);
+  border-radius: var(--ak-radius-card);
+  padding: 2.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.8rem;
+}
+
+.ak-review-card__quote {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.65;
+}
+
+.ak-review-card__author {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.ak-review-card__meta {
+  display: block;
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: var(--ak-stone);
+}
+
+/* ==========================================================================
+   8. Mobile Sticky Add To Cart Bar
+   ========================================================================== */
+.ak-sticky-atc {
+  position: fixed;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 40;
+  background: var(--ak-espresso);
+  color: var(--ak-cream);
+  border-radius: var(--ak-radius-pill);
+  padding: 0.9rem 1.2rem 0.9rem 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  box-shadow: 0 16px 36px rgba(46, 42, 39, 0.28);
+  transform: translateY(130%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s var(--ak-ease), opacity 0.3s var(--ak-ease);
+}
+
+.ak-sticky-atc.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-sticky-atc {
+    left: auto;
+    right: 2.8rem;
+    bottom: 2.4rem;
+    min-width: 38rem;
+  }
+}
+
+.ak-sticky-atc__info strong {
+  display: block;
+  font-size: 1.35rem;
+}
+
+.ak-sticky-atc__info span {
+  font-size: 1.25rem;
+  opacity: 0.82;
+}

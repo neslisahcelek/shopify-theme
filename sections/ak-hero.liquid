@@ -1,0 +1,242 @@
+{%- liquid
+  assign cta_anchor = section.settings.cta_anchor | default: '#ak-buybox'
+  assign secondary_anchor = section.settings.secondary_anchor | default: '#ak-positions'
+-%}
+
+<section
+  id="ak-hero-{{ section.id }}"
+  class="ak-hero color-{{ section.settings.color_scheme }} gradient"
+>
+  <div class="ak-container">
+    <div class="ak-hero__grid">
+      <div class="ak-hero__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="ak-eyebrow">{{ section.settings.eyebrow | escape }}</div>
+        {%- endif -%}
+
+        <h1 class="ak-heading ak-hero__title">
+          {{ section.settings.heading }}
+        </h1>
+
+        {%- if section.settings.subtext != blank -%}
+          <p class="ak-lead">{{ section.settings.subtext | escape }}</p>
+        {%- endif -%}
+
+        <div class="ak-hero__actions">
+          <a href="{{ cta_anchor }}" class="ak-btn ak-btn--primary">
+            {{ section.settings.cta_label | escape }}
+            <span aria-hidden="true">→</span>
+          </a>
+          {%- if section.settings.secondary_label != blank -%}
+            <a href="{{ secondary_anchor }}" class="ak-btn ak-btn--secondary">
+              {{ section.settings.secondary_label | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+
+        <div class="ak-hero__highlights">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'highlight' -%}
+              <div class="ak-hero__highlight-item" {{ block.shopify_attributes }}>
+                <span class="ak-hero__highlight-dot" aria-hidden="true"></span>
+                <span>{{ block.settings.text | escape }}</span>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div class="ak-hero__media-wrap">
+        {%- if section.settings.image != blank -%}
+          {%- assign hero_alt = section.settings.image.alt | default: section.settings.heading | strip_html | escape -%}
+          {{
+            section.settings.image
+            | image_url: width: 1200
+            | image_tag:
+              widths: '540, 760, 980, 1200',
+              sizes: '(min-width: 990px) 48vw, 94vw',
+              alt: hero_alt,
+              loading: 'eager',
+              fetchpriority: 'high'
+          }}
+        {%- else -%}
+          <svg
+            viewBox="0 0 600 630"
+            width="600"
+            height="630"
+            role="img"
+            aria-label="Anne Keyfi kolçaklı ergonomik hamile dinlenme yastığı illüstrasyonu"
+            style="width:100%;height:100%;display:block;"
+          >
+            <defs>
+              <linearGradient id="akHeroBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#EFE8DF" />
+                <stop offset="100%" stop-color="#DFD2C3" />
+              </linearGradient>
+              <linearGradient id="akPillowBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4B4E53" />
+                <stop offset="100%" stop-color="#2F3236" />
+              </linearGradient>
+            </defs>
+            <rect width="600" height="630" fill="url(#akHeroBg)" />
+            <circle cx="470" cy="130" r="110" fill="#E6D8C8" opacity="0.7" />
+            <circle cx="130" cy="500" r="140" fill="#E7DCD0" opacity="0.65" />
+            <!-- Soft backrest reading pillow silhouette -->
+            <ellipse cx="300" cy="485" rx="195" ry="26" fill="rgba(46,42,39,0.12)" />
+            <!-- Backrest upper arch -->
+            <path
+              d="M175 340 C175 185, 220 140, 300 140 C380 140, 425 185, 425 340 L425 440 L175 440 Z"
+              fill="url(#akPillowBody)"
+            />
+            <!-- Tuft / ergonomic lumbar seam -->
+            <path
+              d="M210 275 Q300 300 390 275"
+              fill="none"
+              stroke="rgba(255,255,255,0.18)"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+            <!-- Left armrest -->
+            <path
+              d="M120 355 C120 315, 160 300, 200 315 L220 445 C175 462, 120 450, 120 415 Z"
+              fill="#3B3E42"
+            />
+            <!-- Right armrest -->
+            <path
+              d="M480 355 C480 315, 440 300, 400 315 L380 445 C425 462, 480 450, 480 415 Z"
+              fill="#3B3E42"
+            />
+            <!-- Center seat cushion support -->
+            <rect x="190" y="370" width="220" height="82" rx="34" fill="#43464B" />
+            <!-- Subtle zipper accent -->
+            <path d="M425 310 L425 365" stroke="#C47D63" stroke-width="4" stroke-dasharray="5 5" stroke-linecap="round" />
+            <!-- Dimension badge inside visual -->
+            <rect x="40" y="42" width="166" height="44" rx="22" fill="#F7F4F0" />
+            <text x="123" y="69" text-anchor="middle" fill="#2E2A27" font-family="sans-serif" font-size="15" font-weight="600">
+              54 × 42 cm · Ergonomik
+            </text>
+          </svg>
+        {%- endif -%}
+
+        {%- if section.settings.badge_title != blank -%}
+          <div class="ak-hero__floating-badge">
+            <div>
+              <strong>{{ section.settings.badge_title | escape }}</strong>
+              <span>{{ section.settings.badge_subtitle | escape }}</span>
+            </div>
+            <span style="font-weight:700;color:#C47D63;">★ 4.9 / 5</span>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "AK · Hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Üst rozet",
+      "default": "Hamilelik & Dinlenme Konforu"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Ana başlık",
+      "default": "Otururken ve Uzanırken <em>Tam Bel & Kol Desteği</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Açıklama",
+      "default": "Hamilelik döneminde artan bel ve sırt yükünü hafifletmek için tasarlanan kolçaklı büyük boy destek yastığı. Kitap okurken, TV izlerken ya da yarı uzanırken vücudunuza uyum sağlar."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Birincil buton metni",
+      "default": "Renkleri İncele & Sipariş Ver"
+    },
+    {
+      "type": "text",
+      "id": "cta_anchor",
+      "label": "Birincil buton hedefi",
+      "default": "#ak-buybox"
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "İkincil buton metni",
+      "default": "Kullanım Pozisyonları"
+    },
+    {
+      "type": "text",
+      "id": "secondary_anchor",
+      "label": "İkincil buton hedefi",
+      "default": "#ak-positions"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero görseli"
+    },
+    {
+      "type": "text",
+      "id": "badge_title",
+      "label": "Görsel kart başlığı",
+      "default": "Fermuarlı Yıkanabilir Kılıf"
+    },
+    {
+      "type": "text",
+      "id": "badge_subtitle",
+      "label": "Görsel kart alt metni",
+      "default": "%65 Pamuklu Nefes Alan Doku · Boncuk Elyaf"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "highlight",
+      "name": "Kısa özellik",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Metin",
+          "default": "54 × 42 cm büyük ergonomik form"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Hero",
+      "blocks": [
+        {
+          "type": "highlight",
+          "settings": { "text": "54 × 42 cm geniş sırt & kolçak desteği" }
+        },
+        {
+          "type": "highlight",
+          "settings": { "text": "30°C'de yıkanabilir gizli fermuarlı kılıf" }
+        },
+        {
+          "type": "highlight",
+          "settings": { "text": "Formunu koruyan 650+ gr boncuk elyaf" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

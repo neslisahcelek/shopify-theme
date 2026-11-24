@@ -1,0 +1,174 @@
+<section
+  id="ak-positions"
+  class="ak-section color-{{ section.settings.color_scheme }} gradient"
+>
+  <div class="ak-container">
+    <div class="ak-section-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ak-eyebrow ak-eyebrow--sage">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      <h2 class="ak-heading">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subtext != blank -%}
+        <p class="ak-lead" style="margin-bottom:0;">{{ section.settings.subtext | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="ak-positions__grid">
+      {%- for block in section.blocks -%}
+        <article class="ak-card" {{ block.shopify_attributes }}>
+          <div class="ak-card__media">
+            {%- if block.settings.image != blank -%}
+              {%- assign pos_alt = block.settings.image.alt | default: block.settings.title | escape -%}
+              {{
+                block.settings.image
+                | image_url: width: 800
+                | image_tag:
+                  widths: '400, 600, 800',
+                  sizes: '(min-width: 900px) 30vw, 92vw',
+                  alt: pos_alt,
+                  loading: 'lazy'
+              }}
+            {%- else -%}
+              <svg
+                viewBox="0 0 400 300"
+                width="400"
+                height="300"
+                role="img"
+                aria-label="{{ block.settings.title | escape }}"
+                style="width:100%;height:100%;display:block;"
+              >
+                <rect width="400" height="300" fill="{% if forloop.index == 1 %}#EFE7DC{% elsif forloop.index == 2 %}#E5DDD2{% else %}#EAE4DB{% endif %}" />
+                <circle cx="200" cy="145" r="88" fill="rgba(196,125,99,0.14)" />
+                {%- if forloop.index == 1 -%}
+                  <!-- Upright sitting reading/TV -->
+                  <path d="M120 235 L280 235" stroke="#2E2A27" stroke-width="5" stroke-linecap="round" opacity="0.2" />
+                  <path d="M135 225 C135 135, 165 110, 200 110 C235 110, 265 135, 265 225 Z" fill="#3B3E42" />
+                  <rect x="108" y="175" width="44" height="54" rx="20" fill="#52555A" />
+                  <rect x="248" y="175" width="44" height="54" rx="20" fill="#52555A" />
+                {%- elsif forloop.index == 2 -%}
+                  <!-- Semi-reclined resting -->
+                  <g transform="rotate(-18 200 175)">
+                    <path d="M135 225 C135 140, 165 115, 200 115 C235 115, 265 140, 265 225 Z" fill="#C47D63" />
+                    <rect x="112" y="175" width="42" height="52" rx="18" fill="#AE684F" />
+                    <rect x="246" y="175" width="42" height="52" rx="18" fill="#AE684F" />
+                  </g>
+                {%- else -%}
+                  <!-- Postpartum / Nursing -->
+                  <path d="M135 225 C135 135, 165 110, 200 110 C235 110, 265 135, 265 225 Z" fill="#7D8C75" />
+                  <rect x="108" y="170" width="46" height="58" rx="22" fill="#687761" />
+                  <rect x="246" y="170" width="46" height="58" rx="22" fill="#687761" />
+                {%- endif -%}
+              </svg>
+            {%- endif -%}
+
+            {%- if block.settings.tag != blank -%}
+              <span class="ak-card__tag">{{ block.settings.tag | escape }}</span>
+            {%- endif -%}
+          </div>
+
+          <div class="ak-card__body">
+            <h3 class="ak-card__title">{{ block.settings.title | escape }}</h3>
+            <p class="ak-card__text">{{ block.settings.text | escape }}</p>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "AK · Kullanım Alanları",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Üst rozet",
+      "default": "Günün Her Anında Yanınızda"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Otururken de Uzanırken de <em>Rahat Hisset</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Alt açıklama",
+      "default": "Tek yastıkla üç farklı ihtiyaca cevap veren ergonomik tasarım. Gebelik boyunca sırt ağrılarını azaltır, doğum sonrasında da kullanılmaya devam eder."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "position",
+      "name": "Kullanım pozisyonu",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Pozisyon görseli"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Etiket",
+          "default": "Dik Oturuş"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Başlık",
+          "default": "Okuma & TV Keyfi"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Açıklama",
+          "default": "Yatakta veya koltukta dik otururken bel çukurunu doldurur; yan kolçakları sayesinde dirsekleriniz ve omuzlarınız yorulmaz."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Kullanım Alanları",
+      "blocks": [
+        {
+          "type": "position",
+          "settings": {
+            "tag": "1. Pozisyon · Otururken",
+            "title": "Okuma & TV İzleme Desteği",
+            "text": "Koltukta ya da yatak başında dik otururken bel boşluğunu tamamen doldurur, yan kolçaklarıyla kollarınızı rahatça dinlendirir."
+          }
+        },
+        {
+          "type": "position",
+          "settings": {
+            "tag": "2. Pozisyon · Yatarken",
+            "title": "Yarı Uzanma & Dinlenme",
+            "text": "Hamilelikte sırtüstü düz yatmak zorlaştığında yastığı hafif eğimli yerleştirerek nefes almayı kolaylaştıran güvenli bir eğim sağlar."
+          }
+        },
+        {
+          "type": "position",
+          "settings": {
+            "tag": "3. Pozisyon · Doğum Sonrası",
+            "title": "Emzirme & Anne-Bebek Konforu",
+            "text": "Doğum sonrasında bebeğinizi emzirirken sırtınızı dik tutmanıza ve kolunuzun altına doğal destek almanıza yardımcı olur."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

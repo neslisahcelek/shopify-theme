@@ -1,0 +1,158 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title"
+        },
+        "price": {
+          "type": "price"
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "circle"
+          }
+        },
+        "quantity_selector": {
+          "type": "quantity_selector"
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": false
+          }
+        },
+        "description": {
+          "type": "description"
+        },
+        "collapsible_care": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Yıkama & Bakım Talimatı",
+            "icon": "washing",
+            "content": "<p>Gizli fermuarlı %65 Pamuk / %35 Polyester dış kılıfı 30°C hassas programda yıkayabilirsiniz. Ağartıcı ve kurutma makinesi kullanmayınız.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_specs": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Ölçüler & Dolgu Bilgisi",
+            "icon": "ruler",
+            "content": "<p>54 × 42 cm boyutlarında, 650+ gr yüksek hacimli boncuk elyaf dolgu ile üretilmiştir.</p>",
+            "page": ""
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {
+            "share_label": "Paylaş"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "variant_picker",
+        "quantity_selector",
+        "buy_buttons",
+        "description",
+        "collapsible_care",
+        "collapsible_specs",
+        "share"
+      ],
+      "settings": {
+        "enable_sticky_info": true,
+        "color_scheme": "scheme-1",
+        "media_position": "left",
+        "gallery_layout": "thumbnail_slider",
+        "media_size": "medium",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "image_zoom": "lightbox",
+        "mobile_thumbnails": "show",
+        "hide_variants": false,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 24
+      }
+    },
+    "ak_positions": {
+      "type": "ak-usage-positions",
+      "blocks": {
+        "pos_1": {
+          "type": "position",
+          "settings": {
+            "tag": "1. Pozisyon · Otururken",
+            "title": "Okuma & TV İzleme Desteği",
+            "text": "Koltukta ya da yatak başında dik otururken bel boşluğunu tamamen doldurur, yan kolçaklarıyla kollarınızı rahatça dinlendirir."
+          }
+        },
+        "pos_2": {
+          "type": "position",
+          "settings": {
+            "tag": "2. Pozisyon · Yatarken",
+            "title": "Yarı Uzanma & Dinlenme",
+            "text": "Hamilelikte sırtüstü düz yatmak zorlaştığında yastığı hafif eğimli yerleştirerek nefes almayı kolaylaştıran güvenli bir eğim sağlar."
+          }
+        },
+        "pos_3": {
+          "type": "position",
+          "settings": {
+            "tag": "3. Pozisyon · Doğum Sonrası",
+            "title": "Emzirme & Anne-Bebek Konforu",
+            "text": "Doğum sonrasında bebeğinizi emzirirken sırtınızı dik tutmanıza ve kolunuzun altına doğal destek almanıza yardımcı olur."
+          }
+        }
+      },
+      "block_order": [
+        "pos_1",
+        "pos_2",
+        "pos_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Günün Her Anında Yanınızda",
+        "heading": "Otururken de Uzanırken de <em>Rahat Hisset</em>",
+        "subtext": "Tek yastıkla üç farklı ihtiyaca cevap veren ergonomik tasarım."
+      }
+    },
+    "ak_faq": {
+      "type": "ak-faq",
+      "blocks": {
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Kılıfı çıkarılıp makinede yıkanır mı?",
+            "answer": "<p>Evet. Gizli fermuarı sayesinde dış kılıf tamamen çıkarılır ve 30°C hassas programda güvenle yıkanabilir.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "İç dolgusu zamanla çöker mi?",
+            "answer": "<p>İçerisinde 650+ gr yüksek hacimli boncuk elyaf kullanılmıştır. Formunu uzun süre korur.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_1",
+        "faq_2"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "Merak Edilenler",
+        "heading": "Sıkça Sorulan <em>Sorular</em>"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "ak_positions",
+    "ak_faq"
+  ]
+}

@@ -1,0 +1,115 @@
+<section id="ak-faq" class="ak-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="ak-container" style="max-width:86rem;">
+    <div class="ak-section-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ak-eyebrow ak-eyebrow--sage">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      <h2 class="ak-heading">{{ section.settings.heading }}</h2>
+    </div>
+
+    <div class="ak-accordion">
+      {%- for block in section.blocks -%}
+        <details class="ak-accordion__item" {% if forloop.first %}open{% endif %} {{ block.shopify_attributes }}>
+          <summary class="ak-accordion__trigger">
+            <span>{{ block.settings.question | escape }}</span>
+            <span class="ak-accordion__icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="ak-accordion__content">
+            {{ block.settings.answer }}
+          </div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "AK · SSS",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Üst rozet",
+      "default": "Merak Edilenler"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Sıkça Sorulan <em>Sorular</em>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "Soru",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Soru",
+          "default": "Kılıfı çıkarılıp yıkanabiliyor mu?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Cevap",
+          "default": "<p>Evet, yastığın dış kılıfı gizli fermuarlıdır. Kolayca çıkarıp çamaşır makinesinde 30°C hassas programda yıkayabilirsiniz.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · SSS",
+      "blocks": [
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Hamileliğin kaçıncı ayından itibaren kullanılabilir?",
+            "answer": "<p>İlk aylardan itibaren bel ve sırt yorgunluğunu önlemek için kullanılabilir; özellikle 2. ve 3. trimesterde otururken ve yarı uzanırken büyük rahatlık sağlar.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Yastık sadece otururken mi, yatarken de kullanılabilir mi?",
+            "answer": "<p>Hem koltukta ve yatakta dik otururken hem de yatak başlığına yaslayıp yarı uzanır pozisyonda dinlenirken kullanılmak üzere tasarlanmıştır.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Kılıfı çıkarılıp makinede yıkanır mı?",
+            "answer": "<p>Evet. Gizli fermuarı sayesinde dış kılıf tamamen çıkarılır ve 30°C hassas programda güvenle yıkanabilir.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "İç dolgusu zamanla çöker mi?",
+            "answer": "<p>İçerisinde 650+ gr yüksek hacimli boncuk elyaf kullanılmıştır. Lif yapısı formunu uzun süre korur ve yaslandığınızda bel boşluğunuza göre şekil alır.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Doğum sonrasında emzirme döneminde işe yarar mı?",
+            "answer": "<p>Kesinlikle. Yan kolçakları emzirme sırasında kolunuzu destekler, yüksek sırt kısmı ise omuz ve boyun tutulmalarını azaltır.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

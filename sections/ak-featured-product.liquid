@@ -1,0 +1,425 @@
+{%- liquid
+  assign ak_product = section.settings.product
+  if ak_product == blank
+    assign ak_product = collections.all.products.first
+  endif
+
+  assign current_variant = ak_product.selected_or_first_available_variant
+  assign demo_mode = false
+  if ak_product == blank
+    assign demo_mode = true
+  endif
+-%}
+
+<section
+  id="ak-buybox"
+  class="ak-section color-{{ section.settings.color_scheme }} gradient"
+  data-ak-buybox
+  data-money-format="{{ shop.money_format | escape }}"
+  data-add-text="{{ section.settings.add_label | escape }}"
+  data-sold-out-text="Tükendi"
+>
+  <div class="ak-container">
+    <div class="ak-buybox__grid">
+      <!-- Sol: Ürün Galerisi -->
+      <div class="ak-gallery">
+        <div class="ak-gallery__main">
+          {%- if ak_product != blank and ak_product.featured_media != blank -%}
+            {%- assign first_media = current_variant.featured_media | default: ak_product.featured_media -%}
+            <img
+              data-ak-main-img
+              src="{{ first_media | image_url: width: 1100 }}"
+              alt="{{ first_media.alt | default: ak_product.title | escape }}"
+              width="1100"
+              height="1100"
+              loading="lazy"
+            >
+          {%- else -%}
+            <svg
+              viewBox="0 0 600 600"
+              width="600"
+              height="600"
+              role="img"
+              aria-label="Anne Keyfi Kolçaklı Ergonomik Yastık"
+              style="width:100%;height:100%;display:block;background:#EFE8DF;"
+            >
+              <circle cx="300" cy="300" r="220" fill="#E6DDD1" />
+              <ellipse cx="300" cy="465" rx="180" ry="22" fill="rgba(46,42,39,0.12)" />
+              <path
+                data-ak-demo-pillow
+                d="M170 330 C170 175, 215 130, 300 130 C385 130, 430 175, 430 330 L430 430 L170 430 Z"
+                fill="#3B3E42"
+                style="transition: fill 0.3s ease;"
+              />
+              <path
+                data-ak-demo-arm
+                d="M115 345 C115 305, 155 292, 196 308 L215 436 C170 452, 115 440, 115 405 Z"
+                fill="#3B3E42"
+                style="transition: fill 0.3s ease;"
+              />
+              <path
+                data-ak-demo-arm
+                d="M485 345 C485 305, 445 292, 404 308 L385 436 C430 452, 485 440, 485 405 Z"
+                fill="#3B3E42"
+                style="transition: fill 0.3s ease;"
+              />
+              <rect x="188" y="362" width="224" height="78" rx="32" fill="rgba(0,0,0,0.14)" />
+              <path d="M210 265 Q300 292 390 265" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="3" stroke-linecap="round" />
+            </svg>
+          {%- endif -%}
+        </div>
+
+        {%- if ak_product != blank and ak_product.media.size > 1 -%}
+          <div class="ak-gallery__thumbs">
+            {%- for media in ak_product.media limit: 5 -%}
+              <button
+                type="button"
+                class="ak-gallery__thumb{% if forloop.first %} is-active{% endif %}"
+                data-ak-thumb
+                data-src="{{ media | image_url: width: 1100 }}"
+                data-alt="{{ media.alt | default: ak_product.title | escape }}"
+                aria-label="Ürün görseli {{ forloop.index }}"
+              >
+                <img
+                  src="{{ media | image_url: width: 220 }}"
+                  alt="{{ media.alt | default: ak_product.title | escape }}"
+                  width="220"
+                  height="220"
+                  loading="lazy"
+                >
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- Sağ: Satın Alma Kutusu -->
+      <div>
+        <div class="ak-rating-row">
+          <span class="ak-stars" aria-hidden="true">★★★★★</span>
+          <span>{{ section.settings.rating_text | escape }}</span>
+        </div>
+
+        <h2 class="ak-buybox__title">
+          {%- if demo_mode -%}
+            {{ section.settings.demo_title | escape }}
+          {%- else -%}
+            {{ ak_product.title | escape }}
+          {%- endif -%}
+        </h2>
+
+        <div class="ak-price-row">
+          <span class="ak-price-current" data-ak-price>
+            {%- if demo_mode -%}
+              {{ section.settings.demo_price | escape }}
+            {%- else -%}
+              {{ current_variant.price | money }}
+            {%- endif -%}
+          </span>
+
+          {%- if demo_mode and section.settings.demo_compare_price != blank -%}
+            <span class="ak-price-compare" data-ak-compare>{{ section.settings.demo_compare_price | escape }}</span>
+          {%- elsif ak_product != blank -%}
+            <span
+              class="ak-price-compare"
+              data-ak-compare
+              {% unless current_variant.compare_at_price > current_variant.price %}hidden{% endunless %}
+            >
+              {{ current_variant.compare_at_price | money }}
+            </span>
+          {%- endif -%}
+
+          {%- if section.settings.promo_badge != blank -%}
+            <span class="ak-price-badge">{{ section.settings.promo_badge | escape }}</span>
+          {%- endif -%}
+        </div>
+
+        <p class="ak-lead" style="font-size:1.5rem;margin-bottom:2.2rem;">
+          {{ section.settings.short_description | escape }}
+        </p>
+
+        <form method="post" action="{{ routes.cart_add_url }}" data-ak-form>
+          <input
+            type="hidden"
+            name="id"
+            value="{% unless demo_mode %}{{ current_variant.id }}{% endunless %}"
+          >
+
+          {%- if demo_mode -%}
+            <div class="ak-swatches">
+              <span class="ak-swatches__label">
+                Renk Seçimi: <strong data-ak-active-color>Antrasit</strong>
+              </span>
+              <div class="ak-swatches__list">
+                <button type="button" class="ak-swatch-btn is-active" data-ak-swatch data-option-index="0" data-value="Antrasit" data-hex="#3B3E42" aria-pressed="true">
+                  <span class="ak-swatch-dot" style="background:#3B3E42;"></span>
+                  <span>Antrasit</span>
+                </button>
+                <button type="button" class="ak-swatch-btn" data-ak-swatch data-option-index="0" data-value="Krem Ekru" data-hex="#DDD4C6" aria-pressed="false">
+                  <span class="ak-swatch-dot" style="background:#EFE9DF;"></span>
+                  <span>Krem Ekru</span>
+                </button>
+                <button type="button" class="ak-swatch-btn" data-ak-swatch data-option-index="0" data-value="Gül Kurusu" data-hex="#C47D63" aria-pressed="false">
+                  <span class="ak-swatch-dot" style="background:#C47D63;"></span>
+                  <span>Gül Kurusu</span>
+                </button>
+                <button type="button" class="ak-swatch-btn" data-ak-swatch data-option-index="0" data-value="Adaçayı" data-hex="#7D8C75" aria-pressed="false">
+                  <span class="ak-swatch-dot" style="background:#7D8C75;"></span>
+                  <span>Adaçayı</span>
+                </button>
+              </div>
+            </div>
+          {%- elsif ak_product.has_only_default_variant == false -%}
+            {%- for option in ak_product.options_with_values -%}
+              <div class="ak-swatches">
+                <span class="ak-swatches__label">
+                  {{ option.name | escape }}:
+                  <strong {% if forloop.first %}data-ak-active-color{% endif %}>{{ option.selected_value | escape }}</strong>
+                </span>
+                <div class="ak-swatches__list">
+                  {%- for value in option.values -%}
+                    {%- liquid
+                      assign lower_val = value | downcase
+                      assign swatch_hex = '#C9B8A8'
+                      if lower_val contains 'antrasit' or lower_val contains 'anthracite'
+                        assign swatch_hex = '#3B3E42'
+                      elsif lower_val contains 'krem' or lower_val contains 'ekru' or lower_val contains 'cream'
+                        assign swatch_hex = '#EFE9DF'
+                      elsif lower_val contains 'gül' or lower_val contains 'pudra' or lower_val contains 'terracotta' or lower_val contains 'pembe'
+                        assign swatch_hex = '#C47D63'
+                      elsif lower_val contains 'adaçayı' or lower_val contains 'yeşil' or lower_val contains 'sage'
+                        assign swatch_hex = '#7D8C75'
+                      elsif lower_val contains 'siyah' or lower_val contains 'black'
+                        assign swatch_hex = '#1F1E1D'
+                      elsif lower_val contains 'gri' or lower_val contains 'grey'
+                        assign swatch_hex = '#8E8E93'
+                      elsif lower_val contains 'lacivert' or lower_val contains 'mavi'
+                        assign swatch_hex = '#2E3A59'
+                      elsif lower_val contains 'beyaz' or lower_val contains 'white'
+                        assign swatch_hex = '#F8F6F2'
+                      endif
+                    -%}
+                    <button
+                      type="button"
+                      class="ak-swatch-btn{% if option.selected_value == value %} is-active{% endif %}"
+                      data-ak-swatch
+                      data-option-index="{{ forloop.parentloop.index0 }}"
+                      data-value="{{ value | escape }}"
+                      data-hex="{{ swatch_hex }}"
+                      aria-pressed="{% if option.selected_value == value %}true{% else %}false{% endif %}"
+                    >
+                      <span class="ak-swatch-dot" style="background:{{ swatch_hex }};"></span>
+                      <span>{{ value | escape }}</span>
+                    </button>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+
+          <div class="ak-qty-submit">
+            <div class="ak-qty-box">
+              <button type="button" data-ak-qty-minus aria-label="Adeti azalt">−</button>
+              <input type="number" name="quantity" value="1" min="1" max="20" aria-label="Adet">
+              <button type="button" data-ak-qty-plus aria-label="Adeti artır">+</button>
+            </div>
+            <button
+              type="submit"
+              class="ak-btn ak-btn--primary ak-submit-btn"
+              data-ak-submit
+              {% if ak_product != blank and current_variant.available == false %}disabled{% endif %}
+            >
+              {%- if ak_product != blank and current_variant.available == false -%}
+                Tükendi
+              {%- else -%}
+                {{ section.settings.add_label | escape }}
+              {%- endif -%}
+            </button>
+          </div>
+
+          <p data-ak-feedback hidden style="margin:0 0 1.2rem;font-size:1.35rem;color:#AE684F;font-weight:500;"></p>
+        </form>
+
+        <div class="ak-buybox__perks">
+          <span>✓ Ücretsiz Kargo</span>
+          <span>✓ 30°C Yıkanabilir Fermuarlı Kılıf</span>
+          <span>✓ Yerli Üretim (54 × 42 cm)</span>
+        </div>
+
+        <!-- Sense Tarzı Ürün Akordeonları -->
+        <div class="ak-accordion">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'accordion' -%}
+              <details class="ak-accordion__item" {% if forloop.first %}open{% endif %} {{ block.shopify_attributes }}>
+                <summary class="ak-accordion__trigger">
+                  <span>{{ block.settings.title | escape }}</span>
+                  <span class="ak-accordion__icon" aria-hidden="true">+</span>
+                </summary>
+                <div class="ak-accordion__content">
+                  {{ block.settings.content }}
+                </div>
+              </details>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yapışkan Sepete Ekle Çubuğu -->
+  <div class="ak-sticky-atc" data-ak-sticky-bar aria-label="Hızlı satın alma çubuğu">
+    <div class="ak-sticky-atc__info">
+      <strong>
+        {%- if demo_mode -%}
+          {{ section.settings.demo_title | escape }}
+        {%- else -%}
+          {{ ak_product.title | escape }}
+        {%- endif -%}
+      </strong>
+      <span>
+        Renk: <em data-ak-sticky-color style="font-style:normal;">Antrasit</em> ·
+        <strong data-ak-sticky-price style="display:inline;font-size:1.25rem;">
+          {%- if demo_mode -%}
+            {{ section.settings.demo_price | escape }}
+          {%- else -%}
+            {{ current_variant.price | money }}
+          {%- endif -%}
+        </strong>
+      </span>
+    </div>
+    <button type="button" class="ak-btn ak-btn--primary" data-ak-sticky-submit style="padding:1rem 2rem;font-size:1.35rem;">
+      {{ section.settings.add_label | escape }}
+    </button>
+  </div>
+
+  {%- if ak_product != blank -%}
+    <script type="application/json" data-ak-variants-json>
+      {{ ak_product.variants | json }}
+    </script>
+  {%- endif -%}
+</section>
+
+<script src="{{ 'ak-buybox.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "AK · Tek Ürün Kutusu",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Ana ürün (boş bırakılırsa ilk ürün otomatik seçilir)"
+    },
+    {
+      "type": "text",
+      "id": "rating_text",
+      "label": "Puanlama metni",
+      "default": "4.9 (140+ Mutlu Anne)"
+    },
+    {
+      "type": "text",
+      "id": "promo_badge",
+      "label": "Kampanya etiketi",
+      "default": "Ücretsiz Kargo"
+    },
+    {
+      "type": "textarea",
+      "id": "short_description",
+      "label": "Kısa ürün açıklaması",
+      "default": "Kolçaklı yapısıyla otururken bel ve kolları destekleyen, yarı uzanma pozisyonunda rahat nefes almayı sağlayan 54 × 42 cm büyük boy ergonomik yastık."
+    },
+    {
+      "type": "text",
+      "id": "add_label",
+      "label": "Sepete ekle metni",
+      "default": "Sepete Ekle"
+    },
+    {
+      "type": "header",
+      "content": "Önizleme (Ürün henüz eklenmemişse)"
+    },
+    {
+      "type": "text",
+      "id": "demo_title",
+      "label": "Önizleme başlığı",
+      "default": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı"
+    },
+    {
+      "type": "text",
+      "id": "demo_price",
+      "label": "Önizleme fiyatı",
+      "default": "1.290,00 TL"
+    },
+    {
+      "type": "text",
+      "id": "demo_compare_price",
+      "label": "Önizleme eski fiyat",
+      "default": "1.590,00 TL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion",
+      "name": "Bilgi akordeonu",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Akordeon başlığı",
+          "default": "Kumaş & İç Dolgu Özellikleri"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "İçerik",
+          "default": "<p>%65 Pamuk / %35 Polyester nefes alan, solmaya dayanıklı dış kumaş. İç dolguda çökme yapmayan 650+ gr birinci sınıf boncuk elyaf kullanılmıştır.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Tek Ürün Kutusu",
+      "blocks": [
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Kumaş & İç Dolgu Özellikleri",
+            "content": "<p>%65 Pamuk / %35 Polyester nefes alan, yumuşak dokulu dış kumaş. İç dolguda vücut şeklinize uyum sağlayan 650+ gr boncuk elyaf bulunur.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Ölçüler & Ergonomik Yapı",
+            "content": "<p><strong>Genişlik:</strong> 54 cm · <strong>Yükseklik:</strong> 42 cm. Geniş yan kolçakları sayesinde otururken dirseklerinizi ve sırtınızı aynı anda destekler.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Yıkama & Bakım Talimatı",
+            "content": "<p>Gizli fermuarı açarak dış kılıfı çıkarabilir, çamaşır makinesinde 30°C hassas programda yıkayabilirsiniz. Ağartıcı ve kurutma makinesi önerilmez.</p>"
+          }
+        },
+        {
+          "type": "accordion",
+          "settings": {
+            "title": "Kargo & İade Güvencesi",
+            "content": "<p>Tüm siparişler özenle paketlenerek ücretsiz kargo ile gönderilir. Teslimattan itibaren 14 gün içinde kolay iade hakkınız bulunur.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

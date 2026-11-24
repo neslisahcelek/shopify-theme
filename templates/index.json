@@ -1,0 +1,331 @@
+{
+  "sections": {
+    "ak_hero": {
+      "type": "ak-hero",
+      "blocks": {
+        "highlight_1": {
+          "type": "highlight",
+          "settings": {
+            "text": "54 × 42 cm geniş sırt & kolçak desteği"
+          }
+        },
+        "highlight_2": {
+          "type": "highlight",
+          "settings": {
+            "text": "30°C'de yıkanabilir gizli fermuarlı kılıf"
+          }
+        },
+        "highlight_3": {
+          "type": "highlight",
+          "settings": {
+            "text": "Formunu koruyan 650+ gr boncuk elyaf"
+          }
+        }
+      },
+      "block_order": [
+        "highlight_1",
+        "highlight_2",
+        "highlight_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "Hamilelik & Dinlenme Konforu",
+        "heading": "Otururken ve Uzanırken <em>Tam Bel & Kol Desteği</em>",
+        "subtext": "Hamilelik döneminde artan bel ve sırt yükünü hafifletmek için tasarlanan kolçaklı büyük boy destek yastığı. Kitap okurken, TV izlerken ya da yarı uzanırken vücudunuza uyum sağlar.",
+        "cta_label": "Renkleri İncele & Sipariş Ver",
+        "cta_anchor": "#ak-buybox",
+        "secondary_label": "Kullanım Pozisyonları",
+        "secondary_anchor": "#ak-positions",
+        "badge_title": "Fermuarlı Yıkanabilir Kılıf",
+        "badge_subtitle": "%65 Pamuklu Nefes Alan Doku · Boncuk Elyaf"
+      }
+    },
+    "ak_trust": {
+      "type": "ak-trust-strip",
+      "blocks": {
+        "trust_1": {
+          "type": "item",
+          "settings": {
+            "icon": "support",
+            "title": "Kolçaklı Ergonomik Tasarım",
+            "text": "Dik oturuşta bel ve sırtı sarar, kolların yorulmasını önler."
+          }
+        },
+        "trust_2": {
+          "type": "item",
+          "settings": {
+            "icon": "wash",
+            "title": "30°C Yıkanabilir Kılıf",
+            "text": "Gizli fermuarı sayesinde kılıfı kolayca çıkarıp yıkayabilirsiniz."
+          }
+        },
+        "trust_3": {
+          "type": "item",
+          "settings": {
+            "icon": "cotton",
+            "title": "%65 Pamuklu & Boncuk Elyaf",
+            "text": "Terletmeyen doğal doku ve uzun süre çökme yapmayan 650+ gr dolgu."
+          }
+        }
+      },
+      "block_order": [
+        "trust_1",
+        "trust_2",
+        "trust_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2"
+      }
+    },
+    "ak_positions": {
+      "type": "ak-usage-positions",
+      "blocks": {
+        "pos_1": {
+          "type": "position",
+          "settings": {
+            "tag": "1. Pozisyon · Otururken",
+            "title": "Okuma & TV İzleme Desteği",
+            "text": "Koltukta ya da yatak başında dik otururken bel boşluğunu tamamen doldurur, yan kolçaklarıyla kollarınızı rahatça dinlendirir."
+          }
+        },
+        "pos_2": {
+          "type": "position",
+          "settings": {
+            "tag": "2. Pozisyon · Yatarken",
+            "title": "Yarı Uzanma & Dinlenme",
+            "text": "Hamilelikte sırtüstü düz yatmak zorlaştığında yastığı hafif eğimli yerleştirerek nefes almayı kolaylaştıran güvenli bir eğim sağlar."
+          }
+        },
+        "pos_3": {
+          "type": "position",
+          "settings": {
+            "tag": "3. Pozisyon · Doğum Sonrası",
+            "title": "Emzirme & Anne-Bebek Konforu",
+            "text": "Doğum sonrasında bebeğinizi emzirirken sırtınızı dik tutmanıza ve kolunuzun altına doğal destek almanıza yardımcı olur."
+          }
+        }
+      },
+      "block_order": [
+        "pos_1",
+        "pos_2",
+        "pos_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "Günün Her Anında Yanınızda",
+        "heading": "Otururken de Uzanırken de <em>Rahat Hisset</em>",
+        "subtext": "Tek yastıkla üç farklı ihtiyaca cevap veren ergonomik tasarım. Gebelik boyunca sırt ağrılarını azaltır, doğum sonrasında da kullanılmaya devam eder."
+      }
+    },
+    "ak_anatomy": {
+      "type": "ak-anatomy-compare",
+      "blocks": {
+        "row_1": {
+          "type": "row",
+          "settings": {
+            "feature": "Yan Kolçak Desteği",
+            "brand_value": "Kolları ve omuzları saran yan kanatlar",
+            "other_value": "Yok"
+          }
+        },
+        "row_2": {
+          "type": "row",
+          "settings": {
+            "feature": "Otururken Bel Formu",
+            "brand_value": "Kaymayan dik & ergonomik bel eğimi",
+            "other_value": "Çabuk ezilir ve kayar"
+          }
+        },
+        "row_3": {
+          "type": "row",
+          "settings": {
+            "feature": "İç Dolgu Malzemesi",
+            "brand_value": "650+ gr yüksek hacimli boncuk elyaf",
+            "other_value": "Kısa sürede topaklanan düz elyaf"
+          }
+        },
+        "row_4": {
+          "type": "row",
+          "settings": {
+            "feature": "Temizlik & Hijyen",
+            "brand_value": "Gizli fermuarlı, 30°C yıkanabilir kılıf",
+            "other_value": "Kılıf çıkmaz, makineye sığmaz"
+          }
+        },
+        "row_5": {
+          "type": "row",
+          "settings": {
+            "feature": "Kumaş Dokusu",
+            "brand_value": "%65 Pamuklu, solmaya dayanıklı nefes alan doku",
+            "other_value": "Terleten sentetik yüzeyler"
+          }
+        }
+      },
+      "block_order": [
+        "row_1",
+        "row_2",
+        "row_3",
+        "row_4",
+        "row_5"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Ölçü & Kalite Farkı",
+        "heading": "Neden Sıradan Yastıklar Yerine <em>Anne Keyfi?</em>",
+        "subtext": "İki yastığı üst üste koyduğunuzda kayar ve belinizi boşta bırakır. Anne Keyfi kolçaklı yastığı ise gövdenizi tek parça halinde sarar.",
+        "brand_col_title": "Anne Keyfi Yastığı",
+        "other_col_title": "Standart Yastıklar"
+      }
+    },
+    "ak_product": {
+      "type": "ak-featured-product",
+      "blocks": {
+        "acc_1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Kumaş & İç Dolgu Özellikleri",
+            "content": "<p>%65 Pamuk / %35 Polyester nefes alan, yumuşak dokulu dış kumaş. İç dolguda vücut şeklinize uyum sağlayan 650+ gr boncuk elyaf bulunur.</p>"
+          }
+        },
+        "acc_2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Ölçüler & Ergonomik Yapı",
+            "content": "<p><strong>Genişlik:</strong> 54 cm · <strong>Yükseklik:</strong> 42 cm. Geniş yan kolçakları sayesinde otururken dirseklerinizi ve sırtınızı aynı anda destekler.</p>"
+          }
+        },
+        "acc_3": {
+          "type": "accordion",
+          "settings": {
+            "title": "Yıkama & Bakım Talimatı",
+            "content": "<p>Gizli fermuarı açarak dış kılıfı çıkarabilir, çamaşır makinesinde 30°C hassas programda yıkayabilirsiniz. Ağartıcı ve kurutma makinesi önerilmez.</p>"
+          }
+        },
+        "acc_4": {
+          "type": "accordion",
+          "settings": {
+            "title": "Kargo & İade Güvencesi",
+            "content": "<p>Tüm siparişler özenle paketlenerek ücretsiz kargo ile gönderilir. Teslimattan itibaren 14 gün içinde kolay iade hakkınız bulunur.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "acc_1",
+        "acc_2",
+        "acc_3",
+        "acc_4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "product": "",
+        "rating_text": "4.9 (140+ Mutlu Anne)",
+        "promo_badge": "Ücretsiz Kargo",
+        "short_description": "Kolçaklı yapısıyla otururken bel ve kolları destekleyen, yarı uzanma pozisyonunda rahat nefes almayı sağlayan 54 × 42 cm büyük boy ergonomik yastık.",
+        "add_label": "Sepete Ekle",
+        "demo_title": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı",
+        "demo_price": "1.290,00 TL",
+        "demo_compare_price": "1.590,00 TL"
+      }
+    },
+    "ak_testimonials": {
+      "type": "ak-testimonials",
+      "blocks": {
+        "rev_1": {
+          "type": "review",
+          "settings": {
+            "quote": "Gebeliğin son aylarında düz yatamayınca akşamları yarı oturur pozisyonda dinlenmek için aldım. Bel boşluğunu doldurması çok iyi.",
+            "author": "Elif Y.",
+            "meta": "34. Hafta · Antrasit"
+          }
+        },
+        "rev_2": {
+          "type": "review",
+          "settings": {
+            "quote": "Fermuarlı kılıfının makinede yıkanabilmesi büyük rahatlık. Şimdi bebeğim doğduktan sonra emzirirken de sırtıma koyup kullanıyorum.",
+            "author": "Merve A.",
+            "meta": "Yeni Anne · Krem Ekru"
+          }
+        },
+        "rev_3": {
+          "type": "review",
+          "settings": {
+            "quote": "Kumaşı terletmiyor ve boncuk elyaf dolgusu hemen ezilmiyor. TV izlerken ve kitap okurken kollarım havada kalmıyor.",
+            "author": "Selin D.",
+            "meta": "28. Hafta · Gül Kurusu"
+          }
+        }
+      },
+      "block_order": [
+        "rev_1",
+        "rev_2",
+        "rev_3"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Gerçek Deneyimler",
+        "heading": "Annelerin <em>Keyif Anları</em>"
+      }
+    },
+    "ak_faq": {
+      "type": "ak-faq",
+      "blocks": {
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Hamileliğin kaçıncı ayından itibaren kullanılabilir?",
+            "answer": "<p>İlk aylardan itibaren bel ve sırt yorgunluğunu önlemek için kullanılabilir; özellikle 2. ve 3. trimesterde otururken ve yarı uzanırken büyük rahatlık sağlar.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "Yastık sadece otururken mi, yatarken de kullanılabilir mi?",
+            "answer": "<p>Hem koltukta ve yatakta dik otururken hem de yatak başlığına yaslayıp yarı uzanır pozisyonda dinlenirken kullanılmak üzere tasarlanmıştır.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "question": "Kılıfı çıkarılıp makinede yıkanır mı?",
+            "answer": "<p>Evet. Gizli fermuarı sayesinde dış kılıf tamamen çıkarılır ve 30°C hassas programda güvenle yıkanabilir.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "faq",
+          "settings": {
+            "question": "İç dolgusu zamanla çöker mi?",
+            "answer": "<p>İçerisinde 650+ gr yüksek hacimli boncuk elyaf kullanılmıştır. Lif yapısı formunu uzun süre korur ve yaslandığınızda bel boşluğunuza göre şekil alır.</p>"
+          }
+        },
+        "faq_5": {
+          "type": "faq",
+          "settings": {
+            "question": "Doğum sonrasında emzirme döneminde işe yarar mı?",
+            "answer": "<p>Kesinlikle. Yan kolçakları emzirme sırasında kolunuzu destekler, yüksek sırt kısmı ise omuz ve boyun tutulmalarını azaltır.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4",
+        "faq_5"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "eyebrow": "Merak Edilenler",
+        "heading": "Sıkça Sorulan <em>Sorular</em>"
+      }
+    }
+  },
+  "order": [
+    "ak_hero",
+    "ak_trust",
+    "ak_positions",
+    "ak_anatomy",
+    "ak_product",
+    "ak_testimonials",
+    "ak_faq"
+  ]
+}

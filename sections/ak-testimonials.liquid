@@ -1,0 +1,111 @@
+<section class="ak-section color-{{ section.settings.color_scheme }} gradient">
+  <div class="ak-container">
+    <div class="ak-section-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ak-eyebrow">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      <h2 class="ak-heading">{{ section.settings.heading }}</h2>
+    </div>
+
+    <div class="ak-reviews__grid">
+      {%- for block in section.blocks -%}
+        <article class="ak-review-card" {{ block.shopify_attributes }}>
+          <div>
+            <div class="ak-stars" style="margin-bottom:1.2rem;" aria-label="5 üzerinden 5 yıldız">★★★★★</div>
+            <p class="ak-review-card__quote">“{{ block.settings.quote | escape }}”</p>
+          </div>
+          <div class="ak-review-card__author">
+            {{ block.settings.author | escape }}
+            <span class="ak-review-card__meta">{{ block.settings.meta | escape }}</span>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "AK · Anne Yorumları",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-2"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Üst rozet",
+      "default": "Gerçek Deneyimler"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Annelerin <em>Keyif Anları</em>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Yorum kartı",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Yorum metni",
+          "default": "7. ayımdan beri yatakta otururken sırtım çok ağrıyordu. İki yastığı üst üste koymaktan kurtuldum, kolçakları inanılmaz rahat."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "İsim",
+          "default": "Zeynep K."
+        },
+        {
+          "type": "text",
+          "id": "meta",
+          "label": "Detay",
+          "default": "32. Hafta · Antrasit"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Anne Yorumları",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Gebeliğin son aylarında düz yatamayınca akşamları yarı oturur pozisyonda dinlenmek için aldım. Bel boşluğunu doldurması çok iyi.",
+            "author": "Elif Y.",
+            "meta": "34. Hafta · Antrasit"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Fermuarlı kılıfının makinede yıkanabilmesi büyük rahatlık. Şimdi bebeğim doğduktan sonra emzirirken de sırtıma koyup kullanıyorum.",
+            "author": "Merve A.",
+            "meta": "Yeni Anne · Krem Ekru"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Kumaşı terletmiyor ve boncuk elyaf dolgusu hemen ezilmiyor. TV izlerken ve kitap okurken kollarım havada kalmıyor.",
+            "author": "Selin D.",
+            "meta": "28. Hafta · Gül Kurusu"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
