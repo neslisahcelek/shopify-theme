@@ -1,0 +1,235 @@
+<section
+  id="ak-hotspots"
+  class="ak-section color-{{ section.settings.color_scheme }} gradient"
+  data-ak-hotspots
+>
+  <div class="ak-container">
+    <div class="ak-section-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="ak-eyebrow">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      <h2 class="ak-heading">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subtext != blank -%}
+        <p class="ak-lead" style="margin-bottom:0;">{{ section.settings.subtext | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="ak-hotspots__grid">
+      <div class="ak-hotspots__stage">
+        {%- liquid
+          assign stage_img = section.settings.image
+          if stage_img == blank
+            assign first_prod = collections.all.products.first
+            if first_prod != blank
+              assign stage_img = first_prod.featured_media
+            endif
+          endif
+        -%}
+        {%- if stage_img != blank -%}
+          {%- assign stage_alt = stage_img.alt | default: section.settings.heading | strip_html | escape -%}
+          {{
+            stage_img
+            | image_url: width: 1000
+            | image_tag:
+              widths: '500, 750, 1000',
+              sizes: '(min-width: 990px) 46vw, 92vw',
+              alt: stage_alt,
+              loading: 'lazy'
+          }}
+        {%- else -%}
+          <svg
+            viewBox="0 0 600 600"
+            width="600"
+            height="600"
+            role="img"
+            aria-label="Kolçaklı ergonomik hamile yastığı detay bölgeleri"
+            style="width:100%;height:100%;display:block;background:#EAE3DA;"
+          >
+            <circle cx="300" cy="300" r="230" fill="#E1D6C7" />
+            <ellipse cx="300" cy="465" rx="185" ry="22" fill="rgba(46,42,39,0.12)" />
+            <path d="M170 330 C170 175, 215 130, 300 130 C385 130, 430 175, 430 330 L430 430 L170 430 Z" fill="#3B3E42" />
+            <path d="M115 345 C115 305, 155 292, 196 308 L215 436 C170 452, 115 440, 115 405 Z" fill="#4B4E53" />
+            <path d="M485 345 C485 305, 445 292, 404 308 L385 436 C430 452, 485 440, 485 405 Z" fill="#4B4E53" />
+            <rect x="188" y="362" width="224" height="78" rx="32" fill="#43464B" />
+            <path d="M210 265 Q300 292 390 265" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3" stroke-linecap="round" />
+            <path d="M430 315 L430 375" stroke="#C47D63" stroke-width="4" stroke-dasharray="5 5" stroke-linecap="round" />
+          </svg>
+        {%- endif -%}
+
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="ak-hotspot-pin{% if forloop.first %} is-active{% endif %}"
+            style="left:{{ block.settings.pin_x }}%;top:{{ block.settings.pin_y }}%;"
+            data-ak-hotspot-pin="{{ forloop.index0 }}"
+            aria-label="{{ block.settings.title | escape }}"
+            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+          >
+            {{ forloop.index }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <div class="ak-hotspots__cards">
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="ak-hotspot-card{% if forloop.first %} is-active{% endif %}"
+            data-ak-hotspot-card="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="ak-hotspot-card__num">{{ forloop.index }}</span>
+            <div>
+              <h3>{{ block.settings.title | escape }}</h3>
+              <p>{{ block.settings.description | escape }}</p>
+            </div>
+          </button>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    document.querySelectorAll('[data-ak-hotspots]').forEach((root) => {
+      const pins = root.querySelectorAll('[data-ak-hotspot-pin]');
+      const cards = root.querySelectorAll('[data-ak-hotspot-card]');
+      const activate = (idx) => {
+        pins.forEach((p) => {
+          const active = p.dataset.akHotspotPin === idx;
+          p.classList.toggle('is-active', active);
+          p.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        cards.forEach((c) => {
+          c.classList.toggle('is-active', c.dataset.akHotspotCard === idx);
+        });
+      };
+      pins.forEach((p) => p.addEventListener('click', () => activate(p.dataset.akHotspotPin)));
+      cards.forEach((c) => c.addEventListener('click', () => activate(c.dataset.akHotspotCard)));
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "AK · Ürün Detay Noktaları",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-2"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Üst rozet",
+      "default": "Tek Üründe 4 Kritik Detay"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Başlık",
+      "default": "Her Dikişinde <em>Anne Konforu</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Alt açıklama",
+      "default": "Görsel üzerindeki numaralara dokunarak yastığın bel, sırt, kolçak ve kılıf detaylarını inceleyin."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Ürün detay görseli (boş bırakılırsa ana ürün görseli kullanılır)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Detay noktası",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Başlık",
+          "default": "Yüksek Sırt & Bel Eğimi (42 cm)"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Açıklama",
+          "default": "Dik oturuşta ve yarı uzanmada bel boşluğunu tamamen kavrar; omurga üzerindeki baskıyı hafifletir."
+        },
+        {
+          "type": "range",
+          "id": "pin_x",
+          "min": 10,
+          "max": 90,
+          "step": 2,
+          "unit": "%",
+          "label": "Yatay konum",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pin_y",
+          "min": 10,
+          "max": 90,
+          "step": 2,
+          "unit": "%",
+          "label": "Dikey konum",
+          "default": 34
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Ürün Detay Noktaları",
+      "blocks": [
+        {
+          "type": "hotspot",
+          "settings": {
+            "title": "Yüksek Sırt & Bel Desteği (42 cm)",
+            "description": "Otururken ya da yarı uzanırken bel boşluğunu tam doldurur; sırt ağrılarını azaltmaya yardımcı olur.",
+            "pin_x": 50,
+            "pin_y": 32
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "title": "Dolgun Yan Kolçaklar (54 cm Toplam)",
+            "description": "Kitap okurken, TV izlerken veya emzirirken dirseklerinizi ve omuzlarınızı yormadan destekler.",
+            "pin_x": 24,
+            "pin_y": 60
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "title": "Gizli Fermuarlı Yıkanabilir Kılıf",
+            "description": "%65 Pamuk / %35 Polyester nefes alan dış kılıfı saniyeler içinde çıkarıp 30°C'de yıkayabilirsiniz.",
+            "pin_x": 72,
+            "pin_y": 56
+          }
+        },
+        {
+          "type": "hotspot",
+          "settings": {
+            "title": "650+ gr Boncuk Elyaf İç Dolgu",
+            "description": "Yüksek hacimli boncuk elyaf sayesinde formunu uzun süre korur, çökmeye ve topaklanmaya karşı dirençlidir.",
+            "pin_x": 50,
+            "pin_y": 66
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

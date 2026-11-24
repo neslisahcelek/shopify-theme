@@ -1,26 +1,42 @@
 {
   "sections": {
-    "main": {
-      "type": "main-search",
+    "ak_product": {
+      "type": "ak-featured-product",
+      "blocks": {
+        "acc_1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Kumaş & İç Dolgu Özellikleri",
+            "content": "<p>%65 Pamuk / %35 Polyester nefes alan, yumuşak dokulu dış kumaş. İç dolguda vücut şeklinize uyum sağlayan 650+ gr boncuk elyaf bulunur.</p>"
+          }
+        },
+        "acc_2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Ölçüler & Ergonomik Yapı",
+            "content": "<p><strong>Genişlik:</strong> 54 cm · <strong>Yükseklik:</strong> 42 cm. Geniş yan kolçakları sayesinde otururken dirseklerinizi ve sırtınızı aynı anda destekler.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "acc_1",
+        "acc_2"
+      ],
       "settings": {
-        "columns_desktop": 4,
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": false,
-        "show_vendor": false,
-        "show_rating": false,
-        "enable_filtering": true,
-        "filter_type": "horizontal",
-        "enable_sorting": true,
-        "article_show_date": true,
-        "article_show_author": false,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "color_scheme": "scheme-1",
+        "product": "",
+        "rating_text": "4.9 (140+ Mutlu Anne)",
+        "promo_badge": "Ücretsiz Kargo",
+        "short_description": "Aradığınız tek özel tasarım burada: Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı.",
+        "add_label": "Sepete Ekle",
+        "enable_pack_selector": true,
+        "demo_title": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı",
+        "demo_price": "1.290,00 TL",
+        "demo_compare_price": "1.590,00 TL"
       }
     }
   },
   "order": [
-    "main"
+    "ak_product"
   ]
 }

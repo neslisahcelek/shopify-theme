@@ -1,36 +1,79 @@
 {
   "sections": {
-    "banner": {
-      "type": "main-collection-banner",
+    "ak_product": {
+      "type": "ak-featured-product",
+      "blocks": {
+        "acc_1": {
+          "type": "accordion",
+          "settings": {
+            "title": "Kumaş & İç Dolgu Özellikleri",
+            "content": "<p>%65 Pamuk / %35 Polyester nefes alan, yumuşak dokulu dış kumaş. İç dolguda vücut şeklinize uyum sağlayan 650+ gr boncuk elyaf bulunur.</p>"
+          }
+        },
+        "acc_2": {
+          "type": "accordion",
+          "settings": {
+            "title": "Ölçüler & Ergonomik Yapı",
+            "content": "<p><strong>Genişlik:</strong> 54 cm · <strong>Yükseklik:</strong> 42 cm. Geniş yan kolçakları sayesinde otururken dirseklerinizi ve sırtınızı aynı anda destekler.</p>"
+          }
+        },
+        "acc_3": {
+          "type": "accordion",
+          "settings": {
+            "title": "Yıkama & Bakım Talimatı",
+            "content": "<p>Gizli fermuarı açarak dış kılıfı çıkarabilir, çamaşır makinesinde 30°C hassas programda yıkayabilirsiniz.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "acc_1",
+        "acc_2",
+        "acc_3"
+      ],
       "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-1",
+        "product": "",
+        "rating_text": "4.9 (140+ Mutlu Anne)",
+        "promo_badge": "Ücretsiz Kargo",
+        "short_description": "Kolçaklı yapısıyla otururken bel ve kolları destekleyen, yarı uzanma pozisyonunda rahat nefes almayı sağlayan 54 × 42 cm büyük boy ergonomik yastık.",
+        "add_label": "Sepete Ekle",
+        "enable_pack_selector": true,
+        "demo_title": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı",
+        "demo_price": "1.290,00 TL",
+        "demo_compare_price": "1.590,00 TL"
       }
     },
-    "product-grid": {
-      "type": "main-collection-product-grid",
+    "ak_faq": {
+      "type": "ak-faq",
+      "blocks": {
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Kılıfı çıkarılıp makinede yıkanır mı?",
+            "answer": "<p>Evet. Gizli fermuarı sayesinde dış kılıf tamamen çıkarılır ve 30°C hassas programda güvenle yıkanabilir.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "İç dolgusu zamanla çöker mi?",
+            "answer": "<p>İçerisinde 650+ gr yüksek hacimli boncuk elyaf kullanılmıştır. Formunu uzun süre korur.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_1",
+        "faq_2"
+      ],
       "settings": {
-        "products_per_page": 16,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": false,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "enable_filtering": true,
-        "filter_type": "horizontal",
-        "enable_sorting": true,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "color_scheme": "scheme-2",
+        "eyebrow": "Merak Edilenler",
+        "heading": "Sıkça Sorulan <em>Sorular</em>"
       }
     }
   },
   "order": [
-    "banner",
-    "product-grid"
+    "ak_product",
+    "ak_faq"
   ]
 }

@@ -17,7 +17,7 @@
         "announcement-bar-0": {
           "type": "announcement",
           "settings": {
-            "text": "Tüm Siparişlerde Ücretsiz Kargo • 30°C Yıkanabilir Fermuarlı Kılıf",
+            "text": "Hamilelere Özel Kolçaklı Destek Yastığı • Tüm Siparişlerde Ücretsiz Kargo",
             "text_alignment": "center",
             "color_scheme": "scheme-4",
             "link": ""
@@ -28,27 +28,61 @@
         "announcement-bar-0"
       ]
     },
-    "header": {
-      "type": "header",
+    "ak_header": {
+      "type": "ak-header",
+      "blocks": {
+        "nav_1": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Nasıl Kullanılır?",
+            "anchor": "#ak-positions"
+          }
+        },
+        "nav_2": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Detaylar",
+            "anchor": "#ak-hotspots"
+          }
+        },
+        "nav_3": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Renk Seçenekleri",
+            "anchor": "#ak-buybox"
+          }
+        },
+        "nav_4": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Yorumlar",
+            "anchor": "#ak-reviews"
+          }
+        },
+        "nav_5": {
+          "type": "nav_link",
+          "settings": {
+            "label": "SSS",
+            "anchor": "#ak-faq"
+          }
+        }
+      },
+      "block_order": [
+        "nav_1",
+        "nav_2",
+        "nav_3",
+        "nav_4",
+        "nav_5"
+      ],
       "settings": {
         "color_scheme": "scheme-1",
-        "menu_color_scheme": "scheme-1",
-        "logo_position": "middle-left",
-        "menu": "main-menu",
-        "menu_type_desktop": "dropdown",
-        "sticky_header_type": "on-scroll-up",
-        "show_line_separator": true,
-        "enable_country_selector": false,
-        "enable_language_selector": false,
-        "mobile_logo_position": "center",
-        "margin_bottom": 0,
-        "padding_top": 16,
-        "padding_bottom": 16
+        "brand_text": "Anne Keyfi",
+        "cta_label": "Sipariş Ver"
       }
     }
   },
   "order": [
     "announcement-bar",
-    "header"
+    "ak_header"
   ]
 }

@@ -9,7 +9,7 @@
           "type": "text",
           "settings": {
             "heading": "Anne Keyfi",
-            "subtext": "<p>Hamilelik döneminde ve günlük dinlenme anlarında bel, sırt ve kol desteği sunan ergonomik yaşam yastıkları.</p>"
+            "subtext": "<p>Hamilelikte ve günlük dinlenme anlarında bel, sırt ve kol desteği sunan tek özel tasarım: 54 × 42 cm kolçaklı ergonomik destek yastığı.</p>"
           }
         }
       },
@@ -17,9 +17,9 @@
         "brand-info"
       ],
       "settings": {
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "newsletter_enable": true,
-        "newsletter_heading": "Yeni Renkler ve Fırsatlardan İlk Siz Haberdar Olun",
+        "newsletter_heading": "Yeni Renklerden ve İndirimlerden İlk Siz Haberdar Olun",
         "enable_follow_on_shop": false,
         "show_social": true,
         "enable_country_selector": false,

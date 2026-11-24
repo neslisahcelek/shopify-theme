@@ -217,6 +217,19 @@
             {%- endfor -%}
           {%- endif -%}
 
+          {%- if section.settings.enable_pack_selector -%}
+            <div class="ak-pack-options" role="group" aria-label="Paket seçimi">
+              <button type="button" class="ak-pack-btn is-active" data-ak-pack="1" aria-pressed="true">
+                <strong>1 Adet · Tekli Yastık</strong>
+                <span>Standart tek ürün siparişi</span>
+              </button>
+              <button type="button" class="ak-pack-btn" data-ak-pack="2" aria-pressed="false">
+                <strong>2 Adet · Yatak &amp; Salon Seti</strong>
+                <span>Hem yatak hem oturma odası için</span>
+              </button>
+            </div>
+          {%- endif -%}
+
           <div class="ak-qty-submit">
             <div class="ak-qty-box">
               <button type="button" data-ak-qty-minus aria-label="Adeti azalt">−</button>
@@ -341,6 +354,12 @@
       "id": "add_label",
       "label": "Sepete ekle metni",
       "default": "Sepete Ekle"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_pack_selector",
+      "label": "1 Adet / 2 Adet hızlı paket seçiciyi göster",
+      "default": true
     },
     {
       "type": "header",

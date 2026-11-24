@@ -22,6 +22,7 @@
     const qtyInput = root.querySelector('input[name="quantity"]');
     const qtyMinus = root.querySelector('[data-ak-qty-minus]');
     const qtyPlus = root.querySelector('[data-ak-qty-plus]');
+    const packBtns = root.querySelectorAll('[data-ak-pack]');
     const form = root.querySelector('form[data-ak-form]');
     const feedback = root.querySelector('[data-ak-feedback]');
     const stickyBar = root.querySelector('[data-ak-sticky-bar]');
@@ -116,16 +117,36 @@
       });
     });
 
+    const syncPack = (qty) => {
+      packBtns.forEach((p) => {
+        const active = parseInt(p.dataset.akPack || '1', 10) === qty;
+        p.classList.toggle('is-active', active);
+        p.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    };
+
+    packBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetQty = parseInt(btn.dataset.akPack || '1', 10);
+        if (qtyInput) qtyInput.value = String(targetQty);
+        syncPack(targetQty);
+      });
+    });
+
     if (qtyMinus && qtyInput) {
       qtyMinus.addEventListener('click', () => {
         const current = parseInt(qtyInput.value || '1', 10);
-        qtyInput.value = String(Math.max(1, current - 1));
+        const next = Math.max(1, current - 1);
+        qtyInput.value = String(next);
+        syncPack(next);
       });
     }
     if (qtyPlus && qtyInput) {
       qtyPlus.addEventListener('click', () => {
         const current = parseInt(qtyInput.value || '1', 10);
-        qtyInput.value = String(Math.min(20, current + 1));
+        const next = Math.min(20, current + 1);
+        qtyInput.value = String(next);
+        syncPack(next);
       });
     }
 

@@ -824,3 +824,330 @@ html {
   font-size: 1.25rem;
   opacity: 0.82;
 }
+
+/* ==========================================================================
+   9. Single-Product Header (Zero Search / Zero Catalog)
+   ========================================================================== */
+.ak-header {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  border-bottom: 1px solid var(--ak-border);
+  padding: 1.4rem 0;
+}
+
+.ak-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+}
+
+.ak-header__left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ak-header__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid var(--ak-border);
+  border-radius: 12px;
+  background: transparent;
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-header__menu-btn {
+    display: none;
+  }
+}
+
+.ak-header__logo {
+  font-family: var(--font-heading-family);
+  font-size: 2.2rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  display: inline-flex;
+  align-items: center;
+}
+
+.ak-header__logo img {
+  height: auto;
+  display: block;
+}
+
+.ak-header__nav {
+  display: none;
+  align-items: center;
+  gap: 2.4rem;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-header__nav {
+    display: flex;
+  }
+}
+
+.ak-header__link {
+  text-decoration: none;
+  font-size: 1.45rem;
+  font-weight: 500;
+  color: rgba(var(--color-foreground), 0.82);
+  transition: color 0.2s var(--ak-ease);
+}
+
+.ak-header__link:hover {
+  color: var(--ak-terracotta-dark);
+}
+
+.ak-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ak-header__cta {
+  padding: 0.9rem 1.8rem;
+  font-size: 1.35rem;
+}
+
+@media screen and (max-width: 520px) {
+  .ak-header__cta {
+    padding: 0.8rem 1.3rem;
+    font-size: 1.25rem;
+  }
+}
+
+.ak-header__cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 50%;
+  border: 1px solid var(--ak-border);
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.ak-header__cart-count {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--ak-terracotta);
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ak-mobile-nav {
+  border-top: 1px solid var(--ak-border);
+  padding: 1.4rem 0 2rem;
+}
+
+.ak-mobile-nav__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.ak-mobile-nav__link {
+  padding: 0.8rem 0;
+  text-decoration: none;
+  font-size: 1.55rem;
+  font-weight: 500;
+  color: rgb(var(--color-foreground));
+  border-bottom: 1px solid var(--ak-border);
+}
+
+/* ==========================================================================
+   10. Interactive Product Hotspots & Hero Price Row
+   ========================================================================== */
+.ak-hero__price-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--ak-radius-pill);
+  background: var(--ak-oat);
+  color: var(--ak-espresso);
+  font-size: 1.45rem;
+  margin-bottom: 1.8rem;
+}
+
+.ak-hero__price-pill strong {
+  font-size: 1.65rem;
+}
+
+.ak-hero__price-old {
+  text-decoration: line-through;
+  color: var(--ak-stone);
+  font-size: 1.35rem;
+}
+
+.ak-hotspots__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-hotspots__grid {
+    grid-template-columns: 1.05fr 1fr;
+    gap: 5rem;
+  }
+}
+
+.ak-hotspots__stage {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--ak-oat);
+  border: 1px solid var(--ak-border);
+  box-shadow: var(--ak-shadow-soft);
+  aspect-ratio: 1 / 1;
+}
+
+.ak-hotspots__stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-hotspot-pin {
+  position: absolute;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  background: var(--ak-terracotta);
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 20px rgba(46, 42, 39, 0.28);
+  transition: transform 0.22s var(--ak-ease), background-color 0.22s var(--ak-ease);
+}
+
+.ak-hotspot-pin:hover,
+.ak-hotspot-pin.is-active {
+  background: var(--ak-espresso);
+  transform: translate(-50%, -50%) scale(1.14);
+}
+
+.ak-hotspots__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+}
+
+.ak-hotspot-card {
+  text-align: left;
+  width: 100%;
+  padding: 1.8rem 2rem;
+  border-radius: 18px;
+  border: 1.5px solid var(--ak-border);
+  background: var(--ak-cream);
+  color: var(--ak-espresso);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
+  transition: border-color 0.22s var(--ak-ease), background-color 0.22s var(--ak-ease), transform 0.22s var(--ak-ease);
+}
+
+.ak-hotspot-card.is-active {
+  border-color: var(--ak-terracotta);
+  background: #ffffff;
+  box-shadow: var(--ak-shadow-soft);
+}
+
+.ak-hotspot-card__num {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--ak-oat);
+  color: var(--ak-espresso);
+  font-weight: 700;
+  font-size: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ak-hotspot-card.is-active .ak-hotspot-card__num {
+  background: var(--ak-terracotta);
+  color: #ffffff;
+}
+
+.ak-hotspot-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.65rem;
+  font-family: var(--font-heading-family);
+}
+
+.ak-hotspot-card p {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.55;
+  color: var(--ak-stone);
+}
+
+/* ==========================================================================
+   11. Single-Product Bundle / Quantity Selector Pills
+   ========================================================================== */
+.ak-pack-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ak-pack-btn {
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--ak-border);
+  background: #ffffff;
+  color: var(--ak-espresso);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ak-ease), box-shadow 0.2s var(--ak-ease);
+}
+
+.ak-pack-btn.is-active {
+  border-color: var(--ak-terracotta);
+  box-shadow: 0 0 0 2px rgba(196, 125, 99, 0.16);
+}
+
+.ak-pack-btn strong {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.ak-pack-btn span {
+  font-size: 1.25rem;
+  color: var(--ak-stone);
+}
+

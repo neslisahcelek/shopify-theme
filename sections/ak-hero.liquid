@@ -1,6 +1,11 @@
 {%- liquid
   assign cta_anchor = section.settings.cta_anchor | default: '#ak-buybox'
   assign secondary_anchor = section.settings.secondary_anchor | default: '#ak-positions'
+  assign hero_product = collections.all.products.first
+  assign hero_image = section.settings.image
+  if hero_image == blank and hero_product != blank
+    assign hero_image = hero_product.featured_media
+  endif
 -%}
 
 <section
@@ -21,6 +26,23 @@
         {%- if section.settings.subtext != blank -%}
           <p class="ak-lead">{{ section.settings.subtext | escape }}</p>
         {%- endif -%}
+
+        <div class="ak-hero__price-pill">
+          <span class="ak-stars" aria-hidden="true">★★★★★</span>
+          <strong>
+            {%- if hero_product != blank -%}
+              {{ hero_product.price | money }}
+            {%- else -%}
+              {{ section.settings.demo_price | escape }}
+            {%- endif -%}
+          </strong>
+          {%- if hero_product != blank and hero_product.compare_at_price > hero_product.price -%}
+            <span class="ak-hero__price-old">{{ hero_product.compare_at_price | money }}</span>
+          {%- elsif hero_product == blank and section.settings.demo_compare_price != blank -%}
+            <span class="ak-hero__price-old">{{ section.settings.demo_compare_price | escape }}</span>
+          {%- endif -%}
+          <span>· Ücretsiz Kargo</span>
+        </div>
 
         <div class="ak-hero__actions">
           <a href="{{ cta_anchor }}" class="ak-btn ak-btn--primary">
@@ -47,10 +69,10 @@
       </div>
 
       <div class="ak-hero__media-wrap">
-        {%- if section.settings.image != blank -%}
-          {%- assign hero_alt = section.settings.image.alt | default: section.settings.heading | strip_html | escape -%}
+        {%- if hero_image != blank -%}
+          {%- assign hero_alt = hero_image.alt | default: section.settings.heading | strip_html | escape -%}
           {{
-            section.settings.image
+            hero_image
             | image_url: width: 1200
             | image_tag:
               widths: '540, 760, 980, 1200',
@@ -190,6 +212,18 @@
       "type": "image_picker",
       "id": "image",
       "label": "Hero görseli"
+    },
+    {
+      "type": "text",
+      "id": "demo_price",
+      "label": "Önizleme fiyatı (ürün eklenmemişse)",
+      "default": "1.290,00 TL"
+    },
+    {
+      "type": "text",
+      "id": "demo_compare_price",
+      "label": "Önizleme eski fiyat",
+      "default": "1.590,00 TL"
     },
     {
       "type": "text",

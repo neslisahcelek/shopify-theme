@@ -1,0 +1,208 @@
+{%- liquid
+  assign anchor_prefix = ''
+  unless request.page_type == 'index'
+    assign anchor_prefix = routes.root_url
+  endunless
+-%}
+
+<header class="ak-header color-{{ section.settings.color_scheme }} gradient">
+  <div class="ak-container ak-header__inner">
+    <div class="ak-header__left">
+      <button
+        type="button"
+        class="ak-header__menu-btn"
+        aria-label="Menüyü aç"
+        aria-expanded="false"
+        aria-controls="ak-mobile-drawer-{{ section.id }}"
+        data-ak-drawer-toggle
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      <a href="{{ routes.root_url }}" class="ak-header__logo">
+        {%- if settings.logo != blank -%}
+          {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+          {{
+            settings.logo
+            | image_url: width: 320
+            | image_tag:
+              widths: '120, 240, 320',
+              width: settings.logo_width,
+              alt: logo_alt,
+              loading: 'eager'
+          }}
+        {%- else -%}
+          <span>{{ section.settings.brand_text | default: shop.name | escape }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <nav class="ak-header__nav" aria-label="Ana gezinme">
+      {%- for block in section.blocks -%}
+        <a
+          href="{{ anchor_prefix }}{{ block.settings.anchor | escape }}"
+          class="ak-header__link"
+          {{ block.shopify_attributes }}
+        >
+          {{ block.settings.label | escape }}
+        </a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="ak-header__actions">
+      {%- if section.settings.cta_label != blank -%}
+        <a href="{{ anchor_prefix }}#ak-buybox" class="ak-btn ak-btn--primary ak-header__cta">
+          {{ section.settings.cta_label | escape }}
+        </a>
+      {%- endif -%}
+
+      <a
+        href="{{ routes.cart_url }}"
+        class="ak-header__cart header__icon header__icon--cart link focus-inset"
+        id="cart-icon-bubble"
+        aria-label="Sepetim ({{ cart.item_count }} ürün)"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 7h12l1 13H5L6 7z" />
+          <path d="M9 7V6a3 3 0 0 1 6 0v1" />
+        </svg>
+        <span class="ak-header__cart-count cart-count-bubble" aria-hidden="true">
+          <span>{{ cart.item_count }}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <div
+    id="ak-mobile-drawer-{{ section.id }}"
+    class="ak-mobile-nav color-{{ section.settings.color_scheme }} gradient"
+    hidden
+    data-ak-drawer
+  >
+    <div class="ak-container ak-mobile-nav__inner">
+      {%- for block in section.blocks -%}
+        <a
+          href="{{ anchor_prefix }}{{ block.settings.anchor | escape }}"
+          class="ak-mobile-nav__link"
+          data-ak-drawer-close
+        >
+          {{ block.settings.label | escape }}
+        </a>
+      {%- endfor -%}
+      {%- if section.settings.cta_label != blank -%}
+        <a
+          href="{{ anchor_prefix }}#ak-buybox"
+          class="ak-btn ak-btn--primary"
+          style="width:100%;margin-top:0.8rem;"
+          data-ak-drawer-close
+        >
+          {{ section.settings.cta_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</header>
+
+<script>
+  (() => {
+    const toggle = document.querySelector('[data-ak-drawer-toggle]');
+    const drawer = document.querySelector('[data-ak-drawer]');
+    if (!toggle || !drawer) return;
+    toggle.addEventListener('click', () => {
+      const open = drawer.hasAttribute('hidden');
+      if (open) {
+        drawer.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+      } else {
+        drawer.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    drawer.querySelectorAll('[data-ak-drawer-close]').forEach((link) => {
+      link.addEventListener('click', () => {
+        drawer.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "AK · Tek Ürün Üst Menü",
+  "tag": "section",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Renk şeması",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "brand_text",
+      "label": "Marka adı (logo yüklenmezse)",
+      "default": "Anne Keyfi"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Sipariş butonu metni",
+      "default": "Sipariş Ver"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Bölüm bağlantısı",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Menü metni",
+          "default": "Kullanım Alanları"
+        },
+        {
+          "type": "text",
+          "id": "anchor",
+          "label": "Hedef bölüm (#id)",
+          "default": "#ak-positions"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AK · Tek Ürün Üst Menü",
+      "blocks": [
+        {
+          "type": "nav_link",
+          "settings": { "label": "Nasıl Kullanılır?", "anchor": "#ak-positions" }
+        },
+        {
+          "type": "nav_link",
+          "settings": { "label": "Detaylar", "anchor": "#ak-hotspots" }
+        },
+        {
+          "type": "nav_link",
+          "settings": { "label": "Renk Seçenekleri", "anchor": "#ak-buybox" }
+        },
+        {
+          "type": "nav_link",
+          "settings": { "label": "Yorumlar", "anchor": "#ak-reviews" }
+        },
+        {
+          "type": "nav_link",
+          "settings": { "label": "SSS", "anchor": "#ak-faq" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -32,7 +32,9 @@
         "eyebrow": "Hamilelik & Dinlenme Konforu",
         "heading": "Otururken ve Uzanırken <em>Tam Bel & Kol Desteği</em>",
         "subtext": "Hamilelik döneminde artan bel ve sırt yükünü hafifletmek için tasarlanan kolçaklı büyük boy destek yastığı. Kitap okurken, TV izlerken ya da yarı uzanırken vücudunuza uyum sağlar.",
-        "cta_label": "Renkleri İncele & Sipariş Ver",
+        "demo_price": "1.290,00 TL",
+        "demo_compare_price": "1.590,00 TL",
+        "cta_label": "Renk Seç & Sipariş Ver",
         "cta_anchor": "#ak-buybox",
         "secondary_label": "Kullanım Pozisyonları",
         "secondary_anchor": "#ak-positions",
@@ -117,6 +119,59 @@
         "subtext": "Tek yastıkla üç farklı ihtiyaca cevap veren ergonomik tasarım. Gebelik boyunca sırt ağrılarını azaltır, doğum sonrasında da kullanılmaya devam eder."
       }
     },
+    "ak_hotspots": {
+      "type": "ak-product-hotspots",
+      "blocks": {
+        "hs_1": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Yüksek Sırt & Bel Desteği (42 cm)",
+            "description": "Otururken ya da yarı uzanırken bel boşluğunu tam doldurur; sırt ağrılarını azaltmaya yardımcı olur.",
+            "pin_x": 50,
+            "pin_y": 32
+          }
+        },
+        "hs_2": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Dolgun Yan Kolçaklar (54 cm Toplam)",
+            "description": "Kitap okurken, TV izlerken veya emzirirken dirseklerinizi ve omuzlarınızı yormadan destekler.",
+            "pin_x": 24,
+            "pin_y": 60
+          }
+        },
+        "hs_3": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Gizli Fermuarlı Yıkanabilir Kılıf",
+            "description": "%65 Pamuk / %35 Polyester nefes alan dış kılıfı saniyeler içinde çıkarıp 30°C'de yıkayabilirsiniz.",
+            "pin_x": 72,
+            "pin_y": 56
+          }
+        },
+        "hs_4": {
+          "type": "hotspot",
+          "settings": {
+            "title": "650+ gr Boncuk Elyaf İç Dolgu",
+            "description": "Yüksek hacimli boncuk elyaf sayesinde formunu uzun süre korur, çökmeye ve topaklanmaya karşı dirençlidir.",
+            "pin_x": 50,
+            "pin_y": 66
+          }
+        }
+      },
+      "block_order": [
+        "hs_1",
+        "hs_2",
+        "hs_3",
+        "hs_4"
+      ],
+      "settings": {
+        "color_scheme": "scheme-2",
+        "eyebrow": "Tek Üründe 4 Kritik Detay",
+        "heading": "Her Dikişinde <em>Anne Konforu</em>",
+        "subtext": "Görsel üzerindeki numaralara dokunarak yastığın bel, sırt, kolçak ve kılıf detaylarını inceleyin."
+      }
+    },
     "ak_anatomy": {
       "type": "ak-anatomy-compare",
       "blocks": {
@@ -169,7 +224,7 @@
         "row_5"
       ],
       "settings": {
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "eyebrow": "Ölçü & Kalite Farkı",
         "heading": "Neden Sıradan Yastıklar Yerine <em>Anne Keyfi?</em>",
         "subtext": "İki yastığı üst üste koyduğunuzda kayar ve belinizi boşta bırakır. Anne Keyfi kolçaklı yastığı ise gövdenizi tek parça halinde sarar.",
@@ -216,12 +271,13 @@
         "acc_4"
       ],
       "settings": {
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-2",
         "product": "",
         "rating_text": "4.9 (140+ Mutlu Anne)",
         "promo_badge": "Ücretsiz Kargo",
         "short_description": "Kolçaklı yapısıyla otururken bel ve kolları destekleyen, yarı uzanma pozisyonunda rahat nefes almayı sağlayan 54 × 42 cm büyük boy ergonomik yastık.",
         "add_label": "Sepete Ekle",
+        "enable_pack_selector": true,
         "demo_title": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı",
         "demo_price": "1.290,00 TL",
         "demo_compare_price": "1.590,00 TL"
@@ -261,7 +317,7 @@
         "rev_3"
       ],
       "settings": {
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "eyebrow": "Gerçek Deneyimler",
         "heading": "Annelerin <em>Keyif Anları</em>"
       }
@@ -313,7 +369,7 @@
         "faq_5"
       ],
       "settings": {
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-2",
         "eyebrow": "Merak Edilenler",
         "heading": "Sıkça Sorulan <em>Sorular</em>"
       }
@@ -323,6 +379,7 @@
     "ak_hero",
     "ak_trust",
     "ak_positions",
+    "ak_hotspots",
     "ak_anatomy",
     "ak_product",
     "ak_testimonials",
