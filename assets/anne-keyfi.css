@@ -38,19 +38,25 @@ html {
 .ak-header,
 .ak-hero,
 .ak-section,
-.ak-section.color-scheme-1 {
+.ak-section.color-scheme-1,
+.ak-hero.color-scheme-1 {
   background-color: var(--ak-cream);
   color: var(--ak-espresso);
 }
 
 .ak-trust,
-#ak-hotspots,
-#ak-buybox,
-#ak-faq,
 .ak-trust.color-scheme-2,
-.ak-section.color-scheme-2 {
+.ak-section.color-scheme-2,
+.ak-hero.color-scheme-2 {
   background-color: var(--ak-oat);
   color: var(--ak-espresso);
+}
+
+.ak-hero__media-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
 .announcement-bar-section .utility-bar,
@@ -525,7 +531,24 @@ html {
   }
 }
 
+.ak-buybox--first {
+  padding-top: 3.2rem;
+  padding-bottom: 4.8rem;
+}
+
+@media screen and (min-width: 990px) {
+  .ak-buybox--first {
+    padding-top: 4.4rem;
+    padding-bottom: 6rem;
+  }
+  .ak-gallery {
+    position: sticky;
+    top: 9.2rem;
+  }
+}
+
 .ak-gallery__main {
+  position: relative;
   border-radius: 24px;
   overflow: hidden;
   background: var(--ak-oat);
@@ -533,29 +556,168 @@ html {
   border: 1px solid var(--ak-border);
 }
 
-.ak-gallery__main img {
+.ak-gallery__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  scrollbar-width: none;
+}
+
+.ak-gallery__track::-webkit-scrollbar {
+  display: none;
+}
+
+.ak-gallery__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+}
+
+.ak-gallery__zoom-btn {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: zoom-in;
+  position: relative;
+}
+
+.ak-gallery__zoom-btn img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
+.ak-gallery__video-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+}
+
+.ak-gallery__video-wrap video,
+.ak-gallery__video-wrap iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ak-gallery__zoom-badge {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border-radius: 50%;
+  background: rgba(247, 244, 240, 0.92);
+  color: var(--ak-espresso);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(46, 42, 39, 0.16);
+  pointer-events: none;
+  transition: transform 0.2s var(--ak-ease);
+}
+
+.ak-gallery__zoom-btn:hover .ak-gallery__zoom-badge {
+  transform: scale(1.08);
+}
+
+.ak-gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1px solid var(--ak-border);
+  background: rgba(247, 244, 240, 0.92);
+  color: var(--ak-espresso);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(46, 42, 39, 0.16);
+  transition: transform 0.2s var(--ak-ease), background-color 0.2s var(--ak-ease);
+}
+
+.ak-gallery__nav:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.ak-gallery__nav--prev {
+  left: 1.2rem;
+}
+
+.ak-gallery__nav--next {
+  right: 1.2rem;
+}
+
+.ak-gallery__counter {
+  position: absolute;
+  left: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 3;
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--ak-radius-pill);
+  background: rgba(46, 42, 39, 0.78);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
 .ak-gallery__thumbs {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
   gap: 1rem;
   margin-top: 1.2rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.4rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(46, 42, 39, 0.25) transparent;
 }
 
 .ak-gallery__thumb {
+  flex: 0 0 6.8rem;
+  width: 6.8rem;
+  height: 6.8rem;
   border-radius: 12px;
   overflow: hidden;
   border: 2px solid transparent;
   padding: 0;
   cursor: pointer;
   background: var(--ak-oat);
-  aspect-ratio: 1 / 1;
+  scroll-snap-align: start;
   transition: border-color 0.2s var(--ak-ease), transform 0.2s var(--ak-ease);
+}
+
+@media screen and (min-width: 750px) {
+  .ak-gallery__thumb {
+    flex: 0 0 7.6rem;
+    width: 7.6rem;
+    height: 7.6rem;
+  }
 }
 
 .ak-gallery__thumb.is-active {
@@ -567,6 +729,140 @@ html {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Lightbox Modal */
+.ak-lightbox {
+  border: none;
+  padding: 0;
+  margin: auto;
+  width: min(94vw, 96rem);
+  max-width: 96rem;
+  max-height: 92vh;
+  border-radius: 22px;
+  background: #1f1c1a;
+  color: #f7f4f0;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.ak-lightbox::backdrop {
+  background: rgba(24, 21, 19, 0.82);
+}
+
+.ak-lightbox__inner {
+  display: flex;
+  flex-direction: column;
+  height: min(88vh, 82rem);
+}
+
+.ak-lightbox__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ak-lightbox__counter {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: rgba(247, 244, 240, 0.86);
+}
+
+.ak-lightbox__close {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ak-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ak-lightbox__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.ak-lightbox__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ak-lightbox__track::-webkit-scrollbar {
+  display: none;
+}
+
+.ak-lightbox__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem;
+}
+
+.ak-lightbox__slide img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.ak-gallery__video-wrap--lightbox {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.ak-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(31, 28, 26, 0.78);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ak-lightbox__nav:hover {
+  background: rgba(196, 125, 99, 0.92);
+}
+
+.ak-lightbox__nav--prev {
+  left: 1.2rem;
+}
+
+.ak-lightbox__nav--next {
+  right: 1.2rem;
 }
 
 .ak-rating-row {
@@ -1191,3 +1487,180 @@ html {
   color: var(--ak-stone);
 }
 
+
+/* ==========================================================================
+   12. Defensive Theme & Checkout Visibility Fallbacks (Cart, Product, Footer)
+   ========================================================================== */
+:root {
+  --color-background: 247, 244, 240;
+  --gradient-background: #f7f4f0;
+  --color-foreground: 46, 42, 39;
+  --color-background-contrast: 234, 227, 218;
+  --color-shadow: 46, 42, 39;
+  --color-button: 196, 125, 99;
+  --color-button-text: 255, 255, 255;
+  --color-secondary-button: 247, 244, 240;
+  --color-secondary-button-text: 46, 42, 39;
+  --color-link: 46, 42, 39;
+  --color-badge-foreground: 46, 42, 39;
+  --color-badge-background: 247, 244, 240;
+  --color-badge-border: 46, 42, 39;
+  --alpha-button-background: 1;
+  --alpha-button-border: 1;
+}
+
+/* Guarantee scroll-triggered product/footer/search sections never remain invisible */
+.product__info-wrapper.scroll-trigger,
+.footer .scroll-trigger,
+.template-search__header.scroll-trigger,
+.collection.scroll-trigger {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Guarantee visible, high-contrast buttons & inputs on /cart, /products/*, /collections/*, /search */
+.cart__checkout-button,
+.product-form__submit,
+.cart__warnings .button,
+.cart-drawer .cart__checkout-button {
+  background-color: var(--ak-terracotta) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--ak-terracotta) !important;
+  border-radius: var(--ak-radius-pill) !important;
+  min-height: 5rem;
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: 0 10px 24px -10px rgba(196, 125, 99, 0.55);
+  transition: background-color 0.22s var(--ak-ease), transform 0.22s var(--ak-ease), box-shadow 0.22s var(--ak-ease);
+}
+
+.cart__checkout-button:not([disabled]):hover,
+.product-form__submit:not([disabled]):hover,
+.cart__warnings .button:hover,
+.cart-drawer .cart__checkout-button:not([disabled]):hover {
+  background-color: var(--ak-terracotta-dark) !important;
+  border-color: var(--ak-terracotta-dark) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -10px rgba(196, 125, 99, 0.7);
+}
+
+.cart__checkout-button::after,
+.product-form__submit::after,
+.cart__warnings .button::after {
+  display: none !important;
+}
+
+.ak-buy-now-btn {
+  width: 100%;
+  min-height: 4.8rem;
+  margin-bottom: 1.4rem;
+  background-color: var(--ak-espresso);
+  color: var(--ak-cream);
+  border-color: var(--ak-espresso);
+}
+
+.ak-buy-now-btn:hover:not([disabled]) {
+  background-color: #1f1c1a;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.ak-buy-now-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cart Drawer: keep footer & checkout button pinned and always visible */
+cart-drawer .drawer__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--ak-cream);
+  color: var(--ak-espresso);
+}
+
+cart-drawer:not(.is-empty) cart-drawer-items {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+cart-drawer .drawer__footer {
+  flex-shrink: 0;
+  background-color: var(--ak-cream);
+  padding: 1.4rem 0 2rem;
+}
+
+cart-drawer .cart-drawer__footer .tax-note {
+  margin: 0.6rem 0 1.2rem;
+}
+
+/* Cart Page (/cart): compact spacing so totals & checkout CTA sit comfortably in view */
+.cart__footer {
+  padding-top: 1.6rem !important;
+}
+
+.cart__footer > * + * {
+  margin-top: 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .cart__footer > * + * {
+    margin-top: 0;
+  }
+}
+
+.cart__note .field__input,
+.footer .field__input,
+.template-search .field__input {
+  background-color: #ffffff;
+  color: var(--ak-espresso);
+  border: 1px solid rgba(46, 42, 39, 0.28);
+  border-radius: 12px;
+}
+
+.footer .newsletter-form__button {
+  color: var(--ak-espresso);
+}
+
+/* Prevent fixed sticky bar from covering footer copyright / policy links */
+.footer {
+  background-color: var(--ak-cream);
+  color: var(--ak-espresso);
+  padding-bottom: 8.5rem !important;
+}
+
+/* Header Search & Account icon links */
+.ak-header__icon-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1px solid var(--ak-border);
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+  transition: border-color 0.2s var(--ak-ease), color 0.2s var(--ak-ease);
+}
+
+.ak-header__icon-link:hover {
+  border-color: var(--ak-terracotta);
+  color: var(--ak-terracotta-dark);
+}
+
+@media screen and (max-width: 520px) {
+  .ak-header__cta {
+    display: none;
+  }
+  .ak-header__icon-link,
+  .ak-header__cart {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
+}

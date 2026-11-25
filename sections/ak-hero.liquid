@@ -6,6 +6,10 @@
   if hero_image == blank and hero_product != blank
     assign hero_image = hero_product.featured_media
   endif
+  assign hero_heading_tag = 'h2'
+  if section.index == 1
+    assign hero_heading_tag = 'h1'
+  endif
 -%}
 
 <section
@@ -19,9 +23,9 @@
           <div class="ak-eyebrow">{{ section.settings.eyebrow | escape }}</div>
         {%- endif -%}
 
-        <h1 class="ak-heading ak-hero__title">
+        <{{ hero_heading_tag }} class="ak-heading ak-hero__title">
           {{ section.settings.heading }}
-        </h1>
+        </{{ hero_heading_tag }}>
 
         {%- if section.settings.subtext != blank -%}
           <p class="ak-lead">{{ section.settings.subtext | escape }}</p>
@@ -69,19 +73,19 @@
       </div>
 
       <div class="ak-hero__media-wrap">
-        {%- if hero_image != blank -%}
-          {%- assign hero_alt = hero_image.alt | default: section.settings.heading | strip_html | escape -%}
-          {{
-            hero_image
-            | image_url: width: 1200
-            | image_tag:
-              widths: '540, 760, 980, 1200',
-              sizes: '(min-width: 990px) 48vw, 94vw',
-              alt: hero_alt,
-              loading: 'eager',
-              fetchpriority: 'high'
-          }}
-        {%- else -%}
+        <a href="{{ cta_anchor }}" class="ak-hero__media-link" aria-label="{{ section.settings.cta_label | escape }}">
+          {%- if hero_image != blank -%}
+            {%- assign hero_alt = hero_image.alt | default: section.settings.heading | strip_html | escape -%}
+            {{
+              hero_image
+              | image_url: width: 1200
+              | image_tag:
+                widths: '540, 760, 980, 1200',
+                sizes: '(min-width: 990px) 48vw, 94vw',
+                alt: hero_alt,
+                loading: 'lazy'
+            }}
+          {%- else -%}
           <svg
             viewBox="0 0 600 630"
             width="600"
@@ -138,7 +142,8 @@
               54 × 42 cm · Ergonomik
             </text>
           </svg>
-        {%- endif -%}
+          {%- endif -%}
+        </a>
 
         {%- if section.settings.badge_title != blank -%}
           <div class="ak-hero__floating-badge">

@@ -1,42 +1,17 @@
 {
   "sections": {
-    "ak_product": {
-      "type": "ak-featured-product",
-      "blocks": {
-        "acc_1": {
-          "type": "accordion",
-          "settings": {
-            "title": "Kumaş & İç Dolgu Özellikleri",
-            "content": "<p>%65 Pamuk / %35 Polyester nefes alan, yumuşak dokulu dış kumaş. İç dolguda vücut şeklinize uyum sağlayan 650+ gr boncuk elyaf bulunur.</p>"
-          }
-        },
-        "acc_2": {
-          "type": "accordion",
-          "settings": {
-            "title": "Ölçüler & Ergonomik Yapı",
-            "content": "<p><strong>Genişlik:</strong> 54 cm · <strong>Yükseklik:</strong> 42 cm. Geniş yan kolçakları sayesinde otururken dirseklerinizi ve sırtınızı aynı anda destekler.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "acc_1",
-        "acc_2"
-      ],
+    "main": {
+      "type": "main-list-collections",
       "settings": {
-        "color_scheme": "scheme-1",
-        "product": "",
-        "rating_text": "4.9 (140+ Mutlu Anne)",
-        "promo_badge": "Ücretsiz Kargo",
-        "short_description": "Kolçaklı yapısıyla otururken bel ve kolları destekleyen, yarı uzanma pozisyonunda rahat nefes almayı sağlayan 54 × 42 cm büyük boy ergonomik yastık.",
-        "add_label": "Sepete Ekle",
-        "enable_pack_selector": true,
-        "demo_title": "Anne Keyfi Kolçaklı Ergonomik Hamile & Dinlenme Yastığı",
-        "demo_price": "1.290,00 TL",
-        "demo_compare_price": "1.590,00 TL"
+        "title": "Koleksiyonlar",
+        "sort": "alphabetical",
+        "image_ratio": "square",
+        "columns_desktop": 3,
+        "columns_mobile": "2"
       }
     }
   },
   "order": [
-    "ak_product"
+    "main"
   ]
 }

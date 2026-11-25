@@ -9,11 +9,19 @@
   if ak_product == blank
     assign demo_mode = true
   endif
+
+  assign product_heading_tag = 'h2'
+  if section.index == 1
+    assign product_heading_tag = 'h1'
+  endif
+
+  assign active_media = current_variant.featured_media | default: ak_product.featured_media
+  assign media_count = ak_product.media.size
 -%}
 
 <section
   id="ak-buybox"
-  class="ak-section color-{{ section.settings.color_scheme }} gradient"
+  class="ak-section{% if section.index == 1 %} ak-buybox--first{% endif %} color-{{ section.settings.color_scheme }} gradient"
   data-ak-buybox
   data-money-format="{{ shop.money_format | escape }}"
   data-add-text="{{ section.settings.add_label | escape }}"
@@ -24,16 +32,94 @@
       <!-- Sol: Ürün Galerisi -->
       <div class="ak-gallery">
         <div class="ak-gallery__main">
-          {%- if ak_product != blank and ak_product.featured_media != blank -%}
-            {%- assign first_media = current_variant.featured_media | default: ak_product.featured_media -%}
-            <img
-              data-ak-main-img
-              src="{{ first_media | image_url: width: 1100 }}"
-              alt="{{ first_media.alt | default: ak_product.title | escape }}"
-              width="1100"
-              height="1100"
-              loading="lazy"
+          {%- if ak_product != blank and media_count > 0 -%}
+            <div
+              class="ak-gallery__track"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="{{ ak_product.title | escape }} görselleri"
+              data-ak-track
             >
+              {%- for media in ak_product.media -%}
+                <div
+                  class="ak-gallery__slide"
+                  data-ak-slide
+                  data-index="{{ forloop.index0 }}"
+                  data-media-id="{{ media.id }}"
+                >
+                  {%- if media.media_type == 'image' -%}
+                    <button
+                      type="button"
+                      class="ak-gallery__zoom-btn"
+                      data-ak-open-lightbox
+                      data-index="{{ forloop.index0 }}"
+                      aria-label="Fotoğrafı büyüt ({{ forloop.index }} / {{ media_count }})"
+                    >
+                      {%- if forloop.first and section.index == 1 -%}
+                        <img
+                          src="{{ media | image_url: width: 1200 }}"
+                          srcset="{{ media | image_url: width: 600 }} 600w, {{ media | image_url: width: 900 }} 900w, {{ media | image_url: width: 1200 }} 1200w"
+                          sizes="(min-width: 990px) 46vw, 94vw"
+                          alt="{{ media.alt | default: ak_product.title | escape }}"
+                          width="{{ media.width | default: 1200 }}"
+                          height="{{ media.height | default: 1200 }}"
+                          loading="eager"
+                          fetchpriority="high"
+                        >
+                      {%- else -%}
+                        <img
+                          src="{{ media | image_url: width: 1200 }}"
+                          srcset="{{ media | image_url: width: 600 }} 600w, {{ media | image_url: width: 900 }} 900w, {{ media | image_url: width: 1200 }} 1200w"
+                          sizes="(min-width: 990px) 46vw, 94vw"
+                          alt="{{ media.alt | default: ak_product.title | escape }}"
+                          width="{{ media.width | default: 1200 }}"
+                          height="{{ media.height | default: 1200 }}"
+                          loading="lazy"
+                        >
+                      {%- endif -%}
+                      <span class="ak-gallery__zoom-badge" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="11" cy="11" r="7" />
+                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                          <line x1="11" y1="8" x2="11" y2="14" />
+                          <line x1="8" y1="11" x2="14" y2="11" />
+                        </svg>
+                      </span>
+                    </button>
+                  {%- else -%}
+                    <div class="ak-gallery__video-wrap">
+                      {{ media | media_tag: image_size: '1100x', controls: true }}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
+
+            {%- if media_count > 1 -%}
+              <button
+                type="button"
+                class="ak-gallery__nav ak-gallery__nav--prev"
+                data-ak-prev
+                aria-label="Önceki fotoğraf"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="ak-gallery__nav ak-gallery__nav--next"
+                data-ak-next
+                aria-label="Sonraki fotoğraf"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+              <div class="ak-gallery__counter" data-ak-counter aria-live="polite">
+                1 / {{ media_count }}
+              </div>
+            {%- endif -%}
           {%- else -%}
             <svg
               viewBox="0 0 600 600"
@@ -69,19 +155,28 @@
           {%- endif -%}
         </div>
 
-        {%- if ak_product != blank and ak_product.media.size > 1 -%}
-          <div class="ak-gallery__thumbs">
-            {%- for media in ak_product.media limit: 5 -%}
+        {%- if ak_product != blank and media_count > 1 -%}
+          <div class="ak-gallery__thumbs" data-ak-thumbs role="list" aria-label="Küçük ürün görselleri">
+            {%- for media in ak_product.media -%}
+              {%- assign is_initial = false -%}
+              {%- if active_media != blank and media.id == active_media.id -%}
+                {%- assign is_initial = true -%}
+              {%- elsif active_media == blank and forloop.first -%}
+                {%- assign is_initial = true -%}
+              {%- endif -%}
               <button
                 type="button"
-                class="ak-gallery__thumb{% if forloop.first %} is-active{% endif %}"
+                class="ak-gallery__thumb{% if is_initial %} is-active{% endif %}"
                 data-ak-thumb
-                data-src="{{ media | image_url: width: 1100 }}"
+                data-index="{{ forloop.index0 }}"
+                data-media-id="{{ media.id }}"
+                data-src="{{ media.preview_image | image_url: width: 1200 }}"
                 data-alt="{{ media.alt | default: ak_product.title | escape }}"
                 aria-label="Ürün görseli {{ forloop.index }}"
+                aria-current="{% if is_initial %}true{% else %}false{% endif %}"
               >
                 <img
-                  src="{{ media | image_url: width: 220 }}"
+                  src="{{ media.preview_image | image_url: width: 220 }}"
                   alt="{{ media.alt | default: ak_product.title | escape }}"
                   width="220"
                   height="220"
@@ -100,13 +195,13 @@
           <span>{{ section.settings.rating_text | escape }}</span>
         </div>
 
-        <h2 class="ak-buybox__title">
+        <{{ product_heading_tag }} class="ak-buybox__title">
           {%- if demo_mode -%}
             {{ section.settings.demo_title | escape }}
           {%- else -%}
             {{ ak_product.title | escape }}
           {%- endif -%}
-        </h2>
+        </{{ product_heading_tag }}>
 
         <div class="ak-price-row">
           <span class="ak-price-current" data-ak-price>
@@ -250,6 +345,15 @@
             </button>
           </div>
 
+          <button
+            type="button"
+            class="ak-btn ak-buy-now-btn"
+            data-ak-buy-now
+            {% if ak_product != blank and current_variant.available == false %}disabled{% endif %}
+          >
+            Hemen Satın Al →
+          </button>
+
           <p data-ak-feedback hidden style="margin:0 0 1.2rem;font-size:1.35rem;color:#AE684F;font-weight:500;"></p>
         </form>
 
@@ -290,7 +394,11 @@
         {%- endif -%}
       </strong>
       <span>
-        Renk: <em data-ak-sticky-color style="font-style:normal;">Antrasit</em> ·
+        {%- if ak_product != blank and ak_product.has_only_default_variant == false -%}
+          Renk: <em data-ak-sticky-color style="font-style:normal;">{{ current_variant.option1 | escape }}</em> ·
+        {%- elsif demo_mode -%}
+          Renk: <em data-ak-sticky-color style="font-style:normal;">Antrasit</em> ·
+        {%- endif -%}
         <strong data-ak-sticky-price style="display:inline;font-size:1.25rem;">
           {%- if demo_mode -%}
             {{ section.settings.demo_price | escape }}
@@ -304,6 +412,57 @@
       {{ section.settings.add_label | escape }}
     </button>
   </div>
+
+  {%- if ak_product != blank and media_count > 0 -%}
+    <dialog class="ak-lightbox" data-ak-lightbox aria-label="{{ ak_product.title | escape }} fotoğraf büyütme">
+      <div class="ak-lightbox__inner">
+        <div class="ak-lightbox__topbar">
+          <span class="ak-lightbox__counter" data-ak-lightbox-counter>1 / {{ media_count }}</span>
+          <button type="button" class="ak-lightbox__close" data-ak-lightbox-close aria-label="Kapat">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="ak-lightbox__stage">
+          <div class="ak-lightbox__track" data-ak-lightbox-track>
+            {%- for media in ak_product.media -%}
+              <div class="ak-lightbox__slide" data-ak-lightbox-slide data-index="{{ forloop.index0 }}">
+                {%- if media.media_type == 'image' -%}
+                  <img
+                    src="{{ media | image_url: width: 1800 }}"
+                    alt="{{ media.alt | default: ak_product.title | escape }}"
+                    width="{{ media.width | default: 1800 }}"
+                    height="{{ media.height | default: 1800 }}"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  <div class="ak-gallery__video-wrap ak-gallery__video-wrap--lightbox">
+                    {{ media | media_tag: image_size: '1600x', controls: true }}
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+
+          {%- if media_count > 1 -%}
+            <button type="button" class="ak-lightbox__nav ak-lightbox__nav--prev" data-ak-lightbox-prev aria-label="Önceki fotoğraf">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button type="button" class="ak-lightbox__nav ak-lightbox__nav--next" data-ak-lightbox-next aria-label="Sonraki fotoğraf">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          {%- endif -%}
+        </div>
+      </div>
+    </dialog>
+  {%- endif -%}
 
   {%- if ak_product != blank -%}
     <script type="application/json" data-ak-variants-json>

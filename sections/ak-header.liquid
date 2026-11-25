@@ -61,6 +61,32 @@
       {%- endif -%}
 
       <a
+        href="{{ routes.search_url }}"
+        class="ak-header__icon-link"
+        aria-label="Ara"
+        title="Ara"
+      >
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </a>
+
+      {%- if shop.customer_accounts_enabled -%}
+        <a
+          href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          class="ak-header__icon-link"
+          aria-label="Hesabım"
+          title="Hesabım"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </a>
+      {%- endif -%}
+
+      <a
         href="{{ routes.cart_url }}"
         class="ak-header__cart header__icon header__icon--cart link focus-inset"
         id="cart-icon-bubble"

@@ -28,7 +28,7 @@
         "highlight_3"
       ],
       "settings": {
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-2",
         "eyebrow": "Hamilelik & Dinlenme Konforu",
         "heading": "Otururken ve Uzanırken <em>Tam Bel & Kol Desteği</em>",
         "subtext": "Hamilelik döneminde artan bel ve sırt yükünü hafifletmek için tasarlanan kolçaklı büyük boy destek yastığı. Kitap okurken, TV izlerken ya da yarı uzanırken vücudunuza uyum sağlar.",
@@ -271,7 +271,7 @@
         "acc_4"
       ],
       "settings": {
-        "color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
         "product": "",
         "rating_text": "4.9 (140+ Mutlu Anne)",
         "promo_badge": "Ücretsiz Kargo",
@@ -376,12 +376,12 @@
     }
   },
   "order": [
-    "ak_hero",
+    "ak_product",
     "ak_trust",
     "ak_positions",
     "ak_hotspots",
     "ak_anatomy",
-    "ak_product",
+    "ak_hero",
     "ak_testimonials",
     "ak_faq"
   ]
