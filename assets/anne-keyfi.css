@@ -519,14 +519,28 @@ html {
    ========================================================================== */
 .ak-buybox__grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 3.4rem;
   align-items: start;
 }
 
+.ak-buybox__grid > *,
+.ak-hero__grid > *,
+.ak-compare__grid > *,
+.ak-hotspots__grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ak-gallery,
+.ak-gallery__main,
+.ak-gallery__thumbs {
+  max-width: 100%;
+}
+
 @media screen and (min-width: 990px) {
   .ak-buybox__grid {
-    grid-template-columns: 1.05fr 1fr;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
     gap: 5.2rem;
   }
 }
