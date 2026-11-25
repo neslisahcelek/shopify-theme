@@ -457,16 +457,28 @@
 
     if (stickyBar && 'IntersectionObserver' in window) {
       const target = submitBtn || root;
+      const footerEl = document.querySelector('footer, .footer');
+      let passedBuybox = false;
+      let footerVisible = false;
+      const syncSticky = () => {
+        stickyBar.classList.toggle('is-visible', passedBuybox && !footerVisible);
+      };
+
       const obs = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            const passed = !entry.isIntersecting && entry.boundingClientRect.top < 0;
-            stickyBar.classList.toggle('is-visible', passed);
+            if (entry.target === target) {
+              passedBuybox = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+            } else if (entry.target === footerEl) {
+              footerVisible = entry.isIntersecting;
+            }
           });
+          syncSticky();
         },
         { threshold: 0 }
       );
       obs.observe(target);
+      if (footerEl) obs.observe(footerEl);
     }
   });
 })();
